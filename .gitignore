@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.env
+.DS_Store
+
+# Uni-app
+node_modules/
+unpackage/
+dist/
+
+# Deep Learning
+*.pt
+*.pth
+datasets/images/*
+!datasets/images/.gitkeep
+
+# IDE
+.idea/
+.vscode/
+*.swp
