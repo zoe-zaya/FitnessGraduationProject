@@ -160,7 +160,7 @@ c. 类别间性能差异显著
 | ——  | Treadmill 63.8% | ——  |
 | ——  | Yoga Mat 78.7% | ——  |
 ### (4)查看验证集损失
-![](result.png)
+![](01_DeepLearning/docs/results.png)
 分析损失曲线：
 
 ①　Precision 和 Recall 均呈上升趋势，说明模型学习能力正常。
