@@ -15,7 +15,7 @@ engine = create_engine(
     SQLALCHEMY_DATABASE_URL,
     pool_pre_ping=True,  # 连接前 ping 测试
     pool_recycle=3600,   # 1 小时回收连接
-    echo=False           # 生产环境关闭 SQL 日志
+    echo=True           # False生产环境关闭 SQL 日志 # True临时开启 SQL 日志，便于调试
 )
 
 # 创建会话工厂
@@ -42,4 +42,5 @@ def init_db():
     初始化数据库：创建所有表
     在应用启动时调用
     """
+    from app.models import User, EquipmentInventory, GymEquipment, TrainingAction, TrainingPlan, PlanSession, SessionActionItem
     Base.metadata.create_all(bind=engine)

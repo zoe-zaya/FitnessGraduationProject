@@ -11,6 +11,8 @@ from sqlalchemy import Column, String, Integer, ForeignKey, Text, Enum
 from sqlalchemy.orm import relationship
 import enum
 from app.utils.db import Base
+from datetime import datetime
+from sqlalchemy import DateTime
 
 
 class ActionCategoryEnum(str, enum.Enum):
