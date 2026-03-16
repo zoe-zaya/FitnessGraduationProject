@@ -6,7 +6,7 @@ User（用户）业务对象模型
 
 from sqlalchemy import Column, String, Integer, Double, DateTime, Enum
 from sqlalchemy.orm import relationship
-from datetime import datetime
+from datetime import date, datetime
 import enum
 from app.utils.db import Base
 
@@ -39,7 +39,7 @@ class User(Base):
     # === 表 2-1 定义属性 ===
     user_id = Column(String(64), primary_key=True, index=True, comment="用户唯一标识符，系统自动生成")
     name = Column(String(64), nullable=False, index=True, comment="用户姓名或昵称")
-    age = Column(Integer, nullable=True, comment="用户年龄（岁），作为动作难度筛选与安全评估的依据")
+    age = Column(Integer, nullable=True, comment="用户年龄（岁），建议由生日动态计算")
     gender = Column(Enum(GenderEnum), nullable=True, comment="用户性别，影响目标肌群训练侧重")
     height = Column(Double, nullable=True, comment="身高（厘米），结合体重计算 BMI")
     weight = Column(Double, nullable=True, comment="体重（千克），结合身高计算 BMI")
@@ -68,8 +68,34 @@ class User(Base):
             return round(self.weight / ((self.height / 100) ** 2), 2)
         return None
 
+    def calculate_age(self):
+        """
+        根据生日动态计算年龄
+        确保年龄随当前日期变化实时准确
+        """
+        if not self.birthday:
+            return self.age  # 如果没有生日，返回存储的年龄（可能为空）
+        
+        today = datetime.now().date()
+        birth_date = self.birthday.date() if isinstance(self.birthday, datetime) else self.birthday
+        
+        # 计算年龄
+        age = today.year - birth_date.year
+        if (today.month, today.day) < (birth_date.month, birth_date.day):
+            age -= 1
+        
+        return age if age > 0 else 0
+    
+    def update_age_from_birthday(self):
+        """
+        当生日更新时，同步更新数据库中的 age 字段
+        """
+        if self.birthday:
+            self.age = self.calculate_age()
+
     def is_profile_complete(self):
         """检查用户基本信息是否完整（业务规则：首次使用必须录入）"""
-        required_fields = [self.age, self.gender, self.height, self.weight, 
+        # 将年龄从必填项中移除，因为它是通过生日计算得出的
+        required_fields = [self.birthday, self.gender, self.height, self.weight, 
                           self.fitness_goal, self.experience_level]
         return all(field is not None for field in required_fields)
