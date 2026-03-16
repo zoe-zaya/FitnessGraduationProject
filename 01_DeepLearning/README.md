@@ -40,9 +40,15 @@
 
 (20)瑜伽垫​ - Yoga Mat
 ## 2.数据采集
-从网站上下载公开图片。
+从网站上下载公开1032张图片。
 ## 3.数据集划分
 划分比例：训练集 (70%) : 验证集 (20%) : 测试集 (10%)。
+
+训练集：714张图
+
+验证集：200张图
+
+测试集：118张图
 ## 4.数据标注
 (1)工具选择：使用LabaelImg
 
@@ -160,7 +166,7 @@ c. 类别间性能差异显著
 | ——  | Treadmill 63.8% | ——  |
 | ——  | Yoga Mat 78.7% | ——  |
 ### (4)查看验证集损失
-![](result.png)
+![](https://github.com/zoe-zaya/FitnessGraduationProject/blob/main/01_DeepLearning/docs/results.png?raw=true)
 分析损失曲线：
 
 ①　Precision 和 Recall 均呈上升趋势，说明模型学习能力正常。
