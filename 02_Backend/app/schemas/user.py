@@ -85,8 +85,8 @@ class UserLoginResponse(BaseModel):
 class UserBodyData(BaseModel):
     """用户身体数据请求模型"""
     gender: Optional[GenderEnum] = Field(None, description="性别")
-    height: Optional[float] = Field(None, ge=160, le=250, description="身高 (厘米)")
-    weight: Optional[float] = Field(None, ge=60, le=300, description="体重 (千克)")
+    height: Optional[float] = Field(None, ge=50, le=250, description="身高 (厘米)")
+    weight: Optional[float] = Field(None, ge=20, le=300, description="体重 (千克)")
     fitness_goal: Optional[FitnessGoalEnum] = Field(None, description="健身目标")
     experience_level: Optional[ExperienceLevelEnum] = Field(None, description="健身经验水平")
 
