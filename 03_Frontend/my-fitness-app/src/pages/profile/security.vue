@@ -1,211 +1,181 @@
 <template>
-    <view class="container">
-      <view class="section">
-        <text class="section-title">修改手机号</text>
-        
-        <view class="input-item">
-          <text class="label">当前手机号</text>
-          <input 
-            v-model="formData.oldPhone" 
-            type="number" 
-            placeholder="请输入当前手机号"
-            class="input"
-            maxlength="11"
-          />
+  <view class="container">
+    <!-- 当前账号信息 -->
+    <view class="account-info">
+      <text class="info-label">当前手机号</text>
+      <text class="info-value">{{ maskedCurrentPhone }}</text>
+    </view>
+    
+    <!-- 功能菜单 -->
+    <view class="menu-section">
+      <!-- 修改手机号 -->
+      <view class="menu-item" @click="navigateToUpdatePhone">
+        <view class="menu-left">
+          <text class="menu-icon">📱</text>
+          <text class="menu-label">修改手机号</text>
         </view>
-        
-        <view class="input-item">
-          <text class="label">新手机号</text>
-          <input 
-            v-model="formData.newPhone" 
-            type="number" 
-            placeholder="请输入新手机号"
-            class="input"
-            maxlength="11"
-          />
+        <view class="menu-right">
+          <text class="arrow">></text>
         </view>
-        
-        <button class="submit-btn" @click="handleUpdatePhone" :loading="loading">
-          修改手机号
-        </button>
       </view>
       
-      <view class="section">
-        <text class="section-title">修改密码</text>
-        
-        <view class="input-item">
-          <text class="label">当前密码</text>
-          <input 
-            v-model="passwordForm.oldPassword" 
-            type="password" 
-            placeholder="请输入当前密码"
-            class="input"
-          />
+      <!-- 修改登录密码 -->
+      <view class="menu-item" @click="navigateToUpdatePassword">
+        <view class="menu-left">
+          <text class="menu-icon">🔐</text>
+          <text class="menu-label">修改登录密码</text>
         </view>
-        
-        <view class="input-item">
-          <text class="label">新密码</text>
-          <input 
-            v-model="passwordForm.newPassword" 
-            type="password" 
-            placeholder="8 位以上，含大小写数字符号"
-            class="input"
-          />
+        <view class="menu-right">
+          <text class="arrow">></text>
         </view>
-        
-        <view class="input-item">
-          <text class="label">确认新密码</text>
-          <input 
-            v-model="passwordForm.confirmPassword" 
-            type="password" 
-            placeholder="请再次输入新密码"
-            class="input"
-          />
-        </view>
-        
-        <button class="submit-btn" @click="handleUpdatePassword" :loading="loading">
-          修改密码
-        </button>
       </view>
     </view>
-  </template>
-  
-  <script setup>
-  import { ref } from 'vue'
-  import { useUserStore } from '@/store/user'
-  import request from '@/utils/request'
-  import { API, PASSWORD_REGEX } from '@/utils/constants'
-  
-  const userStore = useUserStore()
-  const loading = ref(false)
-  
-  const formData = ref({
-    oldPhone: '',
-    newPhone: ''
-  })
-  
-  const passwordForm = ref({
-    oldPassword: '',
-    newPassword: '',
-    confirmPassword: ''
-  })
-  
-  const handleUpdatePhone = async () => {
-    if (!formData.value.oldPhone || formData.value.oldPhone.length !== 11) {
-      uni.showToast({ title: '请输入正确的当前手机号', icon: 'none' })
-      return
-    }
     
-    if (!formData.value.newPhone || formData.value.newPhone.length !== 11) {
-      uni.showToast({ title: '请输入正确的新手机号', icon: 'none' })
-      return
-    }
-    
-    loading.value = true
-    
+    <!-- 安全提示 -->
+    <!--<view class="security-tip">
+      <text class="tip-title">💡 安全提示</text>
+      <text class="tip-content">
+        为了您的账号安全，建议定期更换密码，不要使用过于简单的密码
+      </text>
+    </view>-->
+  </view>
+</template>
+
+<script setup>
+import { computed } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
+import { useUserStore } from '@/store/user'
+import request from '@/utils/request'
+import { API } from '@/utils/constants'
+
+const userStore = useUserStore()
+const currentUserPhone = computed(() => userStore.userInfo.phone || '未绑定')
+const maskedCurrentPhone = computed(() => {
+  if (!userStore.userInfo.phone) {
+    return '未绑定'
+  }
+  // 隐藏手机号中间4位数字
+  const phone = userStore.userInfo.phone
+  return phone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2')
+})
+
+/**
+ * 页面显示时刷新用户信息
+ */
+onShow(async () => {
+  if (userStore.isLogin) {
     try {
-      await request.put(API.USER_SECURITY, {
-        type: 'phone',
-        old_value: formData.value.oldPhone,
-        new_value: formData.value.newPhone
-      })
-      
-      uni.showToast({ title: '手机号修改成功', icon: 'success' })
+      const res = await request.get(API.USER_ME)
+      userStore.updateUserInfo(res)
     } catch (error) {
-      console.error('修改失败:', error)
-    } finally {
-      loading.value = false
+      console.error('获取用户信息失败:', error)
     }
   }
+})
+
+/**
+ * 跳转至修改手机号页面
+ */
+const navigateToUpdatePhone = () => {
+  uni.navigateTo({ url: '/pages/profile/update-phone' })
+}
+
+/**
+ * 跳转至修改登录密码页面
+ */
+const navigateToUpdatePassword = () => {
+  uni.navigateTo({ url: '/pages/profile/update-password' })
+}
+</script>
+
+<style lang="scss" scoped>
+@import '@/uni.scss';
+
+.container {
+  min-height: 100vh;
+  background: $fitness-bg;
+  padding: 40rpx;
+}
+
+.account-info {
+  background: #FFFFFF;
+  border-radius: $radius-md;
+  padding: 30rpx;
+  margin-bottom: 30rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   
-  const handleUpdatePassword = async () => {
-    // 密码复杂度校验
-    if (!PASSWORD_REGEX.test(passwordForm.value.newPassword)) {
-      uni.showToast({ 
-        title: '密码需 8 位以上，含大小写字母、数字和特殊符号', 
-        icon: 'none' 
-      })
-      return
-    }
-    
-    // 确认密码校验
-    if (passwordForm.value.newPassword !== passwordForm.value.confirmPassword) {
-      uni.showToast({ title: '两次密码不一致', icon: 'none' })
-      return
-    }
-    
-    loading.value = true
-    
-    try {
-      await request.put(API.USER_SECURITY, {
-        type: 'password',
-        old_value: passwordForm.value.oldPassword,
-        new_value: passwordForm.value.newPassword,
-        confirm_value: passwordForm.value.confirmPassword
-      })
-      
-      uni.showToast({ title: '密码修改成功', icon: 'success' })
-    } catch (error) {
-      console.error('修改失败:', error)
-    } finally {
-      loading.value = false
-    }
-  }
-  </script>
-  
-  <style lang="scss" scoped>
-  @import '@/uni.scss';
-  
-  .container {
-    min-height: 100vh;
-    background: $fitness-bg;
-    padding: 40rpx;
+  .info-label {
+    font-size: $font-md;
+    color: $fitness-text-light;
   }
   
-  .section {
-    background: #FFFFFF;
-    border-radius: $radius-md;
+  .info-value {
+    font-size: $font-lg;
+    font-weight: bold;
+    color: $fitness-text;
+  }
+}
+
+.menu-section {
+  background: #FFFFFF;
+  border-radius: $radius-md;
+  margin-bottom: 30rpx;
+  
+  .menu-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     padding: 30rpx;
-    margin-bottom: 40rpx;
+    border-bottom: 1rpx solid $fitness-bg;
     
-    .section-title {
-      display: block;
-      font-size: $font-lg;
-      font-weight: bold;
-      color: $fitness-text;
-      margin-bottom: 30rpx;
+    &:last-child {
+      border-bottom: none;
     }
     
-    .input-item {
-      margin-bottom: 30rpx;
+    .menu-left {
+      display: flex;
+      align-items: center;
       
-      .label {
-        display: block;
-        font-size: $font-md;
-        color: $fitness-text-light;
-        margin-bottom: 15rpx;
+      .menu-icon {
+        font-size: 40rpx;
+        margin-right: 20rpx;
       }
       
-      .input {
-        width: 100%;
-        height: 90rpx;
-        background: $fitness-bg;
-        border: 1rpx solid $fitness-border;
-        border-radius: $radius-sm;
-        padding: 0 30rpx;
+      .menu-label {
         font-size: $font-md;
-        box-sizing: border-box;
+        color: $fitness-text;
       }
     }
     
-    .submit-btn {
-      width: 100%;
-      height: 90rpx;
-      background: $fitness-primary;
-      color: #FFFFFF;
-      font-size: $font-lg;
-      border-radius: $radius-xl;
-      border: none;
+    .menu-right {
+      .arrow {
+        font-size: $font-sm;
+        color: $fitness-placeholder;
+      }
     }
   }
-  </style>
+}
+
+.security-tip {
+  background: linear-gradient(135deg, #E3F2FD, #BBDEFB);
+  border-radius: $radius-md;
+  padding: 30rpx;
+  
+  .tip-title {
+    display: block;
+    font-size: $font-md;
+    font-weight: bold;
+    color: #1565C0;
+    margin-bottom: 10rpx;
+  }
+  
+  .tip-content {
+    display: block;
+    font-size: $font-xs;
+    color: #1976D2;
+    line-height: 1.6;
+  }
+}
+</style>

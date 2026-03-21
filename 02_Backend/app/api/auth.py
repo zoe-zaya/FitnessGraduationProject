@@ -221,6 +221,6 @@ async def get_current_user_info(current_user: User = Depends(get_current_user)):
         fitness_goal=current_user.fitness_goal.value if current_user.fitness_goal else None,
         experience_level=current_user.experience_level.value if current_user.experience_level else None,
         avatar_url=current_user.avatar_url,
-        birthday=current_user.birthday.date() if current_user.birthday else None,
+        birthday=current_user.birthday if current_user.birthday else None,
         create_time=current_user.create_time
     )
