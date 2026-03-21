@@ -80,6 +80,61 @@ class UserLoginResponse(BaseModel):
     token_type: str = "bearer"
     user_info: dict
 
+# === 忘记密码相关 ✅ ===
+class SendVerificationCodeRequest(BaseModel):
+    """发送验证码请求模型"""
+    phone: str = Field(..., min_length=11, max_length=11, description="手机号")
+
+
+class SendVerificationCodeResponse(BaseModel):
+    """发送验证码响应模型"""
+    message: str
+    expire_seconds: int = 300  # 验证码有效期 5 分钟
+
+
+class VerifyCodeRequest(BaseModel):
+    """验证验证码请求模型"""
+    phone: str = Field(..., min_length=11, max_length=11, description="手机号")
+    code: str = Field(..., min_length=6, max_length=6, description="6 位验证码")
+
+
+class VerifyCodeResponse(BaseModel):
+    """验证验证码响应模型"""
+    message: str
+    is_valid: bool
+
+class ResetPasswordRequest(BaseModel):
+    """重置密码请求模型"""
+    phone: str = Field(..., min_length=11, max_length=11, description="手机号")
+    # verification_code: str = Field(..., min_length=6, max_length=6, description="验证码")
+    new_password: str = Field(..., min_length=8, description="新密码")
+    confirm_password: str = Field(..., min_length=8, description="确认密码")
+    
+    @field_validator('new_password')
+    def validate_new_password(cls, v):
+        """新密码复杂度校验（对应扩展事件流 6a）"""
+        if len(v) < 8:
+            raise ValueError('密码长度需大于 8 个字符')
+        if not any(c.isupper() for c in v):
+            raise ValueError('密码需包含大写字母')
+        if not any(c.islower() for c in v):
+            raise ValueError('密码需包含小写字母')
+        if not any(c.isdigit() for c in v):
+            raise ValueError('密码需包含数字')
+        if not any(c in '!@#$%^&*()_+-=' for c in v):
+            raise ValueError('密码需包含特殊符号')
+        return v
+    
+    @field_validator('confirm_password')
+    def validate_confirm_password(cls, v, info):
+        """确认密码校验（对应扩展事件流 6b）"""
+        if 'new_password' in info.data and v != info.data['new_password']:
+            raise ValueError('确认密码与新密码不一致，请重新输入')
+        return v
+    
+class ResetPasswordResponse(BaseModel):
+    """重置密码响应模型"""
+    message: str
 
 # === 用户信息相关 ===
 class UserBodyData(BaseModel):

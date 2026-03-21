@@ -35,10 +35,12 @@ export const FITNESS_GOALS = [
     REGISTER: '/api/auth/register',
     LOGIN: '/api/auth/login',
     RESET_PASSWORD: '/api/auth/reset-password',
-    VERIFY_CODE: '/api/auth/verify-code',
-    
-    // 用户
     USER_ME: '/api/auth/me',
+    SEND_VERIFICATION_CODE: '/api/auth/send-verification-code',
+    VERIFY_CODE: '/api/auth/verify-code',
+    RESET_PASSWORD: '/api/auth/reset-password',
+    // 用户
+    
     USER_BODY_DATA: '/api/user/body-data',
     USER_PROFILE: '/api/user/profile',
     USER_SECURITY: '/api/user/security',
