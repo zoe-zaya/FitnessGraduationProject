@@ -51,6 +51,10 @@
         <button class="submit-btn" @click="handleSubmit" :loading="loading">
           确认修改
         </button>
+
+        <view class="forget-password" @click="navigateToForget">
+          忘记密码？
+        </view>
       </view>
       
       <!-- 安全提示 -->
@@ -182,6 +186,9 @@
       loading.value = false
     }
   }
+  const navigateToForget = () => {
+    uni.navigateTo({ url: '/pages/forget-password/step1' })
+  }
   </script>
   
   <style lang="scss" scoped>
@@ -280,6 +287,13 @@
       margin-top: 40rpx;
     }
   }
+
+  .forget-password {
+      text-align: right;
+      font-size: $font-xs;
+      color: $uni-primary;
+      margin-top: 40rpx;
+    }
   
   .security-notice {
     background: linear-gradient(135deg, #E8F5E9, #C8E6C9);
