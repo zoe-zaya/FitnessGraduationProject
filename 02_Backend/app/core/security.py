@@ -22,12 +22,18 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/auth/login")
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    """验证密码"""
+    """
+    验证密码
+    用于登录和修改密码时验证旧密码
+    """
     return pwd_context.verify(plain_password, hashed_password)
 
 
 def get_password_hash(password: str) -> str:
-    """生成密码哈希"""
+    """
+    生成密码哈希
+    用于注册和修改密码时加密存储
+    """
     return pwd_context.hash(password)
 
 

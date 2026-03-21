@@ -43,6 +43,8 @@ export const FITNESS_GOALS = [
     
     USER_BODY_DATA: '/api/user/body-data',
     USER_PROFILE: '/api/user/profile',
+    USER_SECURITY_PHONE: '/api/user/security/phone',      
+    USER_SECURITY_PASSWORD: '/api/user/security/password', 
     USER_SECURITY: '/api/user/security',
     CHECK_PROFILE_COMPLETE: '/api/user/check-profile-complete'
   }
