@@ -7,7 +7,6 @@
 - 查看器材
 - 删除器材
 """
-
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
 from sqlalchemy.orm import Session
 from typing import List

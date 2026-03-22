@@ -163,6 +163,13 @@ EQUIPMENT_DATA = [
         "category": "辅助器材",
         "description": "瑜伽、普拉提、拉伸等训练的辅助器材，提供缓冲和防滑功能",
         "target_muscles": ["全身肌群", "核心肌群", "柔韧性"]
+    },
+    {
+        "equipment_id": "none",
+        "name": "无器材",
+        "category": "辅助器材",
+        "description": "适用于无器材训练的场景，强调身体自重训练和功能性训练",
+        "target_muscles": ["全身肌群", "核心肌群", "功能性训练"]
     }
 ]
 
