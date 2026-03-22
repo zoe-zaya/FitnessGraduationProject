@@ -146,6 +146,35 @@
     formData.value.birthday = e.detail.value // 格式：YYYY-MM-DD
   }
   
+  //检查资料完整性
+  const checkProfileCompleteAndRedirect = async () => {
+    try{
+      // 调用资料完整性检查接口
+      const checkRes = await request.get(API.CHECK_PROFILE_COMPLETE)
+      
+      console.log('资料完整性检查结果:', checkRes)
+      
+      // 资料完整
+      if (checkRes.is_complete) {
+        await onShow() // 刷新用户信息
+        /*setTimeout(() => {
+          uni.reLaunch({ url: '/pages/profile/edit-profile' })
+        }, 1000)*/
+      } else {
+        // 资料不完整
+        setTimeout(() => {
+          uni.redirectTo({ url: '/pages/profile/body-data' })
+        }, 1500)
+      }
+    }catch(error){
+      console.error('检查资料完整性失败:', error)
+      uni.showToast({ 
+          title: '检查资料完整性失败', 
+          icon: 'none', 
+          duration: 2000 
+        })
+    }
+  }
   /**
    * 提交个人资料
    * 对应《需求规格说明书》3.2 节编辑个人资料用例
@@ -175,15 +204,8 @@
       
       uni.showToast({ title: '保存成功', icon: 'success', duration: 1500 })
       
-      // 获取页面栈，判断上一个页面是否为注册页面
-      const pages = getCurrentPages();
-      const prevPage = pages[pages.length - 2]; // 上一个页面
-      console.log(pages)
-      
-      // 如果上一个页面是登录页面，则跳转到身体数据页面
-      setTimeout(() => {
-          uni.redirectTo({ url: '/pages/profile/body-data' })
-      }, 1500)
+      // 保存成功后检查资料完整性并跳转
+      await checkProfileCompleteAndRedirect()
       
     } catch (error) {
       console.error('保存失败:', error)
