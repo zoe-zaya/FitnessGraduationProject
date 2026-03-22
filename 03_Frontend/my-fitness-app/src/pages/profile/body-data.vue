@@ -222,10 +222,6 @@
       
       uni.showToast({ title: '保存成功', icon: 'success', duration: 1500 })
       
-      // 获取页面栈，判断上一个页面是否为注册页面
-      const pages = getCurrentPages();
-      const prevPage = pages[pages.length - 2]; // 上一个页面
-      
       setTimeout(() => {
           uni.reLaunch({ url: '/pages/profile/profile' })
       }, 1500)
