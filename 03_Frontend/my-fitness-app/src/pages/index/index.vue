@@ -1,48 +1,187 @@
 <template>
-  <view class="content">
-    <image class="logo" src="/static/logo.png"></image>
-    <view class="text-area">
-      <text class="title">{{ title }}</text>
+  <view class="container">
+    <view class="welcome-section">
+      <view class="greeting">
+        <text class="greeting-text">欢迎回来</text>
+        <text class="username">{{ userInfo.name || '用户' }}</text>
+      </view>
+      <view class="today-stats">
+        <view class="stat-item">
+          <text class="stat-number">0</text>
+          <text class="stat-label">今日运动</text>
+        </view>
+        <view class="stat-item">
+          <text class="stat-number">7</text>
+          <text class="stat-label">连续打卡</text>
+        </view>
+        <view class="stat-item">
+          <text class="stat-number">2.5</text>
+          <text class="stat-label">本月小时</text>
+        </view>
+      </view>
+    </view>
+    
+    <view class="quick-actions">
+      <view class="action-card" @click="startExercise">
+        <text class="action-icon">💪</text>
+        <text class="action-title">开始训练</text>
+        <text class="action-desc">开始今天的锻炼计划</text>
+      </view>
+      
+      <view class="action-card" @click="recordExercise">
+        <text class="action-icon">📷</text>
+        <text class="action-title">动作识别</text>
+        <text class="action-desc">拍照识别健身动作</text>
+      </view>
+    </view>
+    
+    <view class="recent-section">
+      <text class="section-title">最近训练</text>
+      <view class="no-data">
+        <text class="no-data-text">暂无训练记录</text>
+      </view>
     </view>
   </view>
 </template>
 
-<script>
-export default {
-  data() {
-    return {
-      title: 'Hello',
-    }
-  },
-  onLoad() {},
-  methods: {},
+<script setup>
+import { computed } from 'vue'
+import { useUserStore } from '@/store/user'
+
+const userStore = useUserStore()
+const userInfo = computed(() => userStore.userInfo)
+
+const startExercise = () => {
+  uni.showToast({
+    title: '功能即将开放',
+    icon: 'none'
+  })
+}
+
+const recordExercise = () => {
+  uni.showToast({
+    title: '功能即将开放',
+    icon: 'none'
+  })
 }
 </script>
 
-<style>
-.content {
+<style lang="scss" scoped>
+@import '@/uni.scss';
+
+.container {
+  min-height: 100vh;
+  background-color: $fitness-secondary;
+  padding: 40rpx 40rpx 0;
+}
+
+.welcome-section {
+  background: $fitness-primary;
+  border-radius: $radius-lg;
+  padding: 40rpx;
+  margin-bottom: $spacing-lg;
+  box-shadow: 0 1rpx 0 0 $divider-ios; // iOS风格阴影
+  
+  .greeting {
+    margin-bottom: 40rpx;
+    
+    .greeting-text {
+      display: block;
+      font-size: $font-xl;
+      color: $fitness-text-light;
+      margin-bottom: 10rpx;
+    }
+    
+    .username {
+      display: block;
+      font-size: $font-xxl;
+      font-weight: 700;
+      color: $fitness-text;
+    }
+  }
+  
+  .today-stats {
+    display: flex;
+    justify-content: space-between;
+    
+    .stat-item {
+      text-align: center;
+      flex: 1;
+      
+      .stat-number {
+        display: block;
+        font-size: $font-xxl;
+        font-weight: 700;
+        color: $fitness-text;
+        margin-bottom: 10rpx;
+      }
+      
+      .stat-label {
+        display: block;
+        font-size: $font-sm;
+        color: $fitness-text-light;
+      }
+    }
+  }
+}
+
+.quick-actions {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  gap: $spacing-lg;
+  margin-bottom: $spacing-lg;
+  
+  .action-card {
+    flex: 1;
+    background: $fitness-primary;
+    border-radius: $radius-lg;
+    padding: 40rpx 20rpx;
+    text-align: center;
+    box-shadow: 0 1rpx 0 0 $divider-ios; // iOS风格阴影
+    
+    .action-icon {
+      display: block;
+      font-size: $font-xxl;
+      margin-bottom: 20rpx;
+    }
+    
+    .action-title {
+      display: block;
+      font-size: $font-lg;
+      font-weight: 600;
+      color: $fitness-text;
+      margin-bottom: 10rpx;
+    }
+    
+    .action-desc {
+      display: block;
+      font-size: $font-sm;
+      color: $fitness-text-light;
+    }
+  }
 }
 
-.logo {
-  height: 200rpx;
-  width: 200rpx;
-  margin-top: 200rpx;
-  margin-left: auto;
-  margin-right: auto;
-  margin-bottom: 50rpx;
-}
-
-.text-area {
-  display: flex;
-  justify-content: center;
-}
-
-.title {
-  font-size: 36rpx;
-  color: #8f8f94;
+.recent-section {
+  background: $fitness-primary;
+  border-radius: $radius-lg;
+  padding: 40rpx;
+  box-shadow: 0 1rpx 0 0 $divider-ios; // iOS风格阴影
+  
+  .section-title {
+    display: block;
+    font-size: $font-lg;
+    font-weight: 600;
+    color: $fitness-text;
+    margin-bottom: 30rpx;
+  }
+  
+  .no-data {
+    text-align: center;
+    padding: 60rpx 0;
+    
+    .no-data-text {
+      font-size: $font-md;
+      color: $fitness-text-light;
+    }
+  }
 }
 </style>

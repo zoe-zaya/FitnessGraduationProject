@@ -21,8 +21,7 @@ export const FITNESS_GOALS = [
   // 性别选项
   export const GENDERS = [
     { label: '男', value: 'male' },
-    { label: '女', value: 'female' },
-    { label: '其他', value: 'other' }
+    { label: '女', value: 'female' }
   ]
   
   // 密码复杂度正则（对应《需求规格说明书》3.2 节扩展事件流）

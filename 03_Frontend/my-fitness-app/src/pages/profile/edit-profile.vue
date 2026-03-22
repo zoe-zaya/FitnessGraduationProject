@@ -12,39 +12,39 @@
       </view>
       
       <view class="form-section">
-        <view class="input-item">
-          <text class="label">昵称</text>
-          <input 
-            v-model="formData.name" 
-            type="text" 
-            placeholder="请输入昵称"
-            class="input"
-            maxlength="20"
-          />
+        <view class="input-wrapper">
+          <view class="input-item">
+            <text class="label">昵称</text>
+            <input 
+              v-model="formData.name" 
+              type="text" 
+              placeholder="请输入昵称"
+              class="input"
+              maxlength="20"
+            />
+          </view>
+          
+          <view class="input-item input-with-border">
+            <text class="label">生日</text>
+            <picker 
+              mode="date" 
+              :value="formData.birthday" 
+              @change="onBirthdayChange"
+            >
+              <view class="picker">
+                {{ formData.birthday || '请选择' }}
+              </view>
+            </picker>
+          </view>
         </view>
         
-        <view class="input-item">
-          <text class="label">生日</text>
-          <picker 
-            mode="date" 
-            :value="formData.birthday" 
-            @change="onBirthdayChange"
-          >
-            <view class="picker">
-              {{ formData.birthday || '请选择' }}
-            </view>
-          </picker>
-        </view>
-        <!--
         <view class="age-display" v-if="calculatedAge">
           <text class="age-label">自动计算年龄：</text>
           <text class="age-value">{{ calculatedAge }} 岁</text>
         </view>
         
-        -->
-        
-        <button class="submit-btn" @click="handleSubmit" :loading="loading">
-          保存
+        <button class="submit-btn" @click="handleSubmit" :loading="loading" :disabled="loading">
+          {{ loading ? '保存中...' : '保存' }}
         </button>
       </view>
     </view>
@@ -83,16 +83,31 @@
     return age > 0 ? age : 0
   })
   
+
   /**
    * 页面显示时加载用户数据
    * Uni-app 页面生命周期钩子
   */
-  onShow(() => {
-    const info = userStore.userInfo
-    formData.value = {
-      name: info.name || '',
-      avatar_url: info.avatar_url || '',
-      birthday: info.birthday || ''
+  /**
+   * 页面显示时刷新用户信息
+   */
+   onShow(async () => {
+    if (userStore.isLogin) {
+      try {
+        const res = await request.get(API.USER_ME)
+        //console.log('当前用信息:', res)
+        userStore.updateUserInfo(res)
+        const info = userStore.userInfo
+        //console.log('userStore中的用户信息:', info)
+        formData.value = {
+          name: info.name || '',
+          avatar_url: info.avatar_url || '',
+          birthday: info.birthday || ''
+        }
+        console.log('formData中的用户信息:', formData.value)
+      } catch (error) {
+        console.error('获取用户信息失败:', error)
+      }
     }
   })
   
@@ -253,12 +268,21 @@
     
     .submit-btn {
       width: 100%;
-      height: 90rpx;
-      background: $fitness-primary;
+      height: 88rpx;
+      background: $uni-primary;
       color: #FFFFFF;
       font-size: $font-lg;
-      border-radius: $radius-xl;
+      border-radius: $radius-lg;
       border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      margin-top: $spacing-lg;
+      
+      &[disabled] {
+        opacity: 0.6;
+      }
     }
   }
   </style>

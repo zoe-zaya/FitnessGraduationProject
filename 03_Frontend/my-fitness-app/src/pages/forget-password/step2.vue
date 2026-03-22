@@ -1,50 +1,47 @@
 <template>
   <view class="container">
-    <!-- 头部 -->
-    <!--<view class="header">
-      <text class="title">重置密码</text>
-      <text class="subtitle">设置新的登录密码</text>
-    </view>-->
-    
     <!-- 表单区域 -->
     <view class="form-section">
-      <!-- 新密码输入 -->
-      <view class="input-item">
-        <text class="label">新密码</text>
-        <input 
-          v-model="formData.newPassword" 
-          type="password" 
-          placeholder="8 位以上，含大小写数字符号"
-          class="input"
-        />
+      <view class="input-wrapper">
+        <!-- 新密码输入 -->
+        <view class="input-item">
+          <input 
+            v-model="formData.newPassword" 
+            type="password" 
+            placeholder="8 位以上，含大小写数字符号"
+            class="input"
+          />
+        </view>
+        
+        <!-- 确认密码输入 -->
+        <view class="input-item input-with-border">
+          <input 
+            v-model="formData.confirmPassword" 
+            type="password" 
+            placeholder="请再次输入密码"
+            class="input"
+          />
+        </view>
+      </view>
+      
+      <view class="password-info">
         <text class="tip">需包含大小写字母、数字和特殊符号</text>
-      </view>
-      
-      <!-- 确认密码输入 -->
-      <view class="input-item">
-        <text class="label">确认密码</text>
-        <input 
-          v-model="formData.confirmPassword" 
-          type="password" 
-          placeholder="请再次输入密码"
-          class="input"
-        />
-      </view>
-      
-      <!-- 密码强度提示 -->
-      <view class="password-strength" v-if="formData.newPassword">
-        <text class="strength-label">密码强度：</text>
-        <text 
-          class="strength-value" 
-          :class="passwordStrengthClass"
-        >
-          {{ passwordStrengthText }}
-        </text>
+        
+        <!-- 密码强度提示 -->
+        <view class="password-strength" v-if="formData.newPassword">
+          <text class="strength-label">密码强度：</text>
+          <text 
+            class="strength-value" 
+            :class="passwordStrengthClass"
+          >
+            {{ passwordStrengthText }}
+          </text>
+        </view>
       </view>
       
       <!-- 确认按钮 -->
-      <button class="submit-btn" @click="handleSubmit" :loading="loading">
-        确认重置
+      <button class="submit-btn" @click="handleSubmit" :loading="loading" :disabled="loading">
+        {{ loading ? '重置中...' : '确认重置' }}
       </button>
     </view>
   </view>
@@ -165,105 +162,110 @@ const handleSubmit = async () => {
 
 .container {
   min-height: 100vh;
-  background: $fitness-bg;
-  padding: 60rpx 40rpx;
-}
-
-.header {
-  text-align: center;
-  margin-bottom: 80rpx;
-  
-  .title {
-    display: block;
-    font-size: $font-xxl;
-    font-weight: bold;
-    color: $fitness-text;
-    margin-bottom: 10rpx;
-  }
-  
-  .subtitle {
-    display: block;
-    font-size: $font-sm;
-    color: $fitness-text-gray;
-  }
+  background-color: $fitness-secondary;
+  padding: 60rpx 40rpx 40rpx;
 }
 
 .form-section {
+  .input-wrapper {
+    background: $fitness-primary;
+    border-radius: $radius-lg;
+    box-shadow: 0 1rpx 0 0 $divider-ios; // iOS风格阴影
+    overflow: hidden;
+  }
+  
   .input-item {
-    margin-bottom: 40rpx;
     position: relative;
+    padding: 0 $spacing-lg;
     
-    .label {
-      display: block;
-      font-size: $font-md;
-      color: $fitness-text-light;
-      margin-bottom: 15rpx;
+    &:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: $spacing-lg;
+      right: $spacing-lg;
+      height: 1rpx;
+      background: $fitness-border;
+      transform: scaleY(0.5);
     }
     
     .input {
       width: 100%;
-      height: 90rpx;
-      background: #FFFFFF;
-      border: 1rpx solid $fitness-border;
-      border-radius: $radius-md;
-      padding: 0 30rpx;
+      height: 96rpx;
       font-size: $font-md;
+      color: $fitness-text;
+      padding: 0;
       box-sizing: border-box;
-    }
-    
-    .tip {
-      display: block;
-      font-size: $font-xs;
-      color: $fitness-text-gray;
-      margin-top: 10rpx;
     }
   }
   
-  .password-strength {
-    display: flex;
-    align-items: center;
-    margin-bottom: 40rpx;
-    padding: 20rpx;
-    background: #FFFFFF;
-    border-radius: $radius-sm;
+  .password-info {
+    background: $fitness-primary;
+    border-radius: $radius-lg;
+    padding: $spacing-lg;
+    margin: $spacing-lg 0;
+    box-shadow: 0 1rpx 0 0 $divider-ios; // iOS风格阴影
     
-    .strength-label {
-      font-size: $font-xs;
-      color: $fitness-text-gray;
-      margin-right: 10rpx;
+    .tip {
+      display: block;
+      font-size: $font-sm;
+      color: $fitness-text-light;
+      margin-bottom: $spacing-md;
     }
     
-    .strength-value {
-      font-size: $font-xs;
-      font-weight: bold;
-      padding: 4rpx 16rpx;
-      border-radius: 20rpx;
+    .password-strength {
+      display: flex;
+      align-items: center;
+      padding: 16rpx;
+      background: $fitness-secondary;
+      border-radius: $radius-md;
       
-      &.strength-weak {
-        color: $uni-error;
-        background: rgba(255, 68, 68, 0.1);
+      .strength-label {
+        font-size: $font-sm;
+        color: $fitness-text-light;
+        margin-right: 10rpx;
       }
       
-      &.strength-medium {
-        color: $uni-warning;
-        background: rgba(255, 159, 0, 0.1);
-      }
-      
-      &.strength-strong {
-        color: $uni-success;
-        background: rgba(24, 179, 123, 0.1);
+      .strength-value {
+        font-size: $font-sm;
+        font-weight: 600;
+        padding: 8rpx 16rpx;
+        border-radius: $radius-md;
+        
+        &.strength-weak {
+          color: $uni-error;
+          background: rgba(255, 59, 48, 0.1);
+        }
+        
+        &.strength-medium {
+          color: $uni-warning;
+          background: rgba(255, 149, 0, 0.1);
+        }
+        
+        &.strength-strong {
+          color: $uni-success;
+          background: rgba(52, 199, 89, 0.1);
+        }
       }
     }
   }
   
   .submit-btn {
     width: 100%;
-    height: 90rpx;
-    background: $fitness-primary;
+    height: 88rpx;
+    background: $uni-primary;
     color: #FFFFFF;
     font-size: $font-lg;
-    border-radius: $radius-xl;
+    border-radius: $radius-lg;
     border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    
+    &[disabled] {
+      opacity: 0.6;
+    }
   }
 }
 </style>

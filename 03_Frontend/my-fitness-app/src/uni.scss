@@ -14,38 +14,47 @@
 
 /* 全局样式变量 */
 $uni-primary: #007AFF;
-$uni-success: #18B37B;
-$uni-warning: #FF9F00;
-$uni-error: #FF4444;
-$uni-info: #909399;
+$uni-success: #34C759;
+$uni-warning: #FF9500;
+$uni-error: #FF3B30;
+$uni-info: #8E8E93;
 
-/* 健身系统主题色 */
-$fitness-primary: linear-gradient(90deg, #007AFF, #00C6FB);
-$fitness-bg: #F5F5F5;
-$fitness-card-bg: #FFFFFF;
-$fitness-text: #333333;
-$fitness-text-light: #666666;
-$fitness-text-gray: #999999;
-$fitness-border: #E5E5E5;
-$fitness-placeholder: #CCCCCC;
+/* 健身系统主题色 - 符合iOS设计规范 */
+$fitness-primary: #FFFFFF; // iOS风格以白色为主
+$fitness-secondary: #F2F2F7; // iOS背景色
+$fitness-accent: #007AFF; // iOS高亮色
+$fitness-text: #1C1C1E; // iOS深色文字
+$fitness-text-light: #8E8E93; // iOS浅色文字
+$fitness-text-gray: #AEAEB2; // iOS灰色文字
+$fitness-border: #D1D1D6; // iOS边框色
+$fitness-card-bg: #FFFFFF; // iOS卡片背景
+$fitness-placeholder: #C7C7CC; // iOS占位符颜色
 
-/* 间距 */
-$spacing-xs: 10rpx;
-$spacing-sm: 20rpx;
-$spacing-md: 30rpx;
-$spacing-lg: 40rpx;
-$spacing-xl: 60rpx;
+/* 间距 - iOS设计规范 */
+$spacing-xs: 4rpx;
+$spacing-sm: 8rpx;
+$spacing-md: 16rpx;
+$spacing-lg: 24rpx;
+$spacing-xl: 32rpx;
 
 /* 字体大小 */
-$font-xs: 22rpx;
-$font-sm: 26rpx;
-$font-md: 28rpx;
-$font-lg: 32rpx;
-$font-xl: 36rpx;
-$font-xxl: 48rpx;
+$font-xs: 20rpx; // 10pt
+$font-sm: 22rpx; // 11pt
+$font-md: 24rpx; // 12pt
+$font-lg: 28rpx; // 14pt
+$font-xl: 32rpx; // 16pt
+$font-xxl: 40rpx; // 20pt
 
-/* 边框圆角 */
-$radius-sm: 8rpx;
-$radius-md: 12rpx;
-$radius-lg: 20rpx;
-$radius-xl: 45rpx;
+/* 边框圆角 - iOS设计规范 */
+$radius-sm: 6rpx;
+$radius-md: 10rpx;
+$radius-lg: 14rpx;
+$radius-xl: 50rpx; // 圆形头像
+
+/* iOS风格按钮 */
+$button-ios-primary: #007AFF;
+$button-ios-secondary: #F2F2F7;
+$button-ios-destructive: #FF3B30;
+
+/* iOS风格分割线 */
+$divider-ios: #C6C6C8;

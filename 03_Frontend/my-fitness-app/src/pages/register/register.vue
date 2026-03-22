@@ -1,84 +1,96 @@
 <template>
     <view class="container">
-      <view class="header">
+      <!--<view class="header">
         <text class="title">注册账号</text>
         <text class="subtitle">创建您的健身账户</text>
-      </view>
+      </view>-->
       
       <view class="form-section">
-        <view class="input-item">
-          <text class="label">手机号</text>
-          <input 
-            v-model="formData.phone" 
-            type="number" 
-            placeholder="请输入 11 位手机号"
-            class="input"
-            maxlength="11"
-          />
-        </view>
-        
-        <view class="input-item">
-          <text class="label">密码</text>
-          <input 
-            v-model="formData.password" 
-            type="password" 
-            placeholder="8 位以上，含大小写数字符号"
-            class="input"
-          />
-          <text class="tip">需包含大小写字母、数字和特殊符号!@#$%^&*()_+-=</text>
-        </view>
-        
-        <view class="input-item">
-          <text class="label">确认密码</text>
-          <input 
-            v-model="formData.confirmPassword" 
-            type="password" 
-            placeholder="请再次输入密码"
-            class="input"
-          />
-        </view>
-        
-        <view class="agreement">
-          <view class="switch-wrapper">
-            <switch 
-              :checked="agreed" 
-              @change="onAgreeChange"
-              color="#007AFF"
-              class="agreement-switch"
+        <view class="input-wrapper">
+          <view class="input-item">
+            <input 
+              v-model="formData.phone" 
+              type="number" 
+              placeholder="请输入 11 位手机号"
+              class="input"
+              maxlength="11"
             />
           </view>
-          <text class="agreement-text">
-            我已阅读并同意
-            <text class="link">《用户协议》</text>
-            <text>和</text>
-            <text class="link">《隐私政策》</text>
-          </text>
+          
+          <view class="input-item input-with-border">
+            <input 
+              v-model="formData.password" 
+              type="password" 
+              placeholder="8 位以上，含大小写数字符号"
+              class="input"
+            />
+          </view>
+          
+          <view class="input-item">
+            <input 
+              v-model="formData.confirmPassword" 
+              type="password" 
+              placeholder="请再次输入密码"
+              class="input"
+            />
+          </view>
         </view>
         
-        <button class="register-btn" @click="handleRegister" :loading="loading">
-          注册
+        <view class="password-tip">
+          <text>密码需包含大小写字母、数字和特殊符号!@#$%^&*()_+-=</text>
+        </view>
+        
+        <view class="agreement-section">
+          <!-- 使用自定义图标代替checkbox -->
+          <view class="agreement-item" @click="toggleAgreement">
+            <view class="custom-checkbox" :class="{ checked: agreed }">
+              <text v-if="agreed" class="checkmark">✓</text>
+            </view>
+            <text class="agreement-text">
+              我已阅读并同意
+              <text class="link" @click.stop="showAgreement('user')">《用户协议》</text>
+              <text>和</text>
+              <text class="link" @click.stop="showAgreement('privacy')">《隐私政策》</text>
+            </text>
+          </view>
+        </view>
+        
+        <button 
+          class="register-btn" 
+          :disabled="!isFormValid"
+          @click="handleRegister" 
+        >
+        注册
         </button>
       </view>
       
       <view class="login-link" @click="navigateToLogin">
         已有账号？
-        <text>立即登录</text>
+        <text class="link-text">立即登录</text>
       </view>
     </view>
   </template>
   
   <script setup>
-  import { ref } from 'vue'
+  import { ref, computed } from 'vue'
   import request from '@/utils/request'
-  import { API, PASSWORD_REGEX } from '@/utils/constants'
+  import { API, PASSWORD_REGEX, PHONE_REGEX } from '@/utils/constants'
   
-  const loading = ref(false)
+  //const loading = ref(false)
   const agreed = ref(false)
   
   const formData = ref({
     phone: '',
     password: '',
     confirmPassword: ''
+  })
+  
+  // 计算属性，判断表单是否有效
+  const isFormValid = computed(() => {
+    return formData.value.phone.length === 11 &&
+           PASSWORD_REGEX.test(formData.value.password) &&
+           formData.value.password === formData.value.confirmPassword &&
+           agreed.value;
   })
   
   /**
@@ -94,8 +106,12 @@
     }
     
     // 2. 验证手机号
-    if (!formData.value.phone || formData.value.phone.length !== 11) {
-      uni.showToast({ title: '请输入正确的手机号', icon: 'none', duration: 2000 })
+    if (!PHONE_REGEX.test(formData.value.phone)) {
+      uni.showToast({ 
+        title: '请输入有效的手机号', 
+        icon: 'none',
+        duration: 3000
+      })
       return
     }
     
@@ -115,7 +131,7 @@
       return
     }
     
-    loading.value = true
+    //loading.value = true
     
     try {
       // 5. 调用注册 API
@@ -129,7 +145,7 @@
       
       // 6. 返回登录页（对应用例步骤 6）
       setTimeout(() => {
-        uni.navigateBack()
+        navigateToLogin()
       }, 1000)
       
     } catch (error) {
@@ -152,17 +168,25 @@
         });
       }
     } finally {
-      loading.value = false
+      //loading.value = false
+      agreed.value = false; // 注册完成后重置协议同意状态
+      uni.reLaunch({ url: '/pages/register/register' });
     }
   }
   
-  const onAgreeChange = (e) => {
-    // switch 返回布尔值，直接赋值
-    agreed.value = e.detail.value
+  // 切换协议同意状态
+  const toggleAgreement = () => {
+    agreed.value = !agreed.value;
+  }
+
+  const showAgreement = (type) => {
+    // 这里可以实现显示协议内容的逻辑
+    console.log(`显示${type === 'user' ? '用户协议' : '隐私政策'}`)
+    // 可以通过模态框或跳转页面展示协议内容
   }
 
   const navigateToLogin = () => {
-    uni.navigateBack()
+    uni.reLaunch({ url: '/pages/login/login' })
   }
   </script>
   
@@ -171,8 +195,8 @@
   
   .container {
     min-height: 100vh;
-    background: $fitness-bg;
-    padding: 60rpx 40rpx;
+    background-color: $fitness-secondary;
+    padding: 60rpx 40rpx 40rpx;
   }
   
   .header {
@@ -182,86 +206,121 @@
     .title {
       display: block;
       font-size: $font-xxl;
-      font-weight: bold;
+      font-weight: 700;
       color: $fitness-text;
       margin-bottom: 10rpx;
     }
     
     .subtitle {
       display: block;
-      font-size: $font-sm;
-      color: $fitness-text-gray;
+      font-size: $font-md;
+      color: $fitness-text-light;
     }
   }
   
   .form-section {
+    .input-wrapper {
+      background: $fitness-primary;
+      border-radius: $radius-lg;
+      box-shadow: 0 1rpx 0 0 $divider-ios; // iOS风格阴影
+      overflow: hidden;
+    }
+    
     .input-item {
-      margin-bottom: 40rpx;
       position: relative;
       
-      .label {
-        display: block;
-        font-size: $font-md;
-        color: $fitness-text-light;
-        margin-bottom: 15rpx;
+      &:not(:last-child)::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: $spacing-lg;
+        right: $spacing-lg;
+        height: 1rpx;
+        background: $fitness-border;
+        transform: scaleY(0.5);
       }
       
       .input {
         width: 100%;
-        height: 90rpx;
-        background: #FFFFFF;
-        border: 1rpx solid $fitness-border;
-        border-radius: $radius-md;
-        padding: 0 30rpx;
+        height: 96rpx;
         font-size: $font-md;
+        color: $fitness-text;
+        padding: 0 $spacing-lg;
         box-sizing: border-box;
-      }
-      
-      .tip {
-        display: block;
-        font-size: $font-xs;
-        color: $fitness-text-gray;
-        margin-top: 10rpx;
       }
     }
     
-    .agreement {
-      display: flex;
-      align-items: center;
-      font-size: $font-xs;
+    .password-tip {
+      font-size: $font-sm;
       color: $fitness-text-light;
-      margin-bottom: 40rpx;
+      margin: $spacing-md 0 $spacing-lg;
+      padding: 0 $spacing-xs;
+    }
+    
+    .agreement-section {
+      margin-bottom: $spacing-lg;
       
-      .switch-wrapper {
+      .agreement-item {
         display: flex;
         align-items: center;
-        weight:0px;
+        padding: $spacing-md 0;
         
-        .agreement-switch {
-          transform: scale(0.5);
-          transform-origin: center left;
+        .custom-checkbox {
+          width: 40rpx;
+          height: 40rpx;
+          border: 2rpx solid $fitness-border;
+          border-radius: $radius-sm;
+          margin-right: $spacing-md;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+          background: $fitness-primary;
+          transition: background-color 0.3s;
+          
+          &.checked {
+            background: $uni-primary;
+            border-color: $uni-primary;
+          }
+          
+          .checkmark {
+            color: white;
+            font-size: $font-md;
+            line-height: 1;
+            font-weight: bold;
+          }
         }
-      }
-      
-      .agreement-text {
-        flex: 1;
-        line-height: 1.5;
         
-        .link {
-          color: $uni-primary;
-          margin: 0 5rpx;
+        .agreement-text {
+          flex: 1;
+          font-size: $font-md;
+          color: $fitness-text-light;
+          line-height: 1.5;
+          
+          .link {
+            color: $uni-primary;
+            font-weight: 500;
+          }
         }
       }
     }
     
     .register-btn {
       width: 100%;
-      height: 90rpx;
-      background: $fitness-primary;
+      height: 88rpx;
+      background: $uni-primary;
       color: #FFFFFF;
       font-size: $font-lg;
-      border-radius: $radius-xl;
+      border-radius: $radius-lg;
       border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      
+      &[disabled] {
+        opacity: 0.6;
+      }
     }
   }
   
@@ -269,10 +328,11 @@
     text-align: center;
     font-size: $font-md;
     color: $fitness-text-light;
-    margin-top: 40rpx;
+    margin-top: $spacing-lg;
     
-    text {
+    .link-text {
       color: $uni-primary;
+      font-weight: 500;
     }
   }
   </style>

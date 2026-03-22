@@ -9,38 +9,38 @@
       
       <!-- 表单区域 -->
       <view class="form-section">
-        <view class="input-item">
-          <text class="label">手机号</text>
-          <input 
-            v-model="formData.phone" 
-            type="number" 
-            placeholder="请输入 11 位手机号"
-            class="input"
-            maxlength="11"
-          />
-        </view>
-        
-        <view class="input-item">
-          <text class="label">密码</text>
-          <input 
-            v-model="formData.password" 
-            type="password" 
-            placeholder="请输入密码"
-            class="input"
-          />
+        <view class="input-wrapper">
+          <view class="input-item">
+            <input 
+              v-model="formData.phone" 
+              type="number" 
+              placeholder="请输入 11 位手机号"
+              class="input"
+              maxlength="11"
+            />
+          </view>
+          
+          <view class="input-item input-with-margin">
+            <input 
+              v-model="formData.password" 
+              type="password" 
+              placeholder="请输入密码"
+              class="input"
+            />
+          </view>
         </view>
         
         <view class="forget-password" @click="navigateToForget">
           忘记密码？
         </view>
         
-        <button class="login-btn" @click="handleLogin" :loading="loading">
-          登录
+        <button class="login-btn" @click="handleLogin" :loading="loading" :disabled="loading">
+          {{ loading ? '登录中...' : '登录' }}
         </button>
         
         <view class="register-link" @click="navigateToRegister">
           还没有账号？
-          <text>立即注册</text>
+          <text class="link-text">立即注册</text>
         </view>
       </view>
     </view>
@@ -94,6 +94,7 @@
       
     } catch (error) {
       console.error('登录失败:', error)
+      uni.showToast({ title: error.response.data.detail || '登录失败，请稍后重试', icon: 'none', duration: 2000 })
     } finally {
       loading.value = false
     }
@@ -154,8 +155,8 @@
   
   .container {
     min-height: 100vh;
-    background: linear-gradient(180deg, #F5F5F5 0%, #FFFFFF 100%);
-    padding: 60rpx 40rpx;
+    background-color: $fitness-secondary;
+    padding: 80rpx 40rpx 40rpx;
   }
   
   .logo-section {
@@ -163,74 +164,98 @@
     margin-bottom: 80rpx;
     
     .logo {
-      width: 160rpx;
-      height: 160rpx;
+      width: 140rpx;
+      height: 140rpx;
       margin-bottom: 30rpx;
     }
     
     .title {
       display: block;
       font-size: $font-xxl;
-      font-weight: bold;
+      font-weight: 700;
       color: $fitness-text;
       margin-bottom: 10rpx;
     }
     
     .subtitle {
       display: block;
-      font-size: $font-sm;
-      color: $fitness-text-gray;
+      font-size: $font-md;
+      color: $fitness-text-light;
     }
   }
   
   .form-section {
+    .input-wrapper {
+      background: $fitness-primary;
+      border-radius: $radius-lg;
+      padding: 0 $spacing-lg;
+      margin-bottom: $spacing-lg;
+      box-shadow: 0 1rpx 0 0 $divider-ios; // iOS风格阴影
+    }
+    
     .input-item {
-      margin-bottom: 40rpx;
+      position: relative;
       
-      .label {
-        display: block;
-        font-size: $font-md;
-        color: $fitness-text-light;
-        margin-bottom: 15rpx;
+      &:not(:last-child)::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: $spacing-lg;
+        right: $spacing-lg;
+        height: 1rpx;
+        background: $fitness-border;
+        transform: scaleY(0.5);
+      }
+      
+      &.input-with-margin {
+        margin-top: 0;
       }
       
       .input {
         width: 100%;
-        height: 90rpx;
-        background: #FFFFFF;
-        border: 1rpx solid $fitness-border;
-        border-radius: $radius-md;
-        padding: 0 30rpx;
+        height: 96rpx;
         font-size: $font-md;
+        color: $fitness-text;
+        padding: 0 $spacing-md;
         box-sizing: border-box;
       }
     }
     
     .forget-password {
       text-align: right;
-      font-size: $font-xs;
+      font-size: $font-md;
       color: $uni-primary;
-      margin-bottom: 40rpx;
+      margin-bottom: $spacing-lg;
+      padding-right: $spacing-xs;
     }
     
     .login-btn {
       width: 100%;
-      height: 90rpx;
-      background: $fitness-primary;
+      height: 88rpx;
+      background: $uni-primary;
       color: #FFFFFF;
       font-size: $font-lg;
-      border-radius: $radius-xl;
+      border-radius: $radius-lg;
       border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      
+      &[disabled] {
+        opacity: 0.6;
+      }
     }
     
     .register-link {
       text-align: center;
       font-size: $font-md;
       color: $fitness-text-light;
-      margin-top: 40rpx;
+      margin-top: $spacing-lg;
       
-      text {
+      .link-text {
         color: $uni-primary;
+        font-weight: 500;
       }
     }
   }

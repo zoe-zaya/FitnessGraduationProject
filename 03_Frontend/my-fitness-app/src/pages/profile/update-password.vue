@@ -205,15 +205,19 @@
     border-radius: $radius-md;
     padding: 30rpx;
     margin-bottom: 30rpx;
-    
     .input-item {
       margin-bottom: 30rpx;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
       
       &:last-child {
         margin-bottom: 0;
       }
       
       .label {
+        width:30%;
         display: block;
         font-size: $font-md;
         color: $fitness-text;
@@ -221,7 +225,7 @@
       }
       
       .input {
-        width: 100%;
+        width: 70%;
         height: 90rpx;
         background: $fitness-bg;
         border: 1rpx solid $fitness-border;
@@ -230,14 +234,13 @@
         font-size: $font-md;
         box-sizing: border-box;
       }
-      
-      .tip {
+    }
+    .tip {
         display: block;
         font-size: $font-xs;
         color: $fitness-text-gray;
         margin-top: 10rpx;
       }
-    }
     
     .password-strength {
       display: flex;
@@ -248,12 +251,14 @@
       border-radius: $radius-sm;
       
       .strength-label {
+        width: auto;
         font-size: $font-xs;
         color: $fitness-text-gray;
         margin-right: 10rpx;
       }
       
       .strength-value {
+        width: auto;
         font-size: $font-xs;
         font-weight: bold;
         padding: 4rpx 16rpx;
@@ -278,13 +283,21 @@
     
     .submit-btn {
       width: 100%;
-      height: 90rpx;
-      background: $fitness-primary;
+      height: 88rpx;
+      background: $uni-primary;
       color: #FFFFFF;
       font-size: $font-lg;
-      border-radius: $radius-xl;
+      border-radius: $radius-lg;
       border: none;
-      margin-top: 40rpx;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      margin-top: $spacing-lg;
+      
+      &[disabled] {
+        opacity: 0.6;
+      }
     }
   }
 

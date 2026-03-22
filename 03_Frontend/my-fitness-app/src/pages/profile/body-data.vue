@@ -2,86 +2,88 @@
 <template>
     <view class="container">
       <view class="form-section">
-        <view class="input-item">
-          <text class="label">年龄</text>
-          <input 
-            :value="calculatedAge" 
-            type="number" 
-            placeholder="根据生日自动计算"
-            class="input"
-            disabled
-          />
-          <text class="tip">根据生日自动计算，不可手动调整</text>
+        <view class="input-wrapper">
+          <view class="input-item">
+            <text class="input-label">年龄</text>
+            <input 
+              :value="calculatedAge" 
+              type="number" 
+              placeholder="根据生日自动计算"
+              class="input"
+              disabled
+            />
+          </view>
+          
+          <view class="input-item input-with-border">
+            <text class="input-label">性别</text>
+            <picker 
+              :range="GENDERS" 
+              range-key="label"
+              @change="onGenderChange"
+            >
+              <view class="picker">
+                {{ formData.gender ? GENDERS.find(g => g.value === formData.gender)?.label : '请选择' }}
+              </view>
+            </picker>
+          </view>
+          
+          <view class="input-item input-with-border">
+            <text class="input-label">身高 (cm)</text>
+            <input 
+              v-model="formData.height" 
+              type="digit" 
+              placeholder="厘米"
+              class="input"
+            />
+          </view>
+          
+          <view class="input-item input-with-border">
+            <text class="input-label">体重 (kg)</text>
+            <input 
+              v-model="formData.weight" 
+              type="digit" 
+              placeholder="千克"
+              class="input"
+            />
+          </view>
+          
+          <view class="input-item input-with-border">
+            <text class="input-label">健身目标</text>
+            <picker 
+              :range="FITNESS_GOALS" 
+              range-key="label"
+              @change="onGoalChange"
+            >
+              <view class="picker">
+                {{ formData.fitness_goal ? FITNESS_GOALS.find(g => g.value === formData.fitness_goal)?.label : '请选择' }}
+              </view>
+            </picker>
+          </view>
+          
+          <view class="input-item input-with-border">
+            <text class="input-label">经验水平</text>
+            <picker 
+              :range="EXPERIENCE_LEVELS" 
+              range-key="label"
+              @change="onLevelChange"
+            >
+              <view class="picker">
+                {{ formData.experience_level ? EXPERIENCE_LEVELS.find(l => l.value === formData.experience_level)?.label : '请选择' }}
+              </view>
+            </picker>
+          </view>
         </view>
         
-        <view class="input-item">
-          <text class="label">性别</text>
-          <picker 
-            :range="GENDERS" 
-            range-key="label"
-            @change="onGenderChange"
-          >
-            <view class="picker">
-              {{ formData.gender ? GENDERS.find(g => g.value === formData.gender)?.label : '请选择' }}
-            </view>
-          </picker>
+        <view class="input-wrapper" v-if="bmi">
+          <view class="bmi-card">
+            <text class="bmi-label">您的 BMI 指数</text>
+            <text class="bmi-value">{{ bmi }}</text>
+            <text class="bmi-status" :class="bmiStatusClass">{{ bmiStatus }}</text>
+          </view>
         </view>
         
-        <view class="input-item">
-          <text class="label">身高 (cm)</text>
-          <input 
-            v-model="formData.height" 
-            type="digit" 
-            placeholder="厘米"
-            class="input"
-          />
-        </view>
-        
-        <view class="input-item">
-          <text class="label">体重 (kg)</text>
-          <input 
-            v-model="formData.weight" 
-            type="digit" 
-            placeholder="千克"
-            class="input"
-          />
-        </view>
-        
-        <view class="input-item">
-          <text class="label">健身目标</text>
-          <picker 
-            :range="FITNESS_GOALS" 
-            range-key="label"
-            @change="onGoalChange"
-          >
-            <view class="picker">
-              {{ formData.fitness_goal ? FITNESS_GOALS.find(g => g.value === formData.fitness_goal)?.label : '请选择' }}
-            </view>
-          </picker>
-        </view>
-        
-        <view class="input-item">
-          <text class="label">经验水平</text>
-          <picker 
-            :range="EXPERIENCE_LEVELS" 
-            range-key="label"
-            @change="onLevelChange"
-          >
-            <view class="picker">
-              {{ formData.experience_level ? EXPERIENCE_LEVELS.find(l => l.value === formData.experience_level)?.label : '请选择' }}
-            </view>
-          </picker>
-        </view>
-        
-        <!-- BMI 展示 -->
-        <view class="bmi-card" v-if="bmi">
-          <text class="bmi-label">您的 BMI 指数</text>
-          <text class="bmi-value">{{ bmi }}</text>
-          <text class="bmi-status" :class="bmiStatusClass">{{ bmiStatus }}</text>
-        </view>
-        
-        <button class="submit-btn" @click="handleSubmit" :loading="loading">
-          保存
+        <button class="submit-btn" @click="handleSubmit" :loading="loading" :disabled="loading">
+          {{ loading ? '保存中...' : '保存' }}
         </button>
       </view>
     </view>
@@ -241,53 +243,71 @@
   
   .container {
     min-height: 100vh;
-    background: $fitness-bg;
-    padding: 40rpx;
+    background-color: $fitness-secondary;
+    padding: 40rpx 40rpx 0;
   }
   
   .form-section {
-    .input-item {
-      background: #FFFFFF;
-      border-radius: $radius-md;
-      padding: 30rpx;
-      margin-bottom: 30rpx;
+    .input-wrapper {
+      background: $fitness-primary;
+      border-radius: $radius-lg;
+      box-shadow: 0 1rpx 0 0 $divider-ios; // iOS风格阴影
+      overflow: hidden;
+      margin-bottom: $spacing-lg;
       
-      .label {
-        display: block;
-        font-size: $font-md;
-        color: $fitness-text;
-        margin-bottom: 15rpx;
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+    
+    .input-item {
+      position: relative;
+      padding: 0 $spacing-lg;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      
+      &:not(:last-child)::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: $spacing-lg;
+        right: $spacing-lg;
+        height: 1rpx;
+        background: $fitness-border;
+        transform: scaleY(0.5);
+      }
+      
+      .input-label {
+        font-size: $font-sm;
+        color: $fitness-text-light;
+        flex: 1;
+        margin: 26rpx 30rpx 26rpx 0;
       }
       
       .input, .picker {
-        width: 100%;
+        flex: 2;
         height: 80rpx;
-        background: $fitness-bg;
-        border-radius: $radius-sm;
-        padding: 0 20rpx;
         font-size: $font-md;
+        color: $fitness-text;
+        padding: 0;
         box-sizing: border-box;
         align-content: center;
-      }
-      
-      .tip {
-        display: block;
-        font-size: $font-xs;
-        color: $fitness-text-gray;
-        margin-top: 10rpx;
+        text-align: right;
       }
     }
     
     .bmi-card {
-      background: $fitness-primary;
-      border-radius: $radius-md;
+      background: linear-gradient(135deg, #68acff, #54a7ff);
+      border-radius: $radius-lg;
       padding: 40rpx;
       text-align: center;
-      margin-bottom: 40rpx;
+      margin: $spacing-lg;
+      box-shadow: 0 4rpx 10rpx rgba(0, 122, 255, 0.2);
       
       .bmi-label {
         display: block;
-        font-size: $font-xs;
+        font-size: $font-sm;
         color: rgba(255, 255, 255, 0.8);
         margin-bottom: 10rpx;
       }
@@ -295,7 +315,7 @@
       .bmi-value {
         display: block;
         font-size: 72rpx;
-        font-weight: bold;
+        font-weight: 700;
         color: #FFFFFF;
         margin-bottom: 15rpx;
       }
@@ -304,32 +324,41 @@
         display: inline-block;
         background: rgba(255, 255, 255, 0.2);
         color: #FFFFFF;
-        font-size: $font-xs;
-        padding: 8rpx 30rpx;
-        border-radius: 20rpx;
+        font-size: $font-sm;
+        padding: 10rpx 30rpx;
+        border-radius: $radius-lg;
         
         &.status-normal {
-          background: $uni-success;
+          background: rgba(95, 205, 123, 0.9);
         }
         
         &.status-warning {
-          background: $uni-warning;
+          background: rgba(255, 149, 0, 0.9);
         }
         
         &.status-danger {
-          background: $uni-error;
+          background: rgba(255, 59, 48, 0.9);
         }
       }
     }
     
     .submit-btn {
       width: 100%;
-      height: 90rpx;
-      background: $fitness-primary;
+      height: 88rpx;
+      background: $uni-primary;
       color: #FFFFFF;
       font-size: $font-lg;
-      border-radius: $radius-xl;
+      border-radius: $radius-lg;
       border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      margin-top: $spacing-lg;
+      
+      &[disabled] {
+        opacity: 0.6;
+      }
     }
   }
   </style>

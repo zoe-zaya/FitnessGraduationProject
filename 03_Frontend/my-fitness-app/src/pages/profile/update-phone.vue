@@ -8,59 +8,35 @@
       
       <!-- 表单区域 -->
       <view class="form-section">
-        <!-- 旧手机号 -->
-        <view class="input-item">
-          <text class="label">当前手机号</text>
-          <input 
-            v-model="formData.oldPhone" 
-            type="number" 
-            placeholder="请输入当前手机号"
-            class="input"
-            maxlength="11"
-          />
-          <text class="tip">用于验证身份</text>
+        <view class="input-wrapper">
+          <!-- 旧手机号 -->
+          <view class="input-item">
+            <input 
+              v-model="formData.oldPhone" 
+              type="number" 
+              placeholder="请输入当前手机号"
+              class="input"
+              maxlength="11"
+            />
+          </view>
+          
+          <!-- 新手机号 -->
+          <view class="input-item input-with-border">
+            <input 
+              v-model="formData.newPhone" 
+              type="number" 
+              placeholder="请输入新手机号"
+              class="input"
+              maxlength="11"
+            />
+          </view>
         </view>
-        
-        <!-- 新手机号 -->
-        <view class="input-item">
-          <text class="label">新手机号</text>
-          <input 
-            v-model="formData.newPhone" 
-            type="number" 
-            placeholder="请输入新手机号"
-            class="input"
-            maxlength="11"
-          />
-          <text class="tip">新手机号将用于登录和接收通知</text>
-        </view>
-        
-        <!-- 确认新手机号 -->
-        <!--<view class="input-item">
-          <text class="label">确认新手机号</text>
-          <input 
-            v-model="formData.confirmPhone" 
-            type="number" 
-            placeholder="请再次输入新手机号"
-            class="input"
-            maxlength="11"
-          />
-        </view>->
         
         <!-- 提交按钮 -->
-        <button class="submit-btn" @click="handleSubmit" :loading="loading">
-          确认修改
+        <button class="submit-btn" @click="handleSubmit" :loading="loading" :disabled="loading">
+          {{ loading ? '修改中...' : '确认修改' }}
         </button>
       </view>
-      
-      <!-- 安全提示 -->
-      <!--<view class="security-notice">
-        <text class="notice-title">⚠️ 注意事项</text>
-        <text class="notice-content">
-          1. 修改成功后，请使用新手机号登录\
-          2. 请确保新手机号未被其他账号注册\
-          3. 修改后原手机号将解除绑定
-        </text>
-      </view>-->
     </view>
   </template>
   
@@ -176,18 +152,19 @@
   
   .container {
     min-height: 100vh;
-    background: $fitness-bg;
-    padding: 40rpx;
+    background-color: $fitness-secondary;
+    padding: 0rpx 40rpx 0;
   }
   
   .current-phone-tip {
-    background: #FFFFFF;
-    border-radius: $radius-md;
-    padding: 30rpx;
-    margin-bottom: 30rpx;
+    background: $fitness-primary;
+    border-radius: $radius-lg;
+    padding: 20rpx;
+    margin: $spacing-lg 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    box-shadow: 0 1rpx 0 0 $divider-ios; // iOS风格阴影
     
     .tip-label {
       font-size: $font-md;
@@ -196,81 +173,79 @@
     
     .tip-value {
       font-size: $font-lg;
-      font-weight: bold;
+      font-weight: 600;
       color: $uni-primary;
     }
   }
   
   .form-section {
-    background: #FFFFFF;
-    border-radius: $radius-md;
-    padding: 30rpx;
-    margin-bottom: 30rpx;
+    .input-wrapper {
+      background: $fitness-primary;
+      border-radius: $radius-lg;
+      box-shadow: 0 1rpx 0 0 $divider-ios; // iOS风格阴影
+      overflow: hidden;
+    }
     
     .input-item {
-      margin-bottom: 30rpx;
+      position: relative;
       
-      &:last-child {
-        margin-bottom: 0;
-      }
-      
-      .label {
-        display: block;
-        font-size: $font-md;
-        color: $fitness-text;
-        margin-bottom: 15rpx;
+      &:not(:last-child)::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: $spacing-lg;
+        right: $spacing-lg;
+        height: 1rpx;
+        background: $fitness-border;
+        transform: scaleY(0.5);
       }
       
       .input {
         width: 100%;
-        height: 90rpx;
-        background: $fitness-bg;
-        border: 1rpx solid $fitness-border;
-        border-radius: $radius-sm;
-        padding: 0 30rpx;
+        height: 96rpx;
         font-size: $font-md;
+        color: $fitness-text;
+        padding: 0 $spacing-lg;
         box-sizing: border-box;
       }
+    }
+    
+    .phone-info {
+      background: $fitness-primary;
+      border-radius: $radius-lg;
+      padding: $spacing-lg;
+      margin: $spacing-lg 0;
+      box-shadow: 0 1rpx 0 0 $divider-ios; // iOS风格阴影
       
       .tip {
         display: block;
-        font-size: $font-xs;
-        color: $fitness-text-gray;
-        margin-top: 10rpx;
+        font-size: $font-sm;
+        color: $fitness-text-light;
+        margin-bottom: $spacing-md;
+        
+        &:last-child {
+          margin-bottom: 0;
+        }
       }
     }
     
     .submit-btn {
       width: 100%;
-      height: 90rpx;
-      background: $fitness-primary;
+      height: 88rpx;
+      background: $uni-primary;
       color: #FFFFFF;
       font-size: $font-lg;
-      border-radius: $radius-xl;
+      border-radius: $radius-lg;
       border: none;
-      margin-top: 40rpx;
-    }
-  }
-  
-  .security-notice {
-    background: linear-gradient(135deg, #FFF3E0, #FFE0B2);
-    border-radius: $radius-md;
-    padding: 30rpx;
-    
-    .notice-title {
-      display: block;
-      font-size: $font-md;
-      font-weight: bold;
-      color: #E65100;
-      margin-bottom: 10rpx;
-    }
-    
-    .notice-content {
-      display: block;
-      font-size: $font-xs;
-      color: #EF6C00;
-      line-height: 2;
-      white-space: pre-line;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      margin-top: $spacing-lg;
+      
+      &[disabled] {
+        opacity: 0.6;
+      }
     }
   }
   </style>

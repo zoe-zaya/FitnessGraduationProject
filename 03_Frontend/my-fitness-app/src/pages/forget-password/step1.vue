@@ -1,43 +1,37 @@
 <template>
   <view class="container">
-    <!-- 头部 -->
-    <!--<view class="header">
-      <text class="title">忘记密码</text>
-      <text class="subtitle">验证手机号重置密码</text>
-    </view>-->
-    
     <!-- 表单区域 -->
     <view class="form-section">
-      <!-- 手机号输入 -->
-      <view class="input-item">
-        <text class="label">手机号</text>
-        <input 
-          v-model="formData.phone" 
-          type="number" 
-          placeholder="请输入手机号"
-          class="input"
-          maxlength="11"
-        />
-      </view>
-      
-      <!-- 验证码输入 -->
-      <view class="input-item">
-        <text class="label">验证码</text>
-        <view class="code-input-wrapper">
+      <view class="input-wrapper">
+        <!-- 手机号输入 -->
+        <view class="input-item">
           <input 
-            v-model="formData.code" 
+            v-model="formData.phone" 
             type="number" 
-            placeholder="请输入 6 位验证码"
+            placeholder="请输入手机号"
             class="input"
-            maxlength="6"
+            maxlength="11"
           />
-          <button 
-            class="code-btn" 
-            @click="sendCode" 
-            :disabled="countdown > 0"
-          >
-            {{ countdown > 0 ? `${countdown}s` : '获取验证码' }}
-          </button>
+        </view>
+        
+        <!-- 验证码输入 -->
+        <view class="input-item input-with-border">
+          <view class="code-input-wrapper">
+            <input 
+              v-model="formData.code" 
+              type="number" 
+              placeholder="请输入 6 位验证码"
+              class="input"
+              maxlength="6"
+            />
+            <button 
+              class="code-btn" 
+              @click="sendCode" 
+              :disabled="countdown > 0 || !formData.phone"
+            >
+              {{ countdown > 0 ? `${countdown}s` : '获取验证码' }}
+            </button>
+          </view>
         </view>
       </view>
       
@@ -47,8 +41,8 @@
       </view>
       
       <!-- 下一步按钮 -->
-      <button class="next-btn" @click="handleNext" :loading="loading">
-        下一步
+      <button class="next-btn" @click="handleNext" :loading="loading" :disabled="loading">
+        {{ loading ? '验证中...' : '下一步' }}
       </button>
     </view>
     
@@ -199,48 +193,39 @@ onUnmounted(() => {
 
 .container {
   min-height: 100vh;
-  background: $fitness-bg;
-  padding: 60rpx 40rpx;
-}
-
-.header {
-  text-align: center;
-  margin-bottom: 80rpx;
-  
-  .title {
-    display: block;
-    font-size: $font-xxl;
-    font-weight: bold;
-    color: $fitness-text;
-    margin-bottom: 10rpx;
-  }
-  
-  .subtitle {
-    display: block;
-    font-size: $font-sm;
-    color: $fitness-text-gray;
-  }
+  background-color: $fitness-secondary;
+  padding: 60rpx 40rpx 40rpx;
 }
 
 .form-section {
+  .input-wrapper {
+    background: $fitness-primary;
+    border-radius: $radius-lg;
+    box-shadow: 0 1rpx 0 0 $divider-ios; // iOS风格阴影
+    overflow: hidden;
+  }
+  
   .input-item {
-    margin-bottom: 40rpx;
+    position: relative;
+    padding: 0 $spacing-lg;
     
-    .label {
-      display: block;
-      font-size: $font-md;
-      color: $fitness-text-light;
-      margin-bottom: 15rpx;
+    &:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: $spacing-lg;
+      right: $spacing-lg;
+      height: 1rpx;
+      background: $fitness-border;
+      transform: scaleY(0.5);
     }
     
     .input {
       width: 100%;
-      height: 90rpx;
-      background: #FFFFFF;
-      border: 1rpx solid $fitness-border;
-      border-radius: $radius-md;
-      padding: 0 30rpx;
+      height: 96rpx;
       font-size: $font-md;
+      color: $fitness-text;
+      padding: 0;
       box-sizing: border-box;
     }
   }
@@ -251,40 +236,51 @@ onUnmounted(() => {
     
     .input {
       flex: 1;
-      margin-right: 20rpx;
+      margin-right: $spacing-md;
     }
     
     .code-btn {
       width: 170rpx;
-      height: 90rpx;
+      height: 80rpx;
       background: $uni-primary;
       color: #FFFFFF;
-      font-size: $font-xs;
+      font-size: $font-sm;
       border-radius: $radius-md;
       border: none;
-      align-content: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 500;
       
       &[disabled] {
-        background: #CCCCCC;
+        opacity: 0.5;
       }
     }
   }
   
   .tip-text {
-    font-size: $font-xs;
-    color: $fitness-text-gray;
+    font-size: $font-sm;
+    color: $fitness-text-light;
     text-align: center;
-    margin-bottom: 40rpx;
+    margin: $spacing-lg 0;
   }
   
   .next-btn {
     width: 100%;
-    height: 90rpx;
-    background: $fitness-primary;
+    height: 88rpx;
+    background: $uni-primary;
     color: #FFFFFF;
     font-size: $font-lg;
-    border-radius: $radius-xl;
+    border-radius: $radius-lg;
     border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    
+    &[disabled] {
+      opacity: 0.6;
+    }
   }
 }
 
@@ -292,6 +288,6 @@ onUnmounted(() => {
   text-align: center;
   font-size: $font-md;
   color: $uni-primary;
-  margin-top: 40rpx;
+  margin-top: $spacing-lg;
 }
 </style>

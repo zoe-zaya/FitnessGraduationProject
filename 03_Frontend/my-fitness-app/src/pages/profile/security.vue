@@ -9,13 +9,13 @@
     <!-- 功能菜单 -->
     <view class="menu-section">
       <!-- 修改手机号 -->
-      <view class="menu-item" @click="navigateToUpdatePhone">
+      <view class="menu-item border-bottom" @click="navigateToUpdatePhone">
         <view class="menu-left">
           <text class="menu-icon">📱</text>
           <text class="menu-label">修改手机号</text>
         </view>
         <view class="menu-right">
-          <text class="arrow">></text>
+          <text class="arrow">›</text>
         </view>
       </view>
       
@@ -26,18 +26,10 @@
           <text class="menu-label">修改登录密码</text>
         </view>
         <view class="menu-right">
-          <text class="arrow">></text>
+          <text class="arrow">›</text>
         </view>
       </view>
     </view>
-    
-    <!-- 安全提示 -->
-    <!--<view class="security-tip">
-      <text class="tip-title">💡 安全提示</text>
-      <text class="tip-content">
-        为了您的账号安全，建议定期更换密码，不要使用过于简单的密码
-      </text>
-    </view>-->
   </view>
 </template>
 
@@ -93,18 +85,19 @@ const navigateToUpdatePassword = () => {
 
 .container {
   min-height: 100vh;
-  background: $fitness-bg;
-  padding: 40rpx;
+  background-color: $fitness-secondary;
+  padding: 0;
 }
 
 .account-info {
-  background: #FFFFFF;
-  border-radius: $radius-md;
-  padding: 30rpx;
-  margin-bottom: 30rpx;
+  background: $fitness-primary;
+  border-radius: $radius-lg;
+  padding: 20rpx;
+  margin: $spacing-lg;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  box-shadow: 0 1rpx 0 0 $divider-ios; // iOS风格阴影
   
   .info-label {
     font-size: $font-md;
@@ -113,25 +106,33 @@ const navigateToUpdatePassword = () => {
   
   .info-value {
     font-size: $font-lg;
-    font-weight: bold;
+    font-weight: 600;
     color: $fitness-text;
   }
 }
 
 .menu-section {
-  background: #FFFFFF;
-  border-radius: $radius-md;
-  margin-bottom: 30rpx;
+  background: $fitness-primary;
+  border-radius: $radius-lg;
+  margin: 0 $spacing-lg $spacing-lg;
+  box-shadow: 0 1rpx 0 0 $divider-ios; // iOS风格阴影
   
   .menu-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 30rpx;
-    border-bottom: 1rpx solid $fitness-bg;
+    padding: 36rpx $spacing-lg;
+    position: relative;
     
-    &:last-child {
-      border-bottom: none;
+    &.border-bottom::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: $spacing-lg;
+      right: $spacing-lg;
+      height: 1rpx;
+      background: $fitness-border;
+      transform: scaleY(0.5);
     }
     
     .menu-left {
@@ -139,8 +140,10 @@ const navigateToUpdatePassword = () => {
       align-items: center;
       
       .menu-icon {
-        font-size: 40rpx;
+        font-size: $font-xl;
         margin-right: 20rpx;
+        width: 40rpx;
+        text-align: center;
       }
       
       .menu-label {
@@ -151,31 +154,11 @@ const navigateToUpdatePassword = () => {
     
     .menu-right {
       .arrow {
-        font-size: $font-sm;
-        color: $fitness-placeholder;
+        font-size: $font-xl;
+        color: $fitness-text-light;
+        font-weight: bold;
       }
     }
-  }
-}
-
-.security-tip {
-  background: linear-gradient(135deg, #E3F2FD, #BBDEFB);
-  border-radius: $radius-md;
-  padding: 30rpx;
-  
-  .tip-title {
-    display: block;
-    font-size: $font-md;
-    font-weight: bold;
-    color: #1565C0;
-    margin-bottom: 10rpx;
-  }
-  
-  .tip-content {
-    display: block;
-    font-size: $font-xs;
-    color: #1976D2;
-    line-height: 1.6;
   }
 }
 </style>
