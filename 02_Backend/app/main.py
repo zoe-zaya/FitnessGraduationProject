@@ -4,7 +4,7 @@ FastAPI 应用入口
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api import auth, user
+from app.api import auth, user, equipment
 from app.core.config import settings
 from fastapi.security import OAuth2PasswordBearer
 
@@ -32,6 +32,7 @@ app.add_middleware(
 # 注册路由
 app.include_router(auth.router)
 app.include_router(user.router)
+app.include_router(equipment.router)
 
 
 @app.get("/")
