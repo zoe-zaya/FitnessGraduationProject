@@ -239,7 +239,7 @@
   
   .container {
     min-height: 100vh;
-    background-color: $fitness-secondary;
+    background-color: $fitness-primary;
     padding: 40rpx 40rpx 0;
   }
   
@@ -247,9 +247,10 @@
     .input-wrapper {
       background: $fitness-primary;
       border-radius: $radius-lg;
+      border: 3.5rpx solid $fitness-border;
       box-shadow: 0 1rpx 0 0 $divider-ios; // iOS风格阴影
       overflow: hidden;
-      margin-bottom: $spacing-lg;
+      margin-bottom: $spacing-xl;
       
       &:last-child {
         margin-bottom: 0;
@@ -262,6 +263,8 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      border: none;
+      border-bottom: 1rpx solid $fitness-border;
       
       &:not(:last-child)::after {
         content: '';
@@ -294,17 +297,17 @@
     }
     
     .bmi-card {
-      background: linear-gradient(135deg, #68acff, #54a7ff);
+      background: #382626;
       border-radius: $radius-lg;
       padding: 40rpx;
       text-align: center;
       margin: $spacing-lg;
-      box-shadow: 0 4rpx 10rpx rgba(0, 122, 255, 0.2);
+      box-shadow: 0 4rpx 10rpx rgba(3, 7, 11, 0.2);
       
       .bmi-label {
         display: block;
         font-size: $font-sm;
-        color: rgba(255, 255, 255, 0.8);
+        color: rgba(243, 243, 243, 0.8);
         margin-bottom: 10rpx;
       }
       
@@ -312,7 +315,7 @@
         display: block;
         font-size: 72rpx;
         font-weight: 700;
-        color: #FFFFFF;
+        color: rgb(243, 243, 243);
         margin-bottom: 15rpx;
       }
       
@@ -333,7 +336,7 @@
         }
         
         &.status-danger {
-          background: rgba(255, 59, 48, 0.9);
+          background: rgb(245 44 33 / 90%);
         }
       }
     }
@@ -350,7 +353,7 @@
       align-items: center;
       justify-content: center;
       font-weight: 600;
-      margin-top: $spacing-lg;
+      margin-top: $spacing-xl;
       
       &[disabled] {
         opacity: 0.6;

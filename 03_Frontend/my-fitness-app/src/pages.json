@@ -86,7 +86,7 @@
   },
   "tabBar": {
     "color": "#999999",
-    "selectedColor": "#007AFF",
+    "selectedColor": "#DF6860",
     "backgroundColor": "#FFFFFF",
     "borderStyle": "black",
     "list": [
@@ -95,6 +95,24 @@
         "text": "首页",
         "iconPath": "static/tabbar/home.png",
         "selectedIconPath": "static/tabbar/home-active.png"
+      },
+      {
+        "pagePath": "pages/index/index",
+        "text": "健身房",
+        "iconPath": "static/tabbar/gym.png",
+        "selectedIconPath": "static/tabbar/gym-active.png"
+      },
+      {
+        "pagePath": "pages/index/index",
+        "text": "识别",
+        "iconPath": "static/tabbar/camera.png",
+        "selectedIconPath": "static/tabbar/camera-active.png"
+      },
+      {
+        "pagePath": "pages/index/index",
+        "text": "计划",
+        "iconPath": "static/tabbar/plan.png",
+        "selectedIconPath": "static/tabbar/plan-active.png"
       },
       {
         "pagePath": "pages/profile/profile",

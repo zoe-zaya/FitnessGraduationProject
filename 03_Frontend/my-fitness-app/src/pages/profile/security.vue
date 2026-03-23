@@ -11,7 +11,7 @@
       <!-- 修改手机号 -->
       <view class="menu-item border-bottom" @click="navigateToUpdatePhone">
         <view class="menu-left">
-          <text class="menu-icon">📱</text>
+          <img src="@/static/phone.png" class="menu-icon"/>
           <text class="menu-label">修改手机号</text>
         </view>
         <view class="menu-right">
@@ -22,7 +22,7 @@
       <!-- 修改登录密码 -->
       <view class="menu-item" @click="navigateToUpdatePassword">
         <view class="menu-left">
-          <text class="menu-icon">🔐</text>
+          <img src="@/static/password.png" class="menu-icon"/>
           <text class="menu-label">修改登录密码</text>
         </view>
         <view class="menu-right">
@@ -85,7 +85,7 @@ const navigateToUpdatePassword = () => {
 
 .container {
   min-height: 100vh;
-  background-color: $fitness-secondary;
+  background-color: $fitness-primary;
   padding: 0;
 }
 
@@ -93,7 +93,7 @@ const navigateToUpdatePassword = () => {
   background: $fitness-primary;
   border-radius: $radius-lg;
   padding: 20rpx;
-  margin: $spacing-lg;
+  margin: 0 $spacing-lg;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -142,7 +142,7 @@ const navigateToUpdatePassword = () => {
       .menu-icon {
         font-size: $font-xl;
         margin-right: 20rpx;
-        width: 40rpx;
+        width: 48rpx;
         text-align: center;
       }
       

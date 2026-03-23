@@ -22,7 +22,6 @@
             placeholder="8 位以上，含大小写数字符号"
             class="input"
           />
-          <text class="tip">需包含大小写字母、数字和特殊符号</text>
         </view>
         
         <!-- 确认新密码 -->
@@ -35,6 +34,8 @@
             class="input"
           />
         </view>
+        <text class="tip">需包含大小写字母、数字和特殊符号</text>
+
         
         <!-- 密码强度提示 -->
         <view class="password-strength" v-if="formData.newPassword">
@@ -196,39 +197,40 @@
   
   .container {
     min-height: 100vh;
-    background: $fitness-bg;
-    padding: 40rpx;
+    background: $fitness-primary;
+    padding: 20rpx;
   }
   
   .form-section {
     background: #FFFFFF;
-    border-radius: $radius-md;
     padding: 30rpx;
     margin-bottom: 30rpx;
+    
     .input-item {
-      margin-bottom: 30rpx;
+      margin-bottom: 20rpx;
       display: flex;
       align-items: center;
       justify-content: space-between;
       flex-wrap: wrap;
+      border-radius: $radius-lg;
+      border: 3.2rpx solid $fitness-border;
+
       
       &:last-child {
         margin-bottom: 0;
       }
       
       .label {
-        width:30%;
-        display: block;
+        width:25%;
         font-size: $font-md;
         color: $fitness-text;
-        margin-bottom: 15rpx;
+        margin-left: 15rpx;
       }
       
       .input {
         width: 70%;
         height: 90rpx;
-        background: $fitness-bg;
-        border: 1rpx solid $fitness-border;
+        background: $fitness-primary;
         border-radius: $radius-sm;
         padding: 0 30rpx;
         font-size: $font-md;
@@ -239,15 +241,15 @@
         display: block;
         font-size: $font-xs;
         color: $fitness-text-gray;
-        margin-top: 10rpx;
+        margin-left: 10rpx;
       }
     
     .password-strength {
       display: flex;
       align-items: center;
-      margin-top: 20rpx;
-      padding: 20rpx;
-      background: $fitness-bg;
+      margin-top: 10rpx;
+      padding: 10rpx;
+      background: $fitness-primary;
       border-radius: $radius-sm;
       
       .strength-label {
@@ -262,7 +264,7 @@
         font-size: $font-xs;
         font-weight: bold;
         padding: 4rpx 16rpx;
-        border-radius: 20rpx;
+        border-radius: $radius-sm;
         
         &.strength-weak {
           color: $uni-error;

@@ -152,7 +152,7 @@
   
   .container {
     min-height: 100vh;
-    background-color: $fitness-secondary;
+    background-color: $fitness-primary;
     padding: 0rpx 40rpx 0;
   }
   
@@ -160,11 +160,10 @@
     background: $fitness-primary;
     border-radius: $radius-lg;
     padding: 20rpx;
-    margin: $spacing-lg 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 1rpx 0 0 $divider-ios; // iOS风格阴影
+    //box-shadow: 0 1rpx 0 0 $divider-ios; // iOS风格阴影
     
     .tip-label {
       font-size: $font-md;
@@ -172,7 +171,7 @@
     }
     
     .tip-value {
-      font-size: $font-lg;
+      font-size: $font-md;
       font-weight: 600;
       color: $uni-primary;
     }
@@ -182,7 +181,8 @@
     .input-wrapper {
       background: $fitness-primary;
       border-radius: $radius-lg;
-      box-shadow: 0 1rpx 0 0 $divider-ios; // iOS风格阴影
+      border: 3.5rpx solid $fitness-border;
+      //box-shadow: 0 1rpx 0 0 $divider-ios; // iOS风格阴影
       overflow: hidden;
     }
     
@@ -207,6 +207,8 @@
         color: $fitness-text;
         padding: 0 $spacing-lg;
         box-sizing: border-box;
+        border: none;
+        border-bottom: 1rpx solid $fitness-border;
       }
     }
     

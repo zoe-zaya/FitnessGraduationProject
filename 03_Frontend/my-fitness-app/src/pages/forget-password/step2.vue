@@ -162,7 +162,7 @@ const handleSubmit = async () => {
 
 .container {
   min-height: 100vh;
-  background-color: $fitness-secondary;
+  background-color: $fitness-primary;
   padding: 60rpx 40rpx 40rpx;
 }
 
@@ -170,6 +170,7 @@ const handleSubmit = async () => {
   .input-wrapper {
     background: $fitness-primary;
     border-radius: $radius-lg;
+    border: 3.5rpx solid $fitness-border;
     box-shadow: 0 1rpx 0 0 $divider-ios; // iOS风格阴影
     overflow: hidden;
   }
@@ -196,15 +197,16 @@ const handleSubmit = async () => {
       color: $fitness-text;
       padding: 0;
       box-sizing: border-box;
+      border: none;
+      border-bottom: 1rpx solid $fitness-border;
     }
   }
   
   .password-info {
     background: $fitness-primary;
     border-radius: $radius-lg;
-    padding: $spacing-lg;
+    padding: 0 $spacing-sm;
     margin: $spacing-lg 0;
-    box-shadow: 0 1rpx 0 0 $divider-ios; // iOS风格阴影
     
     .tip {
       display: block;
@@ -216,9 +218,6 @@ const handleSubmit = async () => {
     .password-strength {
       display: flex;
       align-items: center;
-      padding: 16rpx;
-      background: $fitness-secondary;
-      border-radius: $radius-md;
       
       .strength-label {
         font-size: $font-sm;

@@ -13,7 +13,7 @@
  */
 
 /* 全局样式变量 */
-$uni-primary: #007AFF;
+$uni-primary: #df6860;
 $uni-success: #34C759;
 $uni-warning: #FF9500;
 $uni-error: #FF3B30;
@@ -23,12 +23,15 @@ $uni-info: #8E8E93;
 $fitness-primary: #FFFFFF; // iOS风格以白色为主
 $fitness-secondary: #F2F2F7; // iOS背景色
 $fitness-accent: #007AFF; // iOS高亮色
-$fitness-text: #1C1C1E; // iOS深色文字
+$fitness-text: #333333; // iOS深色文字
 $fitness-text-light: #8E8E93; // iOS浅色文字
 $fitness-text-gray: #AEAEB2; // iOS灰色文字
-$fitness-border: #D1D1D6; // iOS边框色
+$fitness-border: #efefef; // iOS边框色
+$fitness-input-bg: #f4f4f4; // iOS输入框背景
 $fitness-card-bg: #FFFFFF; // iOS卡片背景
 $fitness-placeholder: #C7C7CC; // iOS占位符颜色
+
+/*健身系统背景色*/
 
 /* 间距 - iOS设计规范 */
 $spacing-xs: 4rpx;

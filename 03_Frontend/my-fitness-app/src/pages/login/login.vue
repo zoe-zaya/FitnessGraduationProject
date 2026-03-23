@@ -2,9 +2,11 @@
     <view class="container">
       <!-- Logo 区域 -->
       <view class="logo-section">
-        <image src="/static/logo.png" class="logo" mode="aspectFit" />
+        <image src="@/static/logo.png" class="logo" mode="aspectFit" />
+        <!--
         <text class="title">健身管理系统</text>
         <text class="subtitle">智能识别 · 科学训练</text>
+        -->
       </view>
       
       <!-- 表单区域 -->
@@ -155,18 +157,18 @@
   
   .container {
     min-height: 100vh;
-    background-color: $fitness-secondary;
+    background: $fitness-primary;
     padding: 80rpx 40rpx 40rpx;
   }
   
   .logo-section {
     text-align: center;
-    margin-bottom: 80rpx;
+    margin-bottom: 40rpx;
     
     .logo {
-      width: 140rpx;
-      height: 140rpx;
-      margin-bottom: 30rpx;
+      width: 400rpx;
+      height: 400rpx;
+      margin-bottom: 0rpx;
     }
     
     .title {
@@ -188,6 +190,7 @@
     .input-wrapper {
       background: $fitness-primary;
       border-radius: $radius-lg;
+      border: 3.5rpx solid $fitness-border;
       padding: 0 $spacing-lg;
       margin-bottom: $spacing-lg;
       box-shadow: 0 1rpx 0 0 $divider-ios; // iOS风格阴影
@@ -218,6 +221,8 @@
         color: $fitness-text;
         padding: 0 $spacing-md;
         box-sizing: border-box;
+        border: none;
+        border-bottom: 1rpx solid $fitness-border;
       }
     }
     

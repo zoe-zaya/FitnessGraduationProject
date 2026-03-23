@@ -195,7 +195,7 @@
   
   .container {
     min-height: 100vh;
-    background-color: $fitness-secondary;
+    background-color: $fitness-primary;
     padding: 60rpx 40rpx 40rpx;
   }
   
@@ -222,6 +222,7 @@
     .input-wrapper {
       background: $fitness-primary;
       border-radius: $radius-lg;
+      border: 3.5rpx solid $fitness-border;
       box-shadow: 0 1rpx 0 0 $divider-ios; // iOS风格阴影
       overflow: hidden;
     }
@@ -247,6 +248,8 @@
         color: $fitness-text;
         padding: 0 $spacing-lg;
         box-sizing: border-box;
+        border: none;
+        border-bottom: 1rpx solid $fitness-border;
       }
     }
     

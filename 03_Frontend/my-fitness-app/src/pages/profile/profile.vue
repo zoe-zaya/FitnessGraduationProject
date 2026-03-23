@@ -27,7 +27,7 @@
         <view class="menu-group">
           <view class="menu-item border-bottom" @click="navigateToBodyData">
             <view class="menu-left">
-              <text class="menu-icon">📊</text>
+              <img src="@/static/body-data.png" class="menu-icon"/>
               <text class="menu-label">身体数据</text>
             </view>
             <view class="menu-right">
@@ -38,7 +38,7 @@
           
           <view class="menu-item" @click="navigateToProfile">
             <view class="menu-left">
-              <text class="menu-icon">👤</text>
+              <img src="@/static/profile-info.png" class="menu-icon"/>
               <text class="menu-label">个人资料</text>
             </view>
             <view class="menu-right">
@@ -50,7 +50,7 @@
         <view class="menu-group">
           <view class="menu-item" @click="navigateToSecurity">
             <view class="menu-left">
-              <text class="menu-icon">🔒</text>
+              <img src="@/static/setting.png" class="menu-icon"/>
               <text class="menu-label">账号与安全</text>
             </view>
             <view class="menu-right">
@@ -62,7 +62,7 @@
         <view class="menu-group">
           <view class="menu-item destructive" @click="handleLogout">
             <view class="menu-left">
-              <text class="menu-icon logout-icon">🚪</text>
+              <img src="@/static/logout.png" class="menu-icon"/>
               <text class="menu-label logout-label">退出登录</text>
             </view>
           </view>
@@ -72,7 +72,7 @@
   </template>
   
   <script setup>
-  import { ref, computed, onMounted } from 'vue'
+  import { ref, computed, onMounted, Static } from 'vue'
   import { onShow, onLoad } from '@dcloudio/uni-app' 
   import { useUserStore } from '@/store/user'
   import request from '@/utils/request'
@@ -136,12 +136,13 @@
   
   .container {
     min-height: 100vh;
-    background-color: $fitness-secondary;
+    background-color: $fitness-primary;
     padding-bottom: 40rpx;
   }
   
   .user-card {
-    background: $fitness-primary;
+    background-image: linear-gradient(to bottom, #fab0a7, #fcbdb3, #fdcac0, #fed7ce, #ffe4dd, #ffeae7, #fff0ef, #fff7f7, #fff9fa, #fefbfd, #fefdfe, #ffffff);
+    //background-image: linear-gradient(to bottom, #df6860, #e88477, #ef9f90, #f6b9ab, #fbd3c8, #fedfd9, #ffebe9, #fff7f7, #fff9fa, #fefbfd, #fefdfe, #ffffff);
     padding: 60rpx 40rpx 40rpx;
     display: flex;
     align-items: center;
@@ -150,7 +151,8 @@
     .avatar {
       width: 120rpx;
       height: 120rpx;
-      border-radius: $radius-xl;
+      border-radius: 100rpx;
+      border: 4rpx solid $uni-primary;
       margin-right: 30rpx;
     }
     
@@ -204,7 +206,8 @@
       border-radius: $radius-lg;
       overflow: hidden;
       margin-bottom: $spacing-lg;
-      box-shadow: 0 1rpx 0 0 $divider-ios; // iOS风格阴影
+      border: 3.5rpx solid $fitness-border;
+      //box-shadow: 0 1rpx 0 0 $divider-ios; // iOS风格阴影
       
       &:last-child {
         margin-bottom: 0;
@@ -215,9 +218,11 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 36rpx $spacing-lg;
+      padding: $spacing-lg;
       position: relative;
       background: $fitness-primary;
+      border: none;
+      border-bottom: 1rpx solid $fitness-border;
       
       &.border-bottom::after {
         content: '';
@@ -244,7 +249,7 @@
       .menu-icon {
         font-size: $font-lg;
         margin-right: 20rpx;
-        width: 40rpx;
+        width: 48rpx;
         text-align: center;
       }
       
