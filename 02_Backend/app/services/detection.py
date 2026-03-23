@@ -85,7 +85,9 @@ class EquipmentDetector:
             
             # 获取类别（简化处理，假设单类别）
             class_scores = detection[5:]
+            print(f"类别分数: {class_scores}, 置信度: {confidence}")
             class_id = int(np.argmax(class_scores))
+            print(f"检测到类别 ID: {class_id}，置信度: {confidence:.2f}")
             
             # 获取坐标 (x_center, y_center, width, height)
             x_center = float(detection[0])
@@ -100,7 +102,7 @@ class EquipmentDetector:
             y2 = (y_center + height / 2) / 640 * original_shape[0]
             
             # 映射类别 ID 到器材 ID（需根据实际模型调整）
-            equipment_id = f"equipment_{class_id}"
+            equipment_id = f"eq_{class_id}"
             
             results.append({
                 'equipment_id': equipment_id,

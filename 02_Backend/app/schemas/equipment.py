@@ -39,7 +39,7 @@ class GymEquipmentResponse(BaseModel):
     description: Optional[str] = None
     target_muscles: Optional[List[str]] = None
     image_url: Optional[str] = None
-    #supported_actions_count: int = 0
+    supported_actions_count: int = 0
     
     class Config:
         from_attributes = True
