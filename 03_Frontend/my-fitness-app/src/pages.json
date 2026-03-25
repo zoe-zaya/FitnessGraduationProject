@@ -76,6 +76,48 @@
         "navigationBarTitleText": "修改登录密码",
         "navigationStyle": "default"
       }
+    },
+    {
+      "path": "pages/gym/gym-list",
+      "style": {
+        "navigationBarTitleText": "健身房",
+        "navigationStyle": "default"
+      }
+    },
+    {
+      "path": "pages/gym/equipment-list",
+      "style": {
+        "navigationBarTitleText": "器材清单",
+        "navigationStyle": "default"
+      }
+    },
+    {
+      "path": "pages/gym/camera-scan",
+      "style": {
+        "navigationBarTitleText": "拍摄识别",
+        "navigationStyle": "default"
+      }
+    },
+    {
+      "path": "pages/gym/add-equipment-manual-1",
+      "style": {
+        "navigationBarTitleText": "手动添加器材",
+        "navigationStyle": "default"
+      }
+    },
+    {
+      "path": "pages/gym/add-equipment-manual-2",
+      "style": {
+        "navigationBarTitleText": "选择器材",
+        "navigationStyle": "default"
+      }
+    },
+    {
+      "path": "pages/gym/equipment-detail",
+      "style": {
+        "navigationBarTitleText": "器材详情",
+        "navigationStyle": "default"
+      }
     }
   ],
   "globalStyle": {
@@ -97,7 +139,7 @@
         "selectedIconPath": "static/tabbar/home-active.png"
       },
       {
-        "pagePath": "pages/index/index",
+        "pagePath": "pages/gym/gym-list",
         "text": "健身房",
         "iconPath": "static/tabbar/gym.png",
         "selectedIconPath": "static/tabbar/gym-active.png"

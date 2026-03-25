@@ -48,7 +48,20 @@ export const FITNESS_GOALS = [
     USER_SECURITY_PHONE: '/api/user/security/phone',      
     USER_SECURITY_PASSWORD: '/api/user/security/password', 
     USER_SECURITY: '/api/user/security',
-    CHECK_PROFILE_COMPLETE: '/api/user/check-profile-complete'
+    CHECK_PROFILE_COMPLETE: '/api/user/check-profile-complete',
+
+    // 器材管理
+    EQUIPMENT_DETECT: '/api/equipment/detect',
+    GYM_CREATE: '/api/equipment/createGym',
+    GYM_LIST: '/api/equipment/getAllGym',
+    GYM_DETAIL: '/api/equipment/getGym',
+    GYM_EDIT: '/api/equipment/editGym',
+    GYM_DELETE: '/api/equipment/deleteGym',
+    EQUIPMENT_ADD_MANUAL: '/api/equipment/addEquipment',
+    EQUIPMENT_ADD_AUTO: '/api/equipment/addEquipment',
+    EQUIPMENT_DETAIL: '/api/equipment/getEquipmentById',
+    EQUIPMENT_SEARCH: '/api/equipment/getEquipmentByKey/search',
+    EQUIPMENT_DELETE: '/api/equipment/deleteEquipment'
   }
   
   // 默认配置
