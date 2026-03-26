@@ -3,32 +3,35 @@
       <!-- Logo 区域 -->
       <view class="logo-section">
         <image src="@/static/logo.png" class="logo" mode="aspectFit" />
-        <!--
-        <text class="title">健身管理系统</text>
-        <text class="subtitle">智能识别 · 科学训练</text>
-        -->
+        <text class="title">TFit</text>
+        <text class="subtitle">能够识别健身器材的健身APP</text>
       </view>
       
       <!-- 表单区域 -->
       <view class="form-section">
         <view class="input-wrapper">
+          <view class="text">手机号</view>
           <view class="input-item">
+            <img src="@/static/phone2.png" class="icon"/>            
             <input 
               v-model="formData.phone" 
               type="number" 
-              placeholder="请输入 11 位手机号"
+              placeholder="请输入手机号"
               class="input"
               maxlength="11"
             />
           </view>
           
+          <view class="text">密码</view>
           <view class="input-item input-with-margin">
+            <img src="@/static/password2.png" class="icon"/>            
             <input 
               v-model="formData.password" 
               type="password" 
               placeholder="请输入密码"
               class="input"
             />
+            <uni-icons type="eye-filled" size="20" color="#8E8E93"></uni-icons>
           </view>
         </view>
         
@@ -42,7 +45,7 @@
         
         <view class="register-link" @click="navigateToRegister">
           还没有账号？
-          <text class="link-text">立即注册</text>
+          <text class="link-text">创建账号</text>
         </view>
       </view>
     </view>
@@ -154,23 +157,23 @@
   
   <style lang="scss" scoped>
   @import '../../uni.scss';
-  
+
   .container {
     min-height: 100vh;
-    background: $fitness-primary;
-    padding: 80rpx 40rpx 40rpx;
+    background: url('@/static/background.png') no-repeat center center / cover;
+    padding: 80rpx 48rpx 48rpx;
   }
-  
+
   .logo-section {
     text-align: center;
     margin-bottom: 40rpx;
-    
+
     .logo {
-      width: 400rpx;
-      height: 400rpx;
-      margin-bottom: 0rpx;
+      width: 200rpx;
+      height: 200rpx;
+      margin-bottom: 20rpx;
     }
-    
+
     .title {
       display: block;
       font-size: $font-xxl;
@@ -178,89 +181,122 @@
       color: $fitness-text;
       margin-bottom: 10rpx;
     }
-    
+
     .subtitle {
       display: block;
       font-size: $font-md;
       color: $fitness-text-light;
     }
   }
-  
+
   .form-section {
+    background: rgba(252, 249, 248, 0.7);
+    border-radius: $radius-l;
+    padding: 64rpx;
+    box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.1);
+    .shadow-\[0_8px_24px_rgba\(160\2c 62\2c 64\2c 0\.06\)\] {
+      --tw-shadow: 0 8px 24px rgba(160,62,64,0.06);
+      --tw-shadow-colored: 0 8px 24px var(--tw-shadow-color);
+      box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+    }
+
     .input-wrapper {
-      background: $fitness-primary;
-      border-radius: $radius-lg;
-      border: 3.5rpx solid $fitness-border;
-      padding: 0 $spacing-lg;
-      margin-bottom: $spacing-lg;
-      box-shadow: 0 1rpx 0 0 $divider-ios; // iOS风格阴影
+      .text{
+          font-weight: 700;
+          font-size: 0.75rem;
+          line-height: 1rem;
+          font-family: Manrope;
+          display: block;
+          margin-left: 0.25rem;
+          color: rgb(86 66 65 / var(--tw-text-opacity, 1));
+      }
+      .input-item {
+        position: relative;
+        margin-bottom: 30rpx;
+        --tw-space-y-reverse: 0;
+        margin-top: calc(0.5rem * calc(1 - var(--tw-space-y-reverse)));
+        margin-bottom: calc(0.5rem * var(--tw-space-y-reverse));
+        align-items: center;
+        display: flex;
+        position: relative;
+
+        .icon{
+          margin-left: 36rpx;
+          padding-bottom: 28rpx;
+          align-items: center;
+          position: absolute;
+          width:32rpx;
+        }
+        .input {
+          transition-property: all;
+          transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+          transition-duration: 150ms;
+          --tw-ring-color: rgb(220 192 191 / 0.2);
+          --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+          --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+          box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
+          --tw-text-opacity: 1;
+          color: rgb(27 28 28 / var(--tw-text-opacity, 1));
+          padding-right: 32rpx;
+          padding-left: 96rpx;
+          padding-top: 32rpx;
+          padding-bottom: 32rpx;
+          --tw-bg-opacity: 1;
+          background-color: rgb(255 255 255 / var(--tw-bg-opacity, 1));
+          border-style: none;
+          border-radius: 32rpx;
+          width: 100%;
+          margin-bottom: 32rpx;
+          font-size: $font-lg;
+        }
+
+        uni-icons {
+          position: absolute;
+          right: 20rpx;
+          top: 50%;
+          transform: translateY(-50%);
+        }
+      }
     }
-    
-    .input-item {
-      position: relative;
-      
-      &:not(:last-child)::after {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        left: $spacing-lg;
-        right: $spacing-lg;
-        height: 1rpx;
-        background: $fitness-border;
-        transform: scaleY(0.5);
-      }
-      
-      &.input-with-margin {
-        margin-top: 0;
-      }
-      
-      .input {
-        width: 100%;
-        height: 96rpx;
-        font-size: $font-md;
-        color: $fitness-text;
-        padding: 0 $spacing-md;
-        box-sizing: border-box;
-        border: none;
-        border-bottom: 1rpx solid $fitness-border;
-      }
-    }
-    
+
     .forget-password {
       text-align: right;
       font-size: $font-md;
-      color: $uni-primary;
-      margin-bottom: $spacing-lg;
-      padding-right: $spacing-xs;
+      color: rgb(160 62 64 / var(--tw-text-opacity, 1));
+      font-weight: 700;
+      line-height: 32rpx;
+      margin-bottom: 30rpx;
+      font-family: Manrope;
     }
-    
+
     .login-btn {
       width: 100%;
       height: 88rpx;
-      background: $uni-primary;
+      background: $button-bg2;
       color: #FFFFFF;
       font-size: $font-lg;
-      border-radius: $radius-lg;
+      border-radius: $radius-xl;
       border: none;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: 600;
-      
+      font-weight: 700;
+
       &[disabled] {
         opacity: 0.6;
       }
     }
-    
+
     .register-link {
       text-align: center;
       font-size: $font-md;
       color: $fitness-text-light;
-      margin-top: $spacing-lg;
-      
+      margin-top: 30rpx;
+
       .link-text {
-        color: $uni-primary;
-        font-weight: 500;
+        color: rgb(160 62 64 / var(--tw-text-opacity, 1));
+        font-weight: 700;
+        font-family: Manrope;
       }
     }
   }

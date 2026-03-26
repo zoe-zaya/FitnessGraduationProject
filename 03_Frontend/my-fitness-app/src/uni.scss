@@ -52,12 +52,15 @@ $font-xxl: 40rpx; // 20pt
 $radius-sm: 6rpx;
 $radius-md: 10rpx;
 $radius-lg: 14rpx;
+$radius-l: 48rpx;
 $radius-xl: 50rpx; // 圆形头像
 
 /* iOS风格按钮 */
 $button-ios-primary: #007AFF;
 $button-ios-secondary: #F2F2F7;
 $button-ios-destructive: #FF3B30;
+$button-bg: linear-gradient(45deg, #a03e40, #e57373);
+$button-bg2: #d8696a;
 
 /* iOS风格分割线 */
 $divider-ios: #C6C6C8;
