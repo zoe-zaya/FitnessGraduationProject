@@ -1,339 +1,363 @@
 <template>
-    <view class="container">
-      <!-- 相机区域 -->
-      <view class="camera-area">
-        <camera 
-          device-position="back" 
-          flash="off"
-          class="camera"
-          mode="scanCode"
-          @error="onCameraError"
-        />
-        <view class="camera-overlay">
-          <view class="scan-frame"></view>
-          <text class="scan-tip">将健身器材放入框内</text>
-        </view>
-      </view>
-      
-      <!-- 操作按钮 -->
-      <view class="action-area">
-        <view class="btn-group">
-          <button class="action-btn album" @click="chooseFromAlbum">
-            <text class="btn-icon">🖼️</text>
-            <text class="btn-text">从相册选择</text>
-          </button>
-          <button class="action-btn capture" @click="captureImage">
-            <text class="btn-icon">📷</text>
-            <text class="btn-text">拍摄</text>
-          </button>
-        </view>
-      </view>
-      
-      <!-- 识别结果弹窗 -->
-      <view class="result-modal" v-if="showResult">
-        <view class="modal-content">
-          <text class="modal-title">识别结果</text>
-          
-          <view class="result-info" v-if="recognitionResult">
-            <text class="result-name">{{ recognitionResult.name }}</text>
-            <text class="result-category">{{ recognitionResult.category }}</text>
-            <text class="result-confidence">置信度：{{ (recognitionResult.confidence * 100).toFixed(1) }}%</text>
-            <text class="result-muscles" v-if="recognitionResult.target_muscles">
-              目标肌群：{{ recognitionResult.target_muscles.join('、') }}
-            </text>
-          </view>
-          
-          <view class="result-actions">
-            <button class="action-btn retry" @click="retryRecognition">
-              重新识别
-            </button>
-            <button class="action-btn confirm" @click="confirmAdd">
-              添加至清单
-            </button>
-          </view>
-        </view>
+  <view class="container">
+    <!-- 相机区域（仅 H5/App 支持，小程序需使用 uni.chooseImage）-->
+    <!-- #ifndef MP-WEIXIN -->
+    <view class="camera-area" v-if="!isWeixinMiniProgram">
+      <camera 
+        device-position="back" 
+        flash="off"
+        class="camera"
+        mode="normal"
+        @error="onCameraError"
+      />
+      <view class="camera-overlay">
+        <view class="scan-frame"></view>
+        <text class="scan-tip">将健身器材放入框内</text>
       </view>
     </view>
-  </template>
+    <!-- #endif -->
+    
+    <!-- 小程序提示 -->
+    <!-- #ifdef MP-WEIXIN -->
+    <view class="camera-hint">
+      <text class="hint-icon">📷</text>
+      <text class="hint-text">请点击下方按钮选择图片</text>
+    </view>
+    <!-- #endif -->
+    
+    <!-- 操作按钮 -->
+    <view class="action-area">
+      <view class="btn-group">
+        <!-- #ifdef MP-WEIXIN -->
+        <button class="action-btn album" @click="chooseFromAlbum">
+          <text class="btn-icon">🖼️</text>
+          <text class="btn-text">从相册选择</text>
+        </button>
+        <!-- #endif -->
+        
+        <!-- #ifndef MP-WEIXIN -->
+        <button class="action-btn album" @click="chooseFromAlbum">
+          <text class="btn-icon">🖼️</text>
+          <text class="btn-text">从相册选择</text>
+        </button>
+        <button class="action-btn capture" @click="captureImage">
+          <text class="btn-icon">📷</text>
+          <text class="btn-text">拍摄</text>
+        </button>
+        <!-- #endif -->
+      </view>
+    </view>
+    
+    <!-- 加载中遮罩 -->
+    <view class="loading-mask" v-if="recognizing">
+      <view class="loading-content">
+        <text class="loading-icon">🔄</text>
+        <text class="loading-text">识别中...</text>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script setup>
+import { ref } from 'vue'
+import { onLoad } from '@dcloudio/uni-app'
+import request from '@/utils/request'
+import { API, CONFIG } from '@/utils/constants'
+
+const inventoryId = ref('')
+const recognizing = ref(false)
+const recognitionResult = ref(null)
+const isWeixinMiniProgram = ref(false)
+
+onLoad((options) => {
+  inventoryId.value = options.inventory_id || ''
   
-  <script setup>
-  import { ref } from 'vue'
-  import { onLoad } from '@dcloudio/uni-app'
-  import request from '@/utils/request'
-  import { API } from '@/utils/constants'
-  
-  const inventoryId = ref('')
-  const showResult = ref(false)
-  const recognitionResult = ref(null)
-  const imageTempPath = ref('')
-  
-  onLoad((options) => {
-    inventoryId.value = options.inventory_id || ''
+  // 检测是否为微信小程序环境
+  // #ifdef MP-WEIXIN
+  isWeixinMiniProgram.value = true
+  // #endif
+})
+
+/**
+ * 相机错误处理
+ */
+const onCameraError = (e) => {
+  console.error('相机错误:', e)
+  uni.showToast({ title: '相机访问失败', icon: 'none', duration: 2000 })
+}
+
+/**
+ * 从相册选择图片（兼容多端）
+ */
+const chooseFromAlbum = () => {
+  uni.chooseImage({
+    count: 1,
+    sourceType: ['album'],
+    sizeType: ['compressed'], // 压缩图片，减少上传时间
+    success: (res) => {
+      const filePath = res.tempFilePaths[0]
+      uploadAndRecognize(filePath)
+    },
+    fail: (err) => {
+      console.error('选择图片失败:', err)
+      uni.showToast({ title: '选择图片失败', icon: 'none', duration: 2000 })
+    }
   })
+}
+
+/**
+ * 拍摄照片（仅非小程序环境）
+ */
+const captureImage = () => {
+  // #ifndef MP-WEIXIN
+  uni.chooseImage({
+    count: 1,
+    sourceType: ['camera'],
+    sizeType: ['compressed'],
+    success: (res) => {
+      const filePath = res.tempFilePaths[0]
+      uploadAndRecognize(filePath)
+    },
+    fail: (err) => {
+      console.error('拍摄失败:', err)
+      uni.showToast({ title: '拍摄失败', icon: 'none', duration: 2000 })
+    }
+  })
+  // #endif
   
-  /**
-   * 相机错误处理
-   */
-  const onCameraError = (e) => {
-    console.error('相机错误:', e)
-    uni.showToast({ title: '相机访问失败', icon: 'none' })
-  }
+  // #ifdef MP-WEIXIN
+  uni.showToast({ title: '小程序请使用相册选择', icon: 'none', duration: 2000 })
+  // #endif
+}
+
+/**
+ * 上传图片并识别（✅ 核心修复：使用 uni.uploadFile）
+ */
+const uploadAndRecognize = (filePath) => {
+  recognizing.value = true
   
-  /**
-   * 从相册选择图片
-   */
-  const chooseFromAlbum = () => {
-    uni.chooseImage({
-      count: 1,
-      sourceType: ['album'],
-      success: (res) => {
-        imageTempPath.value = res.tempFilePaths[0]
-        uploadAndRecognize(res.tempFilePaths[0])
-      }
-    })
-  }
-  
-  /**
-   * 拍摄照片
-   */
-  const captureImage = () => {
-    uni.chooseImage({
-      count: 1,
-      sourceType: ['camera'],
-      success: (res) => {
-        imageTempPath.value = res.tempFilePaths[0]
-        uploadAndRecognize(res.tempFilePaths[0])
-      }
-    })
-  }
-  
-  /**
-   * 上传图片并识别
-   */
-  const uploadAndRecognize = async (filePath) => {
-    uni.showLoading({ title: '识别中...' })
-    
-    try {
-      // 创建 FormData 上传文件
-      const formData = new FormData()
-      formData.append('image', filePath)
+  uni.uploadFile({
+    url: `${CONFIG.API_BASE_URL}${API.EQUIPMENT_DETECT}`, // 后端接口地址
+    filePath: filePath,
+    name: 'image', // 与后端 UploadFile 参数名一致
+    header: {
+      // 携带认证 Token
+      'Authorization': `Bearer ${uni.getStorageSync('token')}`
+    },
+    formData: {
+      // 可添加额外表单数据
+    },
+    success: (uploadFileRes) => {
+      console.log('上传响应:', uploadFileRes)
       
-      const res = await request.post(API.EQUIPMENT_DETECT, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      })
-      
-      if (res.results && res.results.length > 0) {
-        recognitionResult.value = res.results[0]
-        showResult.value = true
+      try {
+        // 解析响应数据
+        const res = JSON.parse(uploadFileRes.data)
         
-        // 检查置信度
-        if (res.results[0].confidence < 0.7) {
-          uni.showToast({ title: '识别不确定，建议重试', icon: 'none' })
-        }
-      } else {
-        uni.showToast({ title: '未识别到器材', icon: 'none' })
-      }
-    } catch (error) {
-      console.error('识别失败:', error)
-    } finally {
-      uni.hideLoading()
-    }
-  }
-  
-  /**
-   * 重新识别
-   */
-  const retryRecognition = () => {
-    showResult.value = false
-    recognitionResult.value = null
-  }
-  
-  /**
-   * 确认添加至清单
-   */
-  const confirmAdd = async () => {
-    if (!recognitionResult.value || !inventoryId.value) {
-      uni.showToast({ title: '参数错误', icon: 'none' })
-      return
-    }
-    
-    try {
-      await request.post(`${API.EQUIPMENT_ADD_AUTO}/${inventoryId.value}/auto`, {
-        inventory_id: inventoryId.value,
-        equipment_id: recognitionResult.value.equipment_id,
-        confidence: recognitionResult.value.confidence
-      })
-      
-      uni.showToast({ title: '添加成功', icon: 'success' })
-      
-      setTimeout(() => {
-        uni.navigateBack()
-      }, 1000)
-    } catch (error) {
-      console.error('添加失败:', error)
-    }
-  }
-  </script>
-  
-  <style lang="scss" scoped>
-  @import '@/uni.scss';
-  
-  .container {
-    min-height: 100vh;
-    background: #000000;
-  }
-  
-  .camera-area {
-    position: relative;
-    width: 100%;
-    height: 60vh;
-    
-    .camera {
-      width: 100%;
-      height: 100%;
-    }
-    
-    .camera-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      
-      .scan-frame {
-        width: 400rpx;
-        height: 400rpx;
-        border: 4rpx solid #007AFF;
-        border-radius: 20rpx;
-        box-shadow: 0 0 0 1000rpx rgba(0, 0, 0, 0.5);
-      }
-      
-      .scan-tip {
-        margin-top: 40rpx;
-        font-size: $font-md;
-        color: #FFFFFF;
-      }
-    }
-  }
-  
-  .action-area {
-    padding: 40rpx;
-    background: #000000;
-    
-    .btn-group {
-      display: flex;
-      justify-content: space-around;
-      
-      .action-btn {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        background: transparent;
-        border: none;
-        
-        .btn-icon {
-          font-size: 48rpx;
-          margin-bottom: 10rpx;
-        }
-        
-        .btn-text {
-          font-size: $font-sm;
-          color: #FFFFFF;
-        }
-        
-        &.album {
-          .btn-icon {
-            font-size: 40rpx;
+        if (uploadFileRes.statusCode === 200) {
+          if (res.results && res.results.length > 0) {
+            recognitionResult.value = res.results[0]
+            
+            // 检查置信度
+            if (res.results[0].confidence < 0.7) {
+              uni.showToast({ 
+                title: '识别不确定，建议重试', 
+                icon: 'none',
+                duration: 2000
+              })
+            } else {
+              // 识别成功后跳转到手动添加设备页面
+              uni.navigateTo({
+                url: `/pages/gym/add-equipment-manual-2?inventory_id=${encodeURIComponent(inventoryId.value)}&equipment_id=${encodeURIComponent(recognitionResult.value.equipment_id)}`
+              })
+            }
+          } else {
+            uni.showToast({ 
+              title: res.message || '未识别到器材', 
+              icon: 'none',
+              duration: 2000
+            })
           }
+        } else {
+          // 处理业务错误
+          uni.showToast({ 
+            title: res.detail || '识别失败', 
+            icon: 'none',
+            duration: 2000
+          })
         }
+      } catch (e) {
+        console.error('解析响应失败:', e)
+        uni.showToast({ title: '响应解析失败', icon: 'none', duration: 2000 })
       }
+    },
+    fail: (err) => {
+      console.error('上传失败:', err)
+      
+      // 处理网络错误
+      if (err.errMsg && err.errMsg.includes('timeout')) {
+        uni.showToast({ title: '上传超时，请重试', icon: 'none', duration: 2000 })
+      } else if (err.statusCode === 401) {
+        uni.showToast({ title: '登录已过期', icon: 'none', duration: 2000 })
+        setTimeout(() => {
+          uni.reLaunch({ url: '/pages/login/login' })
+        }, 1500)
+      } else {
+        uni.showToast({ title: '上传失败，请检查网络', icon: 'none', duration: 2000 })
+      }
+    },
+    complete: () => {
+      recognizing.value = false
     }
+  })
+}
+
+</script>
+
+<style lang="scss" scoped>
+@import '@/uni.scss';
+
+.container {
+  min-height: 100vh;
+  background: #000000;
+  display: flex;
+  flex-direction: column;
+}
+
+// 相机区域（非小程序）
+// #ifndef MP-WEIXIN
+.camera-area {
+  position: relative;
+  width: 100%;
+  height: 60vh;
+  
+  .camera {
+    width: 100%;
+    height: 100%;
   }
   
-  .result-modal {
-    position: fixed;
+  .camera-overlay {
+    position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    z-index: 999;
     
-    .modal-content {
-      background: #FFFFFF;
-      border-radius: $radius-lg;
-      padding: 40rpx;
-      width: 600rpx;
+    .scan-frame {
+      width: 400rpx;
+      height: 400rpx;
+      border: 4rpx solid $uni-primary;
+      border-radius: 20rpx;
+      box-shadow: 0 0 0 1000rpx rgba(0, 0, 0, 0.5);
+    }
+    
+    .scan-tip {
+      margin-top: 40rpx;
+      font-size: $font-md;
+      color: #FFFFFF;
+    }
+  }
+}
+// #endif
+
+// 小程序提示
+// #ifdef MP-WEIXIN
+.camera-hint {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 100rpx 40rpx;
+  background: #1A1A1A;
+  
+  .hint-icon {
+    font-size: 80rpx;
+    margin-bottom: 20rpx;
+  }
+  
+  .hint-text {
+    font-size: $font-md;
+    color: #FFFFFF;
+    text-align: center;
+  }
+}
+// #endif
+
+.action-area {
+  flex: 1;
+  padding: 40rpx;
+  background: #000000;
+  display: flex;
+  align-items: flex-end;
+  
+  .btn-group {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    
+    .action-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: transparent;
+      border: none;
+      padding: 20rpx;
       
-      .modal-title {
-        display: block;
-        font-size: $font-lg;
-        font-weight: bold;
-        text-align: center;
-        margin-bottom: 30rpx;
+      .btn-icon {
+        font-size: 48rpx;
+        margin-bottom: 10rpx;
       }
       
-      .result-info {
-        margin-bottom: 30rpx;
-        
-        .result-name {
-          display: block;
-          font-size: $font-xl;
-          font-weight: bold;
-          color: $fitness-text;
-          margin-bottom: 10rpx;
-        }
-        
-        .result-category {
-          display: block;
-          font-size: $font-sm;
-          color: $uni-primary;
-          margin-bottom: 10rpx;
-        }
-        
-        .result-confidence {
-          display: block;
-          font-size: $font-xs;
-          color: $fitness-text-gray;
-          margin-bottom: 10rpx;
-        }
-        
-        .result-muscles {
-          display: block;
-          font-size: $font-xs;
-          color: $fitness-text-gray;
-        }
+      .btn-text {
+        font-size: $font-sm;
+        color: #FFFFFF;
       }
       
-      .result-actions {
-        display: flex;
-        gap: 20rpx;
-        
-        .action-btn {
-          flex: 1;
-          height: 80rpx;
-          border-radius: 40rpx;
-          font-size: $font-md;
-          border: none;
-          
-          &.retry {
-            background: #F5F5F5;
-            color: $fitness-text;
-          }
-          
-          &.confirm {
-            background: $uni-primary;
-            color: #FFFFFF;
-          }
+      &.album {
+        .btn-icon {
+          font-size: 40rpx;
         }
       }
     }
   }
-  </style>
+}
+
+.loading-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  
+  .loading-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    
+    .loading-icon {
+      font-size: 60rpx;
+      margin-bottom: 20rpx;
+      animation: spin 1s linear infinite;
+    }
+    
+    .loading-text {
+      font-size: $font-md;
+      color: #FFFFFF;
+    }
+  }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+</style>

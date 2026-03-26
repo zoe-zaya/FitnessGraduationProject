@@ -51,7 +51,7 @@ export const FITNESS_GOALS = [
     CHECK_PROFILE_COMPLETE: '/api/user/check-profile-complete',
 
     // 器材管理
-    EQUIPMENT_DETECT: '/api/equipment/detect',
+    EQUIPMENT_DETECT: '/api/equipment/detect', // ✅ 完整 URL
     GYM_CREATE: '/api/equipment/createGym',
     GYM_LIST: '/api/equipment/getAllGym',
     GYM_DETAIL: '/api/equipment/getGym',
@@ -66,6 +66,10 @@ export const FITNESS_GOALS = [
   
   // 默认配置
   export const CONFIG = {
+    // 后端基础地址（开发环境）
+    API_BASE_URL: 'http://localhost:8000',
+    // 生产环境地址（部署时修改）
+    // API_BASE_URL: 'https://your-server.com'
     // Token 有效期（分钟）
     TOKEN_EXPIRE_MINUTES: 60,
     

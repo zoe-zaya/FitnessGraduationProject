@@ -16,6 +16,24 @@ class EquipmentCategoryEnum(str, Enum):
     CARDIO = "有氧器械"
     ACCESSORY = "辅助器材"
 
+class ActionInfoResponse(BaseModel):
+    """动作信息响应模型
+    对应《需求规格说明书》表 2-4 TrainingAction 对象
+    修改：添加 image_url 字段
+    """
+    action_id: str
+    name: str
+    action_category: str
+    difficulty_level: str
+    estimated_seconds: int
+    target_muscles: Optional[List[str]] = None
+    image_url: Optional[str] = None  # ✅ 新增字段
+    video_demo_url: Optional[str] = None  # ✅ 确保此字段存在
+    safety_tips: Optional[str] = None  # ✅ 确保此字段存在
+    
+    class Config:
+        from_attributes = True
+
 
 class EquipmentListResponse(BaseModel):
     """器材列表响应模型"""
@@ -24,6 +42,7 @@ class EquipmentListResponse(BaseModel):
     category: str
     description: Optional[str] = None
     target_muscles: Optional[List[str]] = None
+    image_url: Optional[str] = None  # ✅ 新增字段
     
     class Config:
         from_attributes = True
@@ -40,6 +59,7 @@ class GymEquipmentResponse(BaseModel):
     target_muscles: Optional[List[str]] = None
     image_url: Optional[str] = None
     supported_actions_count: int = 0
+    supported_actions: Optional[List[ActionInfoResponse]] = None  # ✅ 新增字段
     
     class Config:
         from_attributes = True

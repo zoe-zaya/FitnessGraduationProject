@@ -29,6 +29,7 @@ EQUIPMENT_DATA = [
         "name": "卷腹机",
         "category": "力量训练 - 固定器械",
         "description": "专门用于腹部卷腹训练的固定器械，可调节阻力，适合核心肌群强化训练",
+        "image_url": "eq_0.png",
         "target_muscles": ["腹直肌", "腹外斜肌", "核心肌群"]
     },
     {
@@ -36,6 +37,7 @@ EQUIPMENT_DATA = [
         "name": "杠铃",
         "category": "力量训练 - 自由重量",
         "description": "基础自由重量训练器材，可进行深蹲、硬拉、卧推、推举等多种复合动作",
+        "image_url": "eq_1.png",
         "target_muscles": ["全身肌群", "核心肌群", "下肢肌群", "上肢肌群"]
     },
     {
@@ -43,6 +45,7 @@ EQUIPMENT_DATA = [
         "name": "卧推凳",
         "category": "辅助器材",
         "description": "配合哑铃或杠铃进行卧推训练的辅助器材，可调节角度进行上斜、平板、下斜卧推",
+        "image_url": "eq_2.png",
         "target_muscles": ["胸大肌", "三角肌前束", "肱三头肌"]
     },
     {
@@ -50,6 +53,7 @@ EQUIPMENT_DATA = [
         "name": "龙门架",
         "category": "力量训练 - 固定器械",
         "description": "多功能绳索训练器械，可进行夹胸、下拉、划船等多种拉力动作，训练角度灵活",
+        "image_url": "eq_3.png",
         "target_muscles": ["胸大肌", "背阔肌", "三角肌", "肱二头肌"]
     },
     {
@@ -57,6 +61,7 @@ EQUIPMENT_DATA = [
         "name": "坐姿推胸机",
         "category": "力量训练 - 固定器械",
         "description": "胸部训练固定器械，轨迹固定更安全，适合初学者进行胸部力量训练",
+        "image_url": "eq_4.png",
         "target_muscles": ["胸大肌", "三角肌前束", "肱三头肌"]
     },
     {
@@ -64,6 +69,7 @@ EQUIPMENT_DATA = [
         "name": "椭圆机",
         "category": "有氧器械",
         "description": "低冲击有氧训练设备，模拟跑步动作但保护膝关节，适合减脂和心肺功能训练",
+        "image_url": "eq_5.png",
         "target_muscles": ["心肺功能", "下肢肌群", "臀大肌"]
     },
     {
@@ -71,6 +77,7 @@ EQUIPMENT_DATA = [
         "name": "哑铃",
         "category": "力量训练 - 自由重量",
         "description": "自由重量训练器材，可用于多种孤立和复合动作，训练灵活度高",
+        "image_url": "eq_6.png",
         "target_muscles": ["全身肌群", "上肢肌群", "下肢肌群"]
     },
     {
@@ -78,6 +85,7 @@ EQUIPMENT_DATA = [
         "name": "哈克深蹲机",
         "category": "力量训练 - 固定器械",
         "description": "下肢力量训练固定器械，固定轨迹进行深蹲动作，主要锻炼股四头肌和臀大肌",
+        "image_url": "eq_7.png",
         "target_muscles": ["股四头肌", "臀大肌", "腘绳肌"]
     },
     {
@@ -85,6 +93,7 @@ EQUIPMENT_DATA = [
         "name": "臀部外展/内收机",
         "category": "力量训练 - 固定器械",
         "description": "专门训练臀部和大腿内外侧肌群的固定器械，可分别进行外展和内收动作",
+        "image_url": "eq_8.png",
         "target_muscles": ["臀中肌", "臀小肌", "大腿内收肌群", "大腿外展肌群"]
     },
     {
@@ -92,6 +101,7 @@ EQUIPMENT_DATA = [
         "name": "动感单车",
         "category": "有氧器械",
         "description": "室内自行车有氧训练设备，可调节阻力进行高强度间歇训练，适合减脂和心肺功能提升",
+        "image_url": "eq_9.png",
         "target_muscles": ["心肺功能", "股四头肌", "腘绳肌", "臀大肌"]
     },
     {
@@ -99,6 +109,7 @@ EQUIPMENT_DATA = [
         "name": "壶铃",
         "category": "力量训练 - 自由重量",
         "description": "动态力量训练器材，适合爆发力训练和功能性训练，可进行摇摆、抓举、挺举等动作",
+        "image_url": "eq_10.png",
         "target_muscles": ["核心肌群", "臀大肌", "肩部", "下肢肌群"]
     },
     {
@@ -106,6 +117,7 @@ EQUIPMENT_DATA = [
         "name": "高位下拉器",
         "category": "力量训练 - 固定器械",
         "description": "背部训练器械，主要锻炼背阔肌，可进行正握、反握、窄握等多种握法",
+        "image_url": "eq_11.png",
         "target_muscles": ["背阔肌", "肱二头肌", "三角肌后束", "斜方肌"]
     },
     {
@@ -113,6 +125,7 @@ EQUIPMENT_DATA = [
         "name": "腿弯举机",
         "category": "力量训练 - 固定器械",
         "description": "孤立锻炼腘绳肌（大腿后侧）的器械，可进行坐姿或俯卧腿弯举",
+        "image_url": "eq_12.png",
         "target_muscles": ["腘绳肌", "股二头肌", "半腱肌", "半膜肌"]
     },
     {
@@ -120,6 +133,7 @@ EQUIPMENT_DATA = [
         "name": "腿部推蹬机",
         "category": "力量训练 - 固定器械",
         "description": "下肢复合力量训练器械，可进行大重量的腿部推蹬训练，主要锻炼股四头肌和臀大肌",
+        "image_url": "eq_13.png",
         "target_muscles": ["股四头肌", "臀大肌", "腘绳肌", "小腿三头肌"]
     },
     {
@@ -127,6 +141,7 @@ EQUIPMENT_DATA = [
         "name": "划船机",
         "category": "有氧器械",
         "description": "全身有氧训练设备，模拟划船动作，可同时锻炼心肺功能和背部肌群",
+        "image_url": "eq_14.png",
         "target_muscles": ["背阔肌", "心肺功能", "核心肌群", "肱二头肌"]
     },
     {
@@ -134,6 +149,7 @@ EQUIPMENT_DATA = [
         "name": "肩部推举机",
         "category": "力量训练 - 固定器械",
         "description": "肩部训练固定器械，轨迹固定更安全，主要锻炼三角肌前束和中束",
+        "image_url": "eq_15.png",
         "target_muscles": ["三角肌前束", "三角肌中束", "肱三头肌", "上斜方肌"]
     },
     {
@@ -141,6 +157,7 @@ EQUIPMENT_DATA = [
         "name": "史密斯机",
         "category": "力量训练 - 固定器械",
         "description": "固定轨迹的杠铃训练器械，适合深蹲、卧推、推举等复合动作，安全性高",
+        "image_url": "eq_16.png",
         "target_muscles": ["胸大肌", "三角肌", "肱三头肌", "股四头肌", "臀大肌"]
     },
     {
@@ -148,6 +165,7 @@ EQUIPMENT_DATA = [
         "name": "登山机",
         "category": "有氧器械",
         "description": "模拟登山动作的有氧训练设备，可调节阻力进行高强度心肺训练",
+        "image_url": "eq_17.png",
         "target_muscles": ["心肺功能", "下肢肌群", "臀大肌", "核心肌群"]
     },
     {
@@ -155,6 +173,7 @@ EQUIPMENT_DATA = [
         "name": "跑步机",
         "category": "有氧器械",
         "description": "室内有氧训练设备，可调节速度和坡度进行跑步或快走训练，适合减脂和心肺功能提升",
+        "image_url": "eq_18.png",
         "target_muscles": ["心肺功能", "下肢肌群", "臀大肌", "小腿三头肌"]
     },
     {
@@ -162,6 +181,7 @@ EQUIPMENT_DATA = [
         "name": "瑜伽垫",
         "category": "辅助器材",
         "description": "瑜伽、普拉提、拉伸等训练的辅助器材，提供缓冲和防滑功能",
+        "image_url": "eq_19.png",
         "target_muscles": ["全身肌群", "核心肌群", "柔韧性"]
     },
     {
@@ -169,6 +189,7 @@ EQUIPMENT_DATA = [
         "name": "无器材",
         "category": "辅助器材",
         "description": "适用于无器材训练的场景，强调身体自重训练和功能性训练",
+        "image_url": "none.png",
         "target_muscles": ["全身肌群", "核心肌群", "功能性训练"]
     }
 ]
@@ -196,6 +217,7 @@ def seed_equipment():
                 name=eq_data["name"],
                 category=eq_data["category"],
                 description=eq_data["description"],
+                image_url=eq_data["image_url"],
                 target_muscles=json.dumps(eq_data["target_muscles"], ensure_ascii=False)
             )
             db.add(equipment)

@@ -1,14 +1,5 @@
 <template>
-  <view class="container">
-    <!-- 顶部操作栏 -->
-    <view class="header">
-      <text class="title">我的健身房</text>
-      <view class="add-btn" @click="showAddDialog = true">
-        <text class="add-icon">+</text>
-        <text class="add-text">添加</text>
-      </view>
-    </view>
-    
+  <view class="container">    
     <!-- 健身房列表 -->
     <view class="gym-list" v-if="gymList.length > 0">
       <view 
@@ -39,8 +30,7 @@
     <view class="empty-state" v-else>
       <image src="/static/empty-gym.png" class="empty-image" mode="aspectFit" />
       <text class="empty-text">暂无健身房</text>
-      <text class="empty-subtext">点击右上角添加您的第一个健身房</text>
-      <button class="add-gym-btn" @click="showAddDialog = true">添加健身房</button>
+      <text class="empty-subtext">点击下方按钮添加您的第一个健身房</text>
     </view>
     
     <!-- 添加健身房弹窗 -->
@@ -107,6 +97,12 @@
         </view>
       </view>
     </view>
+    
+    <!-- 右下角悬浮添加按钮 -->
+    <img src="/static/add.png" 
+      class="fab-button" 
+      mode="aspectFit" 
+      @click="showAddDialog = true">
   </view>
 </template>
 
@@ -359,7 +355,7 @@ const deleteGym = async (inventoryId) => {
 .container {
   min-height: 100vh;
   background: $fitness-primary;
-  padding: 0 0 40rpx;
+  padding: 0 0 150rpx; /* 为悬浮按钮预留空间 */
 }
 
 .header {
@@ -400,7 +396,7 @@ const deleteGym = async (inventoryId) => {
   padding: 30rpx 40rpx;
   
   .gym-card {
-    background: #FFFFFF;
+    background: $fitness-secondary;
     border-radius: $radius-md;
     padding: 30rpx;
     margin-bottom: 30rpx;
@@ -485,15 +481,27 @@ const deleteGym = async (inventoryId) => {
     color: $fitness-text-gray;
     margin-bottom: 40rpx;
   }
+}
+
+// ==================== 悬浮按钮样式 ====================
+
+.fab-button {
+  position: fixed;
+  right: 30rpx;
+  bottom: 100rpx;
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 8rpx 24rpx rgba(7, 4, 4, 0.2);
+  z-index: 998;
+  margin-bottom: 20rpx;
   
-  .add-gym-btn {
-    width: 300rpx;
-    height: 80rpx;
-    background: $fitness-primary;
-    color: #FFFFFF;
-    font-size: $font-md;
-    border-radius: 40rpx;
-    border: none;
+  &:active {
+    transform: scale(0.95);
+    opacity: 0.9;
   }
 }
 

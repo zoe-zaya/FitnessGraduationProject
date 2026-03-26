@@ -20,10 +20,29 @@
           class="result-item" 
           v-for="(item, index) in searchResults" 
           :key="item.equipment_id"
-          @click="selectEquipment(item)"
         >
-          <text class="item-name">{{ item.name }}</text>
-          <text class="item-category">{{ item.category }}</text>
+        <view class="image-wrapper">
+          <image 
+            :src="'/static/' + item.image_url" 
+            class="equipment-image"
+            mode="aspectFill"
+            lazy-load
+          />
+          <!-- 图片加载失败时的备用显示 -->
+          <view class="image-placeholder" v-if="!item.image_url">
+            <text class="placeholder-icon">🏋️</text>
+          </view>
+        </view>
+
+          <view class="equipment-info">
+            <text class="item-name">{{ item.name }}</text>
+            <text class="item-category">{{ item.category }}</text>
+          </view>
+          
+          <view class="button-group">
+            <button class="select-btn" @click="selectEquipment(item)">选择</button>
+            <button class="add-btn" @click="addEquipmentToGym(item)">添加</button>
+          </view>
         </view>
       </view>
       
@@ -68,6 +87,7 @@
     try {
       const res = await request.get(`${API.EQUIPMENT_SEARCH}?keyword=${keyword.value}`)
       searchResults.value = res
+      console.log('搜索结果:', searchResults.value)
       hasSearched.value = true
     } catch (error) {
       console.error('搜索失败:', error)
@@ -81,83 +101,184 @@
    */
   const selectEquipment = (equipment) => {
     uni.navigateTo({ 
-      url: `/pages/gym/add-equipment-manual-2?inventory_id=${inventoryId.value}&equipment_id=${equipment.equipment_id}&name=${equipment.name}` 
+      url: `/pages/gym/add-equipment-manual-2?inventory_id=${inventoryId.value}&equipment_id=${equipment.equipment_id}` 
     })
   }
-  </script>
+
+  /**
+   * 添加器材到健身房
+   */
+  const addEquipmentToGym = async (equipment) => {
+    //loading.value = true
+    
+    try {
+      console.log('添加器材:', equipment) 
+      console.log('健身房ID:', inventoryId.value)
+      console.log('器材ID:', equipment.equipment_id)
+      await request.post(`${API.EQUIPMENT_ADD_MANUAL}/${inventoryId.value}/manual`, {
+        inventory_id: inventoryId.value,
+        equipment_id: equipment.equipment_id
+      })
+      
+      uni.showToast({ title: '添加成功', icon: 'success' })
+      
+      /*setTimeout(() => {
+        uni.navigateBack({ delta: 1 })
+      }, 1000)*/
+    } catch (error) {
+      console.error('添加失败:', error)
+    } finally {
+      //loading.value = false
+    }
+  }
+</script>
+
+<style lang="scss" scoped>
+@import '@/uni.scss';
+
+.container {
+  min-height: 100vh;
+  background: $fitness-primary;
+  padding: 30rpx 40rpx;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  background: #FFFFFF;
+  border-radius: 40rpx;
+  padding: 20rpx 30rpx;
+  margin-bottom: 30rpx;
+  border: 1rpx solid $divider-ios; // iOS风格边框
+
   
-  <style lang="scss" scoped>
-  @import '@/uni.scss';
-  
-  .container {
-    min-height: 100vh;
-    background: $fitness-primary;
-    padding: 30rpx 40rpx;
+  .search-input {
+    flex: 1;
+    font-size: $font-md;
+    padding: 10rpx 0;
   }
   
-  .search-bar {
+  .search-btn {
+    padding: 10rpx 20rpx;
+    
+    .search-icon {
+      font-size: 32rpx;
+    }
+  }
+}
+
+.search-results {
+  .result-item {
+    background:$fitness-secondary;
+    border-radius: $radius-md;
+    padding: 30rpx;
+    margin-bottom: 20rpx;
     display: flex;
     align-items: center;
-    background: #FFFFFF;
-    border-radius: 40rpx;
-    padding: 20rpx 30rpx;
-    margin-bottom: 30rpx;
     
-    .search-input {
+    // 图片区域样式
+    .image-wrapper {
+      position: relative;
+      width: 160rpx;
+      height: 160rpx;
+      margin-right: 20rpx;
+      flex-shrink: 0;
+      
+      .equipment-image {
+        width: 100%;
+        height: 100%;
+        border-radius: $radius-sm;
+        background: #F5F5F5;
+      }
+      
+      .image-placeholder {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: #F5F5F5;
+        border-radius: $radius-sm;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        
+        .placeholder-icon {
+          font-size: 60rpx;
+        }
+      }
+    }
+    
+    .equipment-info {
       flex: 1;
-      font-size: $font-md;
-      padding: 10rpx 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
     
-    .search-btn {
-      padding: 10rpx 20rpx;
+    .button-group {
+      display: flex;
+      flex-direction: column;
+      gap: 15rpx;
       
-      .search-icon {
-        font-size: 32rpx;
-      }
-    }
-  }
-  
-  .search-results {
-    .result-item {
-      background: #FFFFFF;
-      border-radius: $radius-md;
-      padding: 30rpx;
-      margin-bottom: 20rpx;
-      
-      .item-name {
-        display: block;
-        font-size: $font-lg;
-        font-weight: bold;
+      .select-btn {
+        background: $fitness-secondary;
         color: $fitness-text;
-        margin-bottom: 10rpx;
+        border: none;
+        border-radius: $radius-sm;
+        font-size: $font-md;
+        padding: 15rpx 20rpx;
+        margin: 0;
+        width: auto;
+        height: auto;
       }
       
-      .item-category {
-        display: block;
-        font-size: $font-sm;
-        color: $uni-primary;
+      .add-btn {
+        background: $uni-primary;
+        color: white;
+        border: none;
+        border-radius: $radius-sm;
+        font-size: $font-md;
+        padding: 15rpx 20rpx;
+        margin: 0;
+        width: auto;
+        height: auto;
       }
     }
-  }
-  
-  .empty-state, .default-tip {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 100rpx 40rpx;
-    text-align: center;
     
-    .empty-text, .tip-text {
+    .item-name {
+      display: block;
       font-size: $font-lg;
-      color: $fitness-text-light;
+      font-weight: bold;
+      color: $fitness-text;
       margin-bottom: 10rpx;
     }
     
-    .empty-subtext, .tip-subtext {
+    .item-category {
+      display: block;
       font-size: $font-sm;
-      color: $fitness-text-gray;
+      color: $uni-primary;
     }
   }
-  </style>
+}
+
+.empty-state, .default-tip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 100rpx 40rpx;
+  text-align: center;
+  
+  .empty-text, .tip-text {
+    font-size: $font-lg;
+    color: $fitness-text-light;
+    margin-bottom: 10rpx;
+  }
+  
+  .empty-subtext, .tip-subtext {
+    font-size: $font-sm;
+    color: $fitness-text-gray;
+  }
+}
+</style>

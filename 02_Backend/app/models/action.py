@@ -7,12 +7,11 @@ TrainingAction（训练动作）业务对象模型
 (3) 动作难度需与用户经验水平匹配（初学者不推荐高级动作）
 """
 
-from sqlalchemy import Column, String, Integer, ForeignKey, Text, Enum
+from sqlalchemy import Column, String, Integer, ForeignKey, Text, Enum, DateTime
 from sqlalchemy.orm import relationship
+from datetime import datetime
 import enum
 from app.utils.db import Base
-from datetime import datetime
-from sqlalchemy import DateTime
 
 
 class ActionCategoryEnum(str, enum.Enum):
@@ -45,6 +44,7 @@ class TrainingAction(Base):
                          nullable=True, index=True, comment="关联器材 ID，无器械动作为'none'")
     estimated_seconds = Column(Integer, nullable=True, comment="单次估算时长（秒），用于力量训练")
     video_demo_url = Column(String(512), nullable=True, comment="标准动作演示视频资源地址")
+    image_url = Column(String(512), nullable=True, comment="✅ 动作演示图片资源地址")  # ✅ 新增字段
     safety_tips = Column(Text, nullable=True, comment="安全注意事项与常见错误纠正提示")
     create_time = Column(DateTime, default=datetime.now, comment="记录创建时间")
 

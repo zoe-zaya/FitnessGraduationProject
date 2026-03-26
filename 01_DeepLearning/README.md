@@ -266,7 +266,7 @@ model = torch.hub.load('ultralytics/yolov5', 'custom',
 inference_times = []
 for i in range(50):
     start = time.time()
-    results = model('/kaggle/input/datasets/enkhuushhhh/fitness-dataset/fitness_equipment/images/test/1010.jpg')
+    results = model('/kaggle/input/datasets/enkhuushhhh/fitness-dataset/fitness_equipment/images/test/1010.png')
     end = time.time()
     inference_times.append(end - start)
 

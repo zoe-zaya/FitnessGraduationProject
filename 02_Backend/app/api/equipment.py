@@ -21,7 +21,8 @@ from app.models.action import TrainingAction
 from app.schemas.equipment import (
     EquipmentInventoryCreate, EquipmentInventoryCreateResponse, EquipmentInventoryUpdate, EquipmentInventoryResponse,
     GymEquipmentResponse, EquipmentAddManualRequest, EquipmentAddAutoRequest, EquipmentListResponse,
-    EquipmentDetectionResponse, EquipmentDetectionResult
+    EquipmentDetectionResponse, EquipmentDetectionResult,
+    ActionInfoResponse
 )
 from app.core.security import get_current_user
 from app.services.detection import EquipmentDetector
@@ -210,12 +211,13 @@ async def get_inventory_detail(
     """
     获取指定健身房的详细信息
     对应《需求规格说明书》3.2 节查看器材用例
+    修改：equipment_list 中包含 image_url 字段
     """
     # 1. 验证权限
     inventoryUserId = db.query(EquipmentInventory).filter(
         EquipmentInventory.user_id == current_user.user_id
     ).first()
-
+    
     # 2. 器材清单是否存在
     inventory = db.query(EquipmentInventory).filter(
         EquipmentInventory.inventory_id == inventory_id
@@ -233,7 +235,7 @@ async def get_inventory_detail(
             detail="健身房不存在"
         )
     
-    # 2. 查询清单内的器材
+    # 3. 查询清单内的器材（✅ 修改：包含 image_url）
     equipment_list = []
     rels = db.query(inventory_equipment_rel).filter(
         inventory_equipment_rel.c.inventory_id == inventory_id
@@ -249,7 +251,8 @@ async def get_inventory_detail(
                 name=equipment.name,
                 category=equipment.category,
                 description=equipment.description,
-                target_muscles=equipment.get_target_muscles_list()
+                target_muscles=equipment.get_target_muscles_list(),
+                image_url=equipment.image_url  # ✅ 新增字段
             ))
     
     return EquipmentInventoryResponse(
@@ -521,7 +524,7 @@ async def add_equipment_auto(
 
 # ==================== 器材查询与删除 ====================
 
-@router.get("/getEquipmentById/{equipment_id}", response_model=GymEquipmentResponse, summary="根据器材ID查看器材详细信息")
+@router.get("/getEquipmentById/{equipment_id}", response_model=GymEquipmentResponse, summary="根据器材 ID 查看器材详细信息")
 async def get_equipment_detail(
     equipment_id: str,
     current_user: User = Depends(get_current_user),
@@ -542,10 +545,24 @@ async def get_equipment_detail(
             detail="找不到搜索的器材"
         )
     
-    # 查询支持的动作数量
-    actions_count = db.query(TrainingAction).filter(
+    # 查询支持的动作列表（《需求规格说明书》表 2-3 supportedActions）
+    actions = db.query(TrainingAction).filter(
         TrainingAction.equipment_id == equipment_id
-    ).count()
+    ).limit(20).all()  # 限制返回 20 个动作，避免数据过大
+    
+    supported_actions = []
+    for action in actions:
+        supported_actions.append(ActionInfoResponse(
+            action_id=action.action_id,
+            name=action.name,
+            action_category=action.action_category,
+            difficulty_level=action.difficulty_level,
+            estimated_seconds=action.estimated_seconds,
+            target_muscles=action.get_target_muscles_list(),
+            image_url=action.image_url,  # ✅ 新增字段
+            video_demo_url=action.video_demo_url,
+            safety_tips=action.safety_tips
+        ))
     
     return GymEquipmentResponse(
         equipment_id=equipment.equipment_id,
@@ -554,9 +571,9 @@ async def get_equipment_detail(
         description=equipment.description,
         target_muscles=equipment.get_target_muscles_list(),
         image_url=equipment.image_url,
-        supported_actions_count=actions_count
+        supported_actions_count=len(supported_actions),
+        supported_actions=supported_actions
     )
-
 
 @router.get("/getEquipmentByKey/search", response_model=List[GymEquipmentResponse], summary="根据关键词搜索器材")
 async def search_equipment(
@@ -570,7 +587,6 @@ async def search_equipment(
     返回：匹配的器材列表（名称、分类、描述、目标肌群、支持的动作数量）
     """
     # 1. 验证关键词
-    #print(f"搜索关键词: {keyword}, 长度: {len(keyword)}")
     if not keyword or len(keyword.strip()) == 0:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -579,7 +595,8 @@ async def search_equipment(
     
     # 2. 模糊搜索器材名称和分类
     equipments = db.query(GymEquipment).filter(
-        (GymEquipment.name.like(f"%{keyword}%"))|(GymEquipment.category.like(f"%{keyword}%"))
+        (GymEquipment.name.like(f"%{keyword}%")) | 
+        (GymEquipment.category.like(f"%{keyword}%"))
     ).limit(21).all()
     
     # 3. 检查是否有结果
@@ -592,9 +609,29 @@ async def search_equipment(
     # 4. 构建响应
     response_list = []
     for eq in equipments:
+        # 查询支持的动作数量
         actions_count = db.query(TrainingAction).filter(
             TrainingAction.equipment_id == eq.equipment_id
         ).count()
+        
+        # 查询支持的动作列表（前 5 个）
+        actions = db.query(TrainingAction).filter(
+            TrainingAction.equipment_id == eq.equipment_id
+        ).limit(5).all()
+        
+        supported_actions = []
+        for action in actions:
+            supported_actions.append(ActionInfoResponse(
+                action_id=action.action_id,
+                name=action.name,
+                action_category=action.action_category,
+                difficulty_level=action.difficulty_level,
+                estimated_seconds=action.estimated_seconds,
+                target_muscles=action.get_target_muscles_list(),
+                image_url=action.image_url,  # ✅ 新增字段
+                video_demo_url=action.video_demo_url,
+                safety_tips=action.safety_tips
+            ))
         
         response_list.append(GymEquipmentResponse(
             equipment_id=eq.equipment_id,
@@ -603,7 +640,8 @@ async def search_equipment(
             description=eq.description,
             target_muscles=eq.get_target_muscles_list(),
             image_url=eq.image_url,
-            supported_actions_count=actions_count
+            supported_actions_count=actions_count,
+            supported_actions=supported_actions
         ))
     
     return response_list
