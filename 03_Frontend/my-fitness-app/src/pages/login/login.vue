@@ -161,7 +161,7 @@
   .container {
     min-height: 100vh;
     background: url('@/static/background.png') no-repeat center center / cover;
-    padding: 80rpx 48rpx 48rpx;
+    padding: 48rpx 48rpx 48rpx;
   }
 
   .logo-section {
@@ -169,17 +169,15 @@
     margin-bottom: 40rpx;
 
     .logo {
-      width: 200rpx;
-      height: 200rpx;
-      margin-bottom: 20rpx;
+      width: 220rpx;
+      height: 220rpx;
     }
 
     .title {
       display: block;
-      font-size: $font-xxl;
+      font-size: $font-xxxl;
       font-weight: 700;
-      color: $fitness-text;
-      margin-bottom: 10rpx;
+      color: rgb(160 62 64 / var(--tw-text-opacity, 1));      margin-bottom: 10rpx;
     }
 
     .subtitle {
@@ -210,6 +208,7 @@
           margin-left: 0.25rem;
           color: rgb(86 66 65 / var(--tw-text-opacity, 1));
       }
+
       .input-item {
         position: relative;
         margin-bottom: 30rpx;
@@ -227,6 +226,7 @@
           position: absolute;
           width:32rpx;
         }
+        
         .input {
           transition-property: all;
           transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
