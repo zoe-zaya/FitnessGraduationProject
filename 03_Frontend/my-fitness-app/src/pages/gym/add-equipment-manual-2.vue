@@ -155,7 +155,7 @@ const navigateToEquipmentList = (inventoryId) => {
   width: 100%;
   height: 400rpx;
   border-radius: $radius-lg;
-  margin-bottom: 40rpx;
+  margin-bottom: $size-5;
   position: relative;
   overflow: hidden;
   background-color: #f5f5f5;
@@ -186,12 +186,12 @@ const navigateToEquipmentList = (inventoryId) => {
 .info-card {
   background: #FFFFFF;
   border-radius: $radius-lg;
-  padding: 40rpx;
-  margin-bottom: 40rpx;
+  padding: $size-5;
+  margin-bottom: $size-5;
   box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.05);
   
   .info-header {
-    margin-bottom: 40rpx;
+    margin-bottom: $size-5;
     padding-bottom: 30rpx;
     border-bottom: 1rpx solid $fitness-border;
     
@@ -239,8 +239,8 @@ const navigateToEquipmentList = (inventoryId) => {
 .actions-card {
   background: #FFFFFF;
   border-radius: $radius-lg;
-  padding: 40rpx;
-  margin-bottom: 40rpx;
+  padding: $size-5;
+  margin-bottom: $size-5;
   box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.05);
   
   .card-header {

@@ -263,7 +263,7 @@
         width: auto;
         font-size: $font-xs;
         font-weight: bold;
-        padding: 4rpx 16rpx;
+        padding: 4rpx $size-2;
         border-radius: $radius-sm;
         
         &.strength-weak {
@@ -285,7 +285,7 @@
     
     .submit-btn {
       width: 100%;
-      height: 88rpx;
+      height: $size-11;
       background: $uni-primary;
       color: #FFFFFF;
       font-size: $font-lg;
@@ -307,7 +307,7 @@
       text-align: right;
       font-size: $font-xs;
       color: $uni-primary;
-      margin-top: 40rpx;
+      margin-top: $size-5;
     }
   
   .security-notice {

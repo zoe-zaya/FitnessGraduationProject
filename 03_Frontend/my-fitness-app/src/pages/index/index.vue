@@ -72,18 +72,18 @@ const recordExercise = () => {
 .container {
   min-height: 100vh;
   background-color: $fitness-secondary;
-  padding: 40rpx 40rpx 0;
+  padding: $size-5 $size-5 0;
 }
 
 .welcome-section {
   background: $fitness-primary;
   border-radius: $radius-lg;
-  padding: 40rpx;
+  padding: $size-5;
   margin-bottom: $spacing-lg;
   box-shadow: 0 1rpx 0 0 $divider-ios; // iOS风格阴影
   
   .greeting {
-    margin-bottom: 40rpx;
+    margin-bottom: $size-5;
     
     .greeting-text {
       display: block;
@@ -134,7 +134,7 @@ const recordExercise = () => {
     flex: 1;
     background: $fitness-primary;
     border-radius: $radius-lg;
-    padding: 40rpx 20rpx;
+    padding: $size-5 20rpx;
     text-align: center;
     box-shadow: 0 1rpx 0 0 $divider-ios; // iOS风格阴影
     
@@ -163,7 +163,7 @@ const recordExercise = () => {
 .recent-section {
   background: $fitness-primary;
   border-radius: $radius-lg;
-  padding: 40rpx;
+  padding: $size-5;
   box-shadow: 0 1rpx 0 0 $divider-ios; // iOS风格阴影
   
   .section-title {

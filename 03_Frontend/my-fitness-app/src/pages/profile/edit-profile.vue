@@ -221,7 +221,7 @@ const handleSubmit = async () => {
 .container {
   min-height: 100vh;
   background: $fitness-primary;
-  padding: 40rpx;
+  padding: $size-5;
 }
 
 .avatar-section {
@@ -260,7 +260,7 @@ const handleSubmit = async () => {
     
     .input, .picker {
       width: 100%;
-      height: 80rpx;
+      height: $size-10;
       background: $fitness-secondary;
       border-radius: $radius-sm;
       padding: 0 20rpx;
@@ -292,7 +292,7 @@ const handleSubmit = async () => {
   
   .submit-btn {
     width: 100%;
-    height: 88rpx;
+    height: $size-11;
     background: $uni-primary;
     color: #FFFFFF;
     font-size: $font-lg;

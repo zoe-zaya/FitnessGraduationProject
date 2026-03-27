@@ -139,14 +139,14 @@
 .container {
   min-height: 100vh;
   background: $fitness-primary;
-  padding: 30rpx 40rpx;
+  padding: 30rpx $size-5;
 }
 
 .search-bar {
   display: flex;
   align-items: center;
   background: #FFFFFF;
-  border-radius: 40rpx;
+  border-radius: $size-5;
   padding: 20rpx 30rpx;
   margin-bottom: 30rpx;
   border: 1rpx solid $divider-ios; // iOS风格边框
@@ -162,7 +162,7 @@
     padding: 10rpx 20rpx;
     
     .search-icon {
-      font-size: 32rpx;
+      font-size: $size-4;
     }
   }
 }
@@ -267,7 +267,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 100rpx 40rpx;
+  padding: 100rpx $size-5;
   text-align: center;
   
   .empty-text, .tip-text {

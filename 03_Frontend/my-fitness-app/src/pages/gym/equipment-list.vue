@@ -233,9 +233,9 @@ const generatePlan = () => {
 // ✅ 新增：健身房信息卡片样式
 .gym-info-card {
   background: $fitness-card-bg;
-  margin: 30rpx 40rpx;
+  margin: 30rpx $size-5;
   border-radius: $radius-lg;
-  padding: 40rpx;
+  padding: $size-5;
   box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.08);
   
   .gym-header {
@@ -297,7 +297,7 @@ const generatePlan = () => {
       align-items: center;
       
       .btn-icon {
-        font-size: 40rpx;
+        font-size: $size-5;
       }
       
       .btn-text {
@@ -323,7 +323,7 @@ const generatePlan = () => {
 }
 
 .equipment-list {
-  padding: 0 40rpx 40rpx;
+  padding: 0 $size-5 $size-5;
   
   .equipment-card {
     background: $fitness-card-bg;
@@ -414,7 +414,7 @@ const generatePlan = () => {
       flex-shrink: 0;
       
       .delete-icon {
-        font-size: 28rpx;
+        font-size: 2$size-1;
       }
     }
   }
@@ -425,12 +425,12 @@ const generatePlan = () => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 100rpx 40rpx;
+  padding: 100rpx $size-5;
   
   .empty-image {
     width: 300rpx;
     height: 300rpx;
-    margin-bottom: 40rpx;
+    margin-bottom: $size-5;
   }
   
   .empty-text {

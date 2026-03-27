@@ -142,7 +142,7 @@ const navigateToUpdatePassword = () => {
       .menu-icon {
         font-size: $font-xl;
         margin-right: 20rpx;
-        width: 48rpx;
+        width: $size-6;
         text-align: center;
       }
       

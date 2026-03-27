@@ -18,6 +18,9 @@
               type="number" 
               placeholder="请输入手机号"
               class="input"
+              :class="{ 'input-focus': focusedInput === 'phone' }"
+              @focus="onInputFocus('phone')"
+              @blur="onInputBlur"
               maxlength="11"
             />
           </view>
@@ -30,6 +33,9 @@
               type="password" 
               placeholder="请输入密码"
               class="input"
+              :class="{ 'input-focus': focusedInput === 'password' }"
+              @focus="onInputFocus('password')"
+              @blur="onInputBlur"
             />
             <uni-icons type="eye-filled" size="20" color="#8E8E93"></uni-icons>
           </view>
@@ -59,11 +65,20 @@
   
   const userStore = useUserStore()
   const loading = ref(false)
+  const focusedInput = ref(null)
   
   const formData = ref({
     phone: '',
     password: ''
   })
+  
+  const onInputFocus = (inputName) => {
+    focusedInput.value = inputName
+  }
+  
+  const onInputBlur = () => {
+    focusedInput.value = null
+  }
   
   /**
    * 处理登录
@@ -127,10 +142,10 @@
         uni.showToast({ 
           title: '请先完善个人资料和身体数据', 
           icon: 'none', 
-          duration: 2000 
+          duration: 1000 
         })
         setTimeout(() => {
-          uni.redirectTo({ url: '/pages/profile/edit-profile' })
+          uni.redirectTo({ url: '/pages/profile/edit-profile-login' })
         }, 1500)
       }
     }catch(error){
@@ -138,7 +153,7 @@
       uni.showToast({ 
           title: '检查资料完整性失败', 
           icon: 'none', 
-          duration: 2000 
+          duration: 1000 
         })
       // 如果检查失败，默认跳转登陆页面
       setTimeout(() => {
@@ -161,12 +176,13 @@
   .container {
     min-height: 100vh;
     background: url('@/static/background.png') no-repeat center center / cover;
-    padding: 48rpx 48rpx 48rpx;
+    padding: $size-4 $size-6 $size-6;
+    font-family: Manrope;
   }
 
   .logo-section {
     text-align: center;
-    margin-bottom: 40rpx;
+    margin-bottom: $size-5;
 
     .logo {
       width: 220rpx;
@@ -175,23 +191,23 @@
 
     .title {
       display: block;
-      font-size: $font-xxxl;
+      font-size: $size-8;
       font-weight: 700;
-      color: rgb(160 62 64 / var(--tw-text-opacity, 1));      margin-bottom: 10rpx;
+      color: $color-primary;      
     }
 
     .subtitle {
       display: block;
-      font-size: $font-md;
-      color: $fitness-text-light;
+      font-size: $size-3;
+      color: $color-secondory;
     }
   }
 
   .form-section {
     background: rgba(252, 249, 248, 0.7);
-    border-radius: $radius-l;
-    padding: 64rpx;
-    box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.1);
+    border-radius: $size-4;
+    padding: $size-8;
+    box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.12);
     .shadow-\[0_8px_24px_rgba\(160\2c 62\2c 64\2c 0\.06\)\] {
       --tw-shadow: 0 8px 24px rgba(160,62,64,0.06);
       --tw-shadow-colored: 0 8px 24px var(--tw-shadow-color);
@@ -201,58 +217,55 @@
     .input-wrapper {
       .text{
           font-weight: 700;
-          font-size: 0.75rem;
-          line-height: 1rem;
-          font-family: Manrope;
+          font-size: $size-3;
+          line-height: $size-5;
           display: block;
-          margin-left: 0.25rem;
-          color: rgb(86 66 65 / var(--tw-text-opacity, 1));
+          margin-left: $size-1;
+          color: $color-label;
       }
 
       .input-item {
         position: relative;
-        margin-bottom: 30rpx;
-        --tw-space-y-reverse: 0;
-        margin-top: calc(0.5rem * calc(1 - var(--tw-space-y-reverse)));
-        margin-bottom: calc(0.5rem * var(--tw-space-y-reverse));
+        margin-bottom: $size-3;
+        margin-top: $size-2;
+        margin-bottom: 0;
         align-items: center;
         display: flex;
         position: relative;
 
         .icon{
-          margin-left: 36rpx;
-          padding-bottom: 28rpx;
+          margin-left: $size-5;
+          padding-bottom: $size-4;
           align-items: center;
           position: absolute;
-          width:32rpx;
+          width: $size-4;
         }
-        
+
         .input {
           transition-property: all;
           transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
           transition-duration: 150ms;
-          --tw-ring-color: rgb(220 192 191 / 0.2);
-          --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
-          --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color);
-          box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
-          --tw-text-opacity: 1;
-          color: rgb(27 28 28 / var(--tw-text-opacity, 1));
-          padding-right: 32rpx;
-          padding-left: 96rpx;
-          padding-top: 32rpx;
-          padding-bottom: 32rpx;
-          --tw-bg-opacity: 1;
-          background-color: rgb(255 255 255 / var(--tw-bg-opacity, 1));
+          color: $color-input;
+          padding-right: $size-4;
+          padding-left: $size-12;
+          padding-top: $size-4;
+          padding-bottom: $size-4;
+          background-color: $fitness-primary;
           border-style: none;
-          border-radius: 32rpx;
+          border-radius: $size-4;
+          border: 2px solid rgba(160, 62, 64, 0.1);
           width: 100%;
-          margin-bottom: 32rpx;
-          font-size: $font-lg;
+          margin-bottom: $size-4;
+          font-size: $size-4;
+        }
+
+        .input-focus {
+          border: 2px solid rgba(160, 62, 64, 0.4);
         }
 
         uni-icons {
           position: absolute;
-          right: 20rpx;
+          right: $size-3;
           top: 50%;
           transform: translateY(-50%);
         }
@@ -261,21 +274,21 @@
 
     .forget-password {
       text-align: right;
-      font-size: $font-md;
-      color: rgb(160 62 64 / var(--tw-text-opacity, 1));
+      font-size: $size-3;
+      color: $color-primary;
       font-weight: 700;
-      line-height: 32rpx;
-      margin-bottom: 30rpx;
+      line-height: $size-4;
+      margin-bottom: $size-3;
       font-family: Manrope;
     }
 
     .login-btn {
       width: 100%;
-      height: 88rpx;
+      height: $size-12;
       background: $button-bg2;
       color: #FFFFFF;
-      font-size: $font-lg;
-      border-radius: $radius-xl;
+      font-size: $size-4;
+      border-radius: $size-6;
       border: none;
       display: flex;
       align-items: center;
@@ -289,12 +302,12 @@
 
     .register-link {
       text-align: center;
-      font-size: $font-md;
-      color: $fitness-text-light;
-      margin-top: 30rpx;
+      font-size: $size-3;
+      color: $color-secondory;
+      margin-top: $size-3;
 
       .link-text {
-        color: rgb(160 62 64 / var(--tw-text-opacity, 1));
+        color: $color-primary;
         font-weight: 700;
         font-family: Manrope;
       }

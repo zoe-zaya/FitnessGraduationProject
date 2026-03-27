@@ -137,13 +137,13 @@
   .container {
     min-height: 100vh;
     background-color: $fitness-primary;
-    padding-bottom: 40rpx;
+    padding-bottom: $size-5;
   }
   
   .user-card {
     background-image: linear-gradient(to bottom, #fab0a7, #fcbdb3, #fdcac0, #fed7ce, #ffe4dd, #ffeae7, #fff0ef, #fff7f7, #fff9fa, #fefbfd, #fefdfe, #ffffff);
     //background-image: linear-gradient(to bottom, #df6860, #e88477, #ef9f90, #f6b9ab, #fbd3c8, #fedfd9, #ffebe9, #fff7f7, #fff9fa, #fefbfd, #fefdfe, #ffffff);
-    padding: 60rpx 40rpx 40rpx;
+    padding: 60rpx $size-5 $size-5;
     display: flex;
     align-items: center;
     box-shadow: 0 1rpx 0 0 $divider-ios; // iOS风格阴影
@@ -164,7 +164,7 @@
         font-size: $font-xl;
         font-weight: 600;
         color: $fitness-text;
-        margin-bottom: 8rpx;
+        margin-bottom: $size-1;
       }
       
       .phone {
@@ -249,7 +249,7 @@
       .menu-icon {
         font-size: $font-lg;
         margin-right: 20rpx;
-        width: 48rpx;
+        width: $size-6;
         text-align: center;
       }
       

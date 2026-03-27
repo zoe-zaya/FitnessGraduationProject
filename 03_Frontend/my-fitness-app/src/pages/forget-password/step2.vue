@@ -163,7 +163,7 @@ const handleSubmit = async () => {
 .container {
   min-height: 100vh;
   background-color: $fitness-primary;
-  padding: 60rpx 40rpx 40rpx;
+  padding: 60rpx $size-5 $size-5;
 }
 
 .form-section {
@@ -192,7 +192,7 @@ const handleSubmit = async () => {
     
     .input {
       width: 100%;
-      height: 96rpx;
+      height: $size-12;
       font-size: $font-md;
       color: $fitness-text;
       padding: 0;
@@ -228,7 +228,7 @@ const handleSubmit = async () => {
       .strength-value {
         font-size: $font-sm;
         font-weight: 600;
-        padding: 8rpx 16rpx;
+        padding: $size-1 $size-2;
         border-radius: $radius-md;
         
         &.strength-weak {
@@ -251,7 +251,7 @@ const handleSubmit = async () => {
   
   .submit-btn {
     width: 100%;
-    height: 88rpx;
+    height: $size-11;
     background: $uni-primary;
     color: #FFFFFF;
     font-size: $font-lg;

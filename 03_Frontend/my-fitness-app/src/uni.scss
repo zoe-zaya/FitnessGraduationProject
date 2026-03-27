@@ -21,47 +21,33 @@ $uni-info: #8E8E93;
 
 /* 健身系统主题色 - 符合iOS设计规范 */
 $fitness-primary: #FFFFFF; // iOS风格以白色为主
-$fitness-secondary: #F2F2F7; // iOS背景色
-$fitness-accent: #007AFF; // iOS高亮色
 $fitness-text: #333333; // iOS深色文字
-$fitness-text-light: #8E8E93; // iOS浅色文字
-$fitness-text-gray: #AEAEB2; // iOS灰色文字
-$fitness-border: #efefef; // iOS边框色
-$fitness-input-bg: #f4f4f4; // iOS输入框背景
-$fitness-card-bg: #FFFFFF; // iOS卡片背景
-$fitness-placeholder: #C7C7CC; // iOS占位符颜色
+$glass-bg1: rgba(252, 249, 248, 0.7);
+$border-shadow: rgba(0, 0, 0, 0.12);
 
 /*健身系统背景色*/
 
-/* 间距 - iOS设计规范 */
-$spacing-xs: 4rpx;
-$spacing-sm: 8rpx;
-$spacing-md: 16rpx;
-$spacing-lg: 24rpx;
-$spacing-xl: 32rpx;
+/*文字颜色*/
+$color-primary: #A03E40;
+$color-secondory: #8E8E93;
+$color-label: #564241;
+$color-input: #1B1C1C;
+$color-line: #e7e5e4;
 
-/* 字体大小 */
-$font-xs: 20rpx; // 10pt
-$font-sm: 22rpx; // 11pt
-$font-md: 24rpx; // 12pt
-$font-lg: 28rpx; // 14pt
-$font-xl: 32rpx; // 16pt
-$font-xxl: 40rpx; // 20pt
-$font-xxxl: 64rpx; // 32pt
-
-/* 边框圆角 - iOS设计规范 */
-$radius-sm: 6rpx;
-$radius-md: 10rpx;
-$radius-lg: 14rpx;
-$radius-l: 48rpx;
-$radius-xl: 50rpx; // 圆形头像
+/*大小*/
+$size-1: 8rpx;
+$size-2: 16rpx;
+$size-3: 24rpx;
+$size-4: 32rpx;
+$size-5: 40rpx;
+$size-6: 48rpx;
+$size-7: 56rpx;
+$size-8: 64rpx;
+$size-9: 72rpx;
+$size-10: 80rpx;
+$size-11: 88rpx;
+$size-12: 96rpx;
 
 /* iOS风格按钮 */
-$button-ios-primary: #007AFF;
-$button-ios-secondary: #F2F2F7;
-$button-ios-destructive: #FF3B30;
-$button-bg: linear-gradient(45deg, #a03e40, #e57373);
+$button-bg: #df6860;
 $button-bg2: #d8696a;
-
-/* iOS风格分割线 */
-$divider-ios: #C6C6C8;

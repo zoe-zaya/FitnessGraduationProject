@@ -50,9 +50,23 @@
       }
     },
     {
+      "path": "pages/profile/body-data-login",
+      "style": {
+        "navigationBarTitleText": "填写资料",
+        "navigationStyle": "default"
+      }
+    },
+    {
       "path": "pages/profile/edit-profile",
       "style": {
         "navigationBarTitleText": "个人资料",
+        "navigationStyle": "default"
+      }
+    },
+    {
+      "path": "pages/profile/edit-profile-login",
+      "style": {
+        "navigationBarTitleText": "填写资料",
         "navigationStyle": "default"
       }
     },

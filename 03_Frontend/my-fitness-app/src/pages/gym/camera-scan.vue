@@ -256,7 +256,7 @@ const uploadAndRecognize = (filePath) => {
     }
     
     .scan-tip {
-      margin-top: 40rpx;
+      margin-top: $size-5;
       font-size: $font-md;
       color: #FFFFFF;
     }
@@ -271,11 +271,11 @@ const uploadAndRecognize = (filePath) => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 100rpx 40rpx;
+  padding: 100rpx $size-5;
   background: #1A1A1A;
   
   .hint-icon {
-    font-size: 80rpx;
+    font-size: $size-10;
     margin-bottom: 20rpx;
   }
   
@@ -289,7 +289,7 @@ const uploadAndRecognize = (filePath) => {
 
 .action-area {
   flex: 1;
-  padding: 40rpx;
+  padding: $size-5;
   background: #000000;
   display: flex;
   align-items: flex-end;
@@ -308,7 +308,7 @@ const uploadAndRecognize = (filePath) => {
       padding: 20rpx;
       
       .btn-icon {
-        font-size: 48rpx;
+        font-size: $size-6;
         margin-bottom: 10rpx;
       }
       
@@ -319,7 +319,7 @@ const uploadAndRecognize = (filePath) => {
       
       &.album {
         .btn-icon {
-          font-size: 40rpx;
+          font-size: $size-5;
         }
       }
     }

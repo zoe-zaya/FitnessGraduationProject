@@ -240,7 +240,7 @@
   .container {
     min-height: 100vh;
     background-color: $fitness-primary;
-    padding: 40rpx 40rpx 0;
+    padding: $size-5 $size-5 0;
   }
   
   .form-section {
@@ -286,7 +286,7 @@
       
       .input, .picker {
         flex: 2;
-        height: 80rpx;
+        height: $size-10;
         font-size: $font-md;
         color: $fitness-text;
         padding: 0;
@@ -299,7 +299,7 @@
     .bmi-card {
       background: #382626;
       border-radius: $radius-lg;
-      padding: 40rpx;
+      padding: $size-5;
       text-align: center;
       margin: $spacing-lg;
       box-shadow: 0 4rpx 10rpx rgba(3, 7, 11, 0.2);
@@ -313,7 +313,7 @@
       
       .bmi-value {
         display: block;
-        font-size: 72rpx;
+        font-size: $size-9;
         font-weight: 700;
         color: rgb(243, 243, 243);
         margin-bottom: 15rpx;
@@ -343,7 +343,7 @@
     
     .submit-btn {
       width: 100%;
-      height: 88rpx;
+      height: $size-11;
       background: $uni-primary;
       color: #FFFFFF;
       font-size: $font-lg;

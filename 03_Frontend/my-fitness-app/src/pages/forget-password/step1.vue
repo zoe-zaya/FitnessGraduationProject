@@ -4,7 +4,9 @@
     <view class="form-section">
       <view class="input-wrapper">
         <!-- 手机号输入 -->
+        <view class="text">手机号</view>
         <view class="input-item">
+          <img src="@/static/phone2.png" class="icon"/>
           <input 
             v-model="formData.phone" 
             type="number" 
@@ -15,8 +17,10 @@
         </view>
         
         <!-- 验证码输入 -->
+        <view class="text">验证码</view>
         <view class="input-item input-with-border">
           <view class="code-input-wrapper">
+            <img src="@/static/verify-code.png" class="icon"/>
             <input 
               v-model="formData.code" 
               type="number" 
@@ -193,22 +197,50 @@ onUnmounted(() => {
 
 .container {
   min-height: 100vh;
-  background-color: $fitness-primary;
-  padding: 60rpx 40rpx 40rpx;
+  background: url('@/static/background2.png') no-repeat center center / cover;
+  padding: 60rpx $size-5 $size-5;
 }
 
 .form-section {
+  background: rgba(252, 249, 248, 0.7);
+  border-radius: $radius-l;
+  padding: $size-8;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.1);
+  .shadow-\[0_8px_24px_rgba\(160\2c 62\2c 64\2c 0\.06\)\] {
+    --tw-shadow: 0 8px 24px rgba(160,62,64,0.06);
+    --tw-shadow-colored: 0 8px 24px var(--tw-shadow-color);
+    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+  }
+
   .input-wrapper {
-    background: $fitness-primary;
-    border-radius: $radius-lg;
-    border: 3.5rpx solid $fitness-border;
-    box-shadow: 0 1rpx 0 0 $divider-ios; // iOS风格阴影
-    overflow: hidden;
+    .text{
+      font-weight: 700;
+      font-size: 0.75rem;
+      line-height: 1rem;
+      font-family: Manrope;
+      display: block;
+      margin-left: 0.25rem;
+      color: rgb(86 66 65 / var(--tw-text-opacity, 1));
+    }
   }
   
   .input-item {
     position: relative;
-    padding: 0 $spacing-lg;
+    margin-bottom: 30rpx;
+    --tw-space-y-reverse: 0;
+    margin-top: calc(0.5rem * calc(1 - var(--tw-space-y-reverse)));
+    margin-bottom: calc(0.5rem * var(--tw-space-y-reverse));
+    align-items: center;
+    display: flex;
+    position: relative;
+    
+    .icon{
+      margin-left: 36rpx;
+      padding-bottom: 2$size-1;
+      align-items: center;
+      position: absolute;
+      width:$size-4;
+    }
     
     &:not(:last-child)::after {
       content: '';
@@ -222,14 +254,26 @@ onUnmounted(() => {
     }
     
     .input {
+      transition-property: all;
+      transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+      transition-duration: 150ms;
+      --tw-ring-color: rgb(220 192 191 / 0.2);
+      --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+      --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+      box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
+      --tw-text-opacity: 1;
+      color: rgb(27 28 28 / var(--tw-text-opacity, 1));
+      padding-right: $size-4;
+      padding-left: $size-12;
+      padding-top: $size-4;
+      padding-bottom: $size-4;
+      --tw-bg-opacity: 1;
+      background-color: rgb(255 255 255 / var(--tw-bg-opacity, 1));
+      border-style: none;
+      border-radius: $size-4;
       width: 100%;
-      height: 96rpx;
-      font-size: $font-md;
-      color: $fitness-text;
-      padding: 0;
-      box-sizing: border-box;
-      border: none;
-      border-bottom: 1rpx solid $fitness-border;
+      margin-bottom: $size-4;
+      font-size: $font-lg;
     }
   }
   
@@ -244,42 +288,46 @@ onUnmounted(() => {
     
     .code-btn {
       width: 170rpx;
-      height: 80rpx;
+      height: 100rpx;
       background: $uni-primary;
       color: #FFFFFF;
       font-size: $font-sm;
-      border-radius: $radius-md;
+      border-radius: $size-4;
       border: none;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 500;
+      margin-bottom: $size-4;
+
       
       &[disabled] {
-        opacity: 0.5;
+        opacity: 0.6;
       }
     }
   }
   
   .tip-text {
     font-size: $font-sm;
-    color: $fitness-text-light;
-    text-align: center;
+    color: rgb(86, 66, 65, var(--tw-text-opacity, 1));    text-align: center;
     margin: $spacing-lg 0;
+    font-weight: 550;
+    font-family: Manrope;
   }
   
   .next-btn {
     width: 100%;
-    height: 88rpx;
-    background: $uni-primary;
+    height: $size-11;
+    background: $button-bg2;
     color: #FFFFFF;
     font-size: $font-lg;
-    border-radius: $radius-lg;
+    border-radius: $radius-xl;
     border: none;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 600;
+    font-weight: 700;
+    font-family: Manrope;
     
     &[disabled] {
       opacity: 0.6;
@@ -290,7 +338,9 @@ onUnmounted(() => {
 .back-login {
   text-align: center;
   font-size: $font-md;
-  color: $uni-primary;
+  color: rgb(160 62 64 / var(--tw-text-opacity, 1));
   margin-top: $spacing-lg;
+  font-weight: 700;
+  font-family: Manrope;
 }
 </style>

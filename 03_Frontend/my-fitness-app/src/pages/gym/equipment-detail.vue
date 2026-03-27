@@ -199,7 +199,7 @@
   .info-card {
     background: #FFFFFF;
     border-radius: $radius-lg;
-    padding: 40rpx;
+    padding: $size-5;
     margin-bottom: 30rpx;
     box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.08);
     
@@ -216,7 +216,7 @@
       font-size: $font-sm;
       color: $uni-primary;
       margin-bottom: 20rpx;
-      padding: 8rpx 20rpx;
+      padding: $size-1 20rpx;
       background: #F5F7FF;
       border-radius: 20rpx;
       display: inline-block;
@@ -270,7 +270,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 40rpx 0;
+      padding: $size-5 0;
       
       .empty-text {
         font-size: $font-md;
@@ -303,8 +303,8 @@
           
           .action-badge {
             font-size: $font-xs;
-            padding: 6rpx 16rpx;
-            border-radius: 24rpx;
+            padding: 6rpx $size-2;
+            border-radius: $size-3;
             white-space: nowrap;
             
             &.badge-warmup {
@@ -336,12 +336,12 @@
         
         .action-meta {
           display: flex;
-          gap: 16rpx;
+          gap: $size-2;
           margin-bottom: 12rpx;
           
           .action-difficulty {
             font-size: $font-xs;
-            padding: 6rpx 16rpx;
+            padding: 6rpx $size-2;
             border-radius: 20rpx;
             
             &.difficulty-beginner {
@@ -362,7 +362,7 @@
           
           .action-duration {
             font-size: $font-xs;
-            padding: 6rpx 16rpx;
+            padding: 6rpx $size-2;
             border-radius: 20rpx;
             background: #F1F3F4;
             color: #5F6368;
@@ -377,7 +377,7 @@
           .muscles-label {
             font-size: $font-sm;
             color: $fitness-text-gray;
-            margin-right: 8rpx;
+            margin-right: $size-1;
           }
           
           .muscles-value {
@@ -398,7 +398,7 @@
             font-size: $font-sm;
             color: #FF8F00;
             font-weight: 500;
-            margin-right: 8rpx;
+            margin-right: $size-1;
           }
           
           .safety-value {

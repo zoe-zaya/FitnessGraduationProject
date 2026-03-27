@@ -362,7 +362,7 @@ const deleteGym = async (inventoryId) => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 30rpx 40rpx;
+  padding: 30rpx $size-5;
   background: #FFFFFF;
   border-bottom: 1rpx solid $fitness-border;
   
@@ -380,7 +380,7 @@ const deleteGym = async (inventoryId) => {
     border-radius: 30rpx;
     
     .add-icon {
-      font-size: 32rpx;
+      font-size: $size-4;
       color: #FFFFFF;
       margin-right: 5rpx;
     }
@@ -393,7 +393,7 @@ const deleteGym = async (inventoryId) => {
 }
 
 .gym-list {
-  padding: 30rpx 40rpx;
+  padding: 30rpx $size-5;
   
   .gym-card {
     background: $fitness-secondary;
@@ -450,7 +450,7 @@ const deleteGym = async (inventoryId) => {
         }
         
         .action-icon {
-          font-size: 28rpx;
+          font-size: 2$size-1;
         }
       }
     }
@@ -462,12 +462,12 @@ const deleteGym = async (inventoryId) => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 100rpx 40rpx;
+  padding: 100rpx $size-5;
   
   .empty-image {
     width: 300rpx;
     height: 300rpx;
-    margin-bottom: 40rpx;
+    margin-bottom: $size-5;
   }
   
   .empty-text {
@@ -479,7 +479,7 @@ const deleteGym = async (inventoryId) => {
   .empty-subtext {
     font-size: $font-sm;
     color: $fitness-text-gray;
-    margin-bottom: 40rpx;
+    margin-bottom: $size-5;
   }
 }
 
@@ -495,7 +495,7 @@ const deleteGym = async (inventoryId) => {
   display: flex;
   justify-content: center;
   align-items: center;
-  box-shadow: 0 8rpx 24rpx rgba(7, 4, 4, 0.2);
+  box-shadow: 0 $size-1 $size-3 rgba(7, 4, 4, 0.2);
   z-index: 998;
   margin-bottom: 20rpx;
   
@@ -524,7 +524,7 @@ const deleteGym = async (inventoryId) => {
 .dialog-content {
   background: #FFFFFF;
   border-radius: $radius-lg;
-  padding: 40rpx;
+  padding: $size-5;
   width: 600rpx;
   max-height: 80vh;
   overflow-y: auto;
@@ -565,7 +565,7 @@ const deleteGym = async (inventoryId) => {
     }
     
     .form-input {
-      height: 80rpx;
+      height: $size-10;
     }
     .form-textarea {
       height: 200rpx;
@@ -578,12 +578,12 @@ const deleteGym = async (inventoryId) => {
   .dialog-buttons {
     display: flex;
     gap: 20rpx;
-    margin-top: 40rpx;
+    margin-top: $size-5;
     
     .btn-cancel, .btn-confirm {
       flex: 1;
-      height: 80rpx;
-      border-radius: 40rpx;
+      height: $size-10;
+      border-radius: $size-5;
       font-size: $font-lg;
       align-content: center;
     }

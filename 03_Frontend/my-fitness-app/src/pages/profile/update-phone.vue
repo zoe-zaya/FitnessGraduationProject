@@ -153,7 +153,7 @@
   .container {
     min-height: 100vh;
     background-color: $fitness-primary;
-    padding: 0rpx 40rpx 0;
+    padding: 0rpx $size-5 0;
   }
   
   .current-phone-tip {
@@ -202,7 +202,7 @@
       
       .input {
         width: 100%;
-        height: 96rpx;
+        height: $size-12;
         font-size: $font-md;
         color: $fitness-text;
         padding: 0 $spacing-lg;
@@ -233,7 +233,7 @@
     
     .submit-btn {
       width: 100%;
-      height: 88rpx;
+      height: $size-11;
       background: $uni-primary;
       color: #FFFFFF;
       font-size: $font-lg;
