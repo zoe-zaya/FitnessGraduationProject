@@ -14,15 +14,19 @@
 
 /* 全局样式变量 */
 $uni-primary: #df6860;
-$uni-success: #34C759;
+$uni-success: #24a978;
+$uni-success-bg: #E9F5F1;
 $uni-warning: #FF9500;
-$uni-error: #FF3B30;
+$uni-warning-bg: #fff6ea;
+$uni-error: #db0f00;
+$uni-error-bg: #ffe0de;
 $uni-info: #8E8E93;
 
 /* 健身系统主题色 - 符合iOS设计规范 */
 $fitness-primary: #FFFFFF; // iOS风格以白色为主
 $fitness-text: #333333; // iOS深色文字
 $glass-bg1: rgba(252, 249, 248, 0.7);
+$glass-bg2: rgba(252, 249, 248, 0.95);
 $border-shadow: rgba(0, 0, 0, 0.12);
 
 /*健身系统背景色*/

@@ -1,6 +1,20 @@
 <!--编辑个人资料：头像、昵称、生日-->
 <template>
   <view class="container">
+    <!--进度条-->
+    <!--
+    <view class="step-indicator">
+      <view class="label">
+          <img src="@/static/num1-icon.png" class="icon"/>
+          <text class="text">个人资料</text>
+      </view>
+      <div class="line"> </div>
+      <view class="label">
+          <img src="@/static/num2-icon.png" class="icon" />
+          <text class="text">身体数据</text>
+      </view>
+    </view>
+    -->
     <!-- 头像上传 -->
     <view class="avatar-section" @click="chooseAvatar">
       <image 
@@ -11,6 +25,7 @@
       <view class="avatar-tip">点击更换头像</view>
     </view>
     
+    <!--表单-->
     <view class="form-section">
       <view class="input-wrapper">
         <view class="input-item">
@@ -20,6 +35,9 @@
             type="text" 
             placeholder="请输入昵称"
             class="input"
+            :class="{ 'input-focus': focusedInput === 'name' }"
+            @focus="onInputFocus('name')"
+            @blur="onInputBlur"
             maxlength="20"
           />
         </view>
@@ -60,12 +78,21 @@ import dayjs from 'dayjs'
 
 const userStore = useUserStore()
 const loading = ref(false)
+const focusedInput = ref(null)
 
 const formData = ref({
   name: '',
   avatar_url: '',
   birthday: '' // 格式：YYYY-MM-DD
 })
+
+const onInputFocus = (inputName) => {
+  focusedInput.value = inputName
+}
+
+const onInputBlur = () => {
+  focusedInput.value = null
+}
 
 /**
  * 计算年龄（对应《需求规格说明书》2.2.1 业务规则）
@@ -163,7 +190,7 @@ const checkProfileCompleteAndRedirect = async () => {
     } else {
       // 资料不完整
       setTimeout(() => {
-        uni.redirectTo({ url: '/pages/profile/body-data' })
+        uni.redirectTo({ url: '/pages/profile/body-data-login' })
       }, 1500)
     }
   }catch(error){
@@ -171,7 +198,7 @@ const checkProfileCompleteAndRedirect = async () => {
     uni.showToast({ 
         title: '检查资料完整性失败', 
         icon: 'none', 
-        duration: 2000 
+        duration: 1500 
       })
   }
 }
@@ -220,93 +247,147 @@ const handleSubmit = async () => {
 
 .container {
   min-height: 100vh;
-  background: $fitness-primary;
-  padding: $size-5;
+  background: url('@/static/background3.png') no-repeat center center / cover;
+  padding: $size-6;
+  font-family: Manrope;
 }
 
+.step-indicator{
+  padding-left: $size-2;
+  padding-right: $size-2;
+  justify-content: space-between;
+  align-items: center;
+  object-position: center;
+  display: flex;
+  margin-bottom: $size-5;
+
+  .label{
+      gap: $size-3;
+      align-items: center;
+      display: flex;
+      .icon{
+          width: 20px;
+          height:20px;
+      }
+      .text{
+          color: $color-label;
+          font-weight: 700;
+          font-size: $size-4;
+          line-height: $size-6;
+      }
+  }
+  .line{
+      --tw-bg-opacity: 1;
+      background-color: $color-line;
+      flex: 1 1 0%;
+      height: 1px;
+      margin-left: $size-4;
+      margin-right: $size-4;
+  }
+}
 .avatar-section {
   text-align: center;
-  margin-bottom: 60rpx;
+  //justify-content: center;
+  margin-bottom: $size-6;
+  //position: relative;
   
   .avatar {
-    width: 200rpx;
-    height: 200rpx;
-    border-radius: 100rpx;
-    border: 4rpx solid $uni-primary;
-    margin-bottom: 20rpx;
+    --tw-shadow: 0 10px 30px -12px rgba(0, 0, 0, 0.2);
+    --tw-shadow-colored: 0 25px 50px -12px var(--tw-shadow-color);
+    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+    width: 352rpx;
+    height: 352rpx;
+    border-radius: 999rpx;
+    box-sizing: border-box;
+    border-style: solid;
+    border-color: #ffffff;    
+    margin-bottom: $size-2;
   }
   
   .avatar-tip {
-    font-size: $font-xs;
-    color: $uni-primary;
+    //font-size: $size-3;
+    font-size: 28rpx;
+    color: $color-primary;
+    font-weight: 550;
+    font-family: Manrope;
   }
 }
 
 .form-section {
-  .input-item {
-    background: #FFFFFF;
-    border-radius: $radius-lg;
-    padding: 30rpx;
-    margin-bottom: 30rpx;
-    border: 3.5rpx solid $fitness-border;
+.input-item {
+  background: $glass-bg1;
+  border-radius: $size-4;
+  padding: $size-5;
+  margin-bottom: $size-3;
+  box-shadow: 0 2rpx 10rpx $border-shadow;
+  .shadow-\[0_8px_24px_rgba\(160\2c 62\2c 64\2c 0\.06\)\] {
+    --tw-shadow: 0 8px 24px rgba(160, 62, 64, 0.15);
+    --tw-shadow-colored: 0 8px 24px var(--tw-shadow-color);
+    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+  }
+  
+  .label {
+    display: block;
+    font-weight: 700;
+    font-size: 28rpx;
+    line-height: $size-3;
+    color: $color-label;
+    margin-bottom: $size-2;
+    font-family: Manrope;
+  }
+  
+  .input, .picker {
+      transition-property: all;
+      transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+      transition-duration: 150ms;
+      color: $color-input;
+      padding: $size-2 $size-4;
+      background-color: $fitness-primary;
+      border-style: none;
+      border-radius: $size-4;
+      border: 2px solid rgba(160, 62, 64, 0.1);
+      width: auto;
+      font-size: $size-4;
+  }
+  .input-focus {
+      border: 2px solid rgba(160, 62, 64, 0.4);
+  }
+}
 
-    
-    .label {
-      display: block;
-      font-size: $font-md;
-      color: $fitness-text;
-      margin-bottom: 15rpx;
-    }
-    
-    .input, .picker {
-      width: 100%;
-      height: $size-10;
-      background: $fitness-secondary;
-      border-radius: $radius-sm;
-      padding: 0 20rpx;
-      font-size: $font-md;
-      box-sizing: border-box;
-      align-content: center;
-    }
+.age-display {
+  border-radius: $size-3;
+  margin-bottom: $size-2;
+  text-align: center;
+  
+  .age-label {
+    font-size: $size-3;
+    color: $color-secondory;
+    margin-right: $size-1;
   }
   
-  .age-display {
-    background: #FFFFFF;
-    border-radius: $radius-md;
-    padding: 10rpx;
-    margin-bottom: 10rpx;
-    text-align: center;
-    
-    .age-label {
-      font-size: $font-md;
-      color: $fitness-text-light;
-      margin-right: 10rpx;
-    }
-    
-    .age-value {
-      font-size: $font-md;
-      font-weight: bold;
-      color: $fitness-text-light;
-    }
+  .age-value {
+    font-size: $size-3;
+    font-weight: bold;
+    color: $color-secondory;
   }
+}
+
+.submit-btn {
+  width: 100%;
+  height: $size-12;
+  background: $button-bg2;
+  color: #FFFFFF;
+  font-size: $size-4;
+  border-radius: $size-6;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
   
-  .submit-btn {
-    width: 100%;
-    height: $size-11;
-    background: $uni-primary;
-    color: #FFFFFF;
-    font-size: $font-lg;
-    border-radius: $radius-lg;
-    border: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 600;
-    margin-top: $spacing-lg;
-    
-    &[disabled] {
-      opacity: 0.6;
-    }
+  &[disabled] {
+    opacity: 0.6;
   }
+}
 }
 </style>

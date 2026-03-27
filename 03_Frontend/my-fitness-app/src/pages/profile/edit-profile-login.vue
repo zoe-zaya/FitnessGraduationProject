@@ -319,7 +319,7 @@
     margin-bottom: $size-3;
     box-shadow: 0 2rpx 10rpx $border-shadow;
     .shadow-\[0_8px_24px_rgba\(160\2c 62\2c 64\2c 0\.06\)\] {
-      --tw-shadow: 0 8px 24px rgba(160, 62, 64, 0.2);
+      --tw-shadow: 0 8px 24px rgba(160, 62, 64, 0.15);
       --tw-shadow-colored: 0 8px 24px var(--tw-shadow-color);
       box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
     }
