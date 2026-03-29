@@ -193,10 +193,10 @@
         content: '';
         position: absolute;
         bottom: 0;
-        left: $spacing-lg;
-        right: $spacing-lg;
+        left: $size-5;
+        right: $size-5;
         height: 1rpx;
-        background: $fitness-border;
+        background: #FFFFFF;
         transform: scaleY(0.5);
       }
       
@@ -205,7 +205,7 @@
         height: $size-12;
         font-size: $font-md;
         color: $fitness-text;
-        padding: 0 $spacing-lg;
+        padding: 0 $size-5;
         box-sizing: border-box;
         border: none;
         border-bottom: 1rpx solid $fitness-border;
@@ -215,15 +215,15 @@
     .phone-info {
       background: $fitness-primary;
       border-radius: $radius-lg;
-      padding: $spacing-lg;
-      margin: $spacing-lg 0;
+      padding: $size-5;
+      margin: $size-5 0;
       box-shadow: 0 1rpx 0 0 $divider-ios; // iOS风格阴影
       
       .tip {
         display: block;
         font-size: $font-sm;
         color: $fitness-text-light;
-        margin-bottom: $spacing-md;
+        margin-bottom: $size-4;
         
         &:last-child {
           margin-bottom: 0;
@@ -243,7 +243,7 @@
       align-items: center;
       justify-content: center;
       font-weight: 600;
-      margin-top: $spacing-lg;
+      margin-top: $size-5;
       
       &[disabled] {
         opacity: 0.6;

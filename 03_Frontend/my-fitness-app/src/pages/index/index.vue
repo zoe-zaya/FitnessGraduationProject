@@ -79,7 +79,7 @@ const recordExercise = () => {
   background: $fitness-primary;
   border-radius: $radius-lg;
   padding: $size-5;
-  margin-bottom: $spacing-lg;
+  margin-bottom: $size-5;
   box-shadow: 0 1rpx 0 0 $divider-ios; // iOS风格阴影
   
   .greeting {
@@ -127,8 +127,8 @@ const recordExercise = () => {
 
 .quick-actions {
   display: flex;
-  gap: $spacing-lg;
-  margin-bottom: $spacing-lg;
+  gap: $size-5;
+  margin-bottom: $size-5;
   
   .action-card {
     flex: 1;

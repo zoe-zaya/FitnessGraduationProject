@@ -225,108 +225,108 @@ const navigateToLogin = () => {
 <style lang="scss" scoped>
 @import '@/uni.scss';
 
-  .container {
+.container {
     min-height: 100vh;
     background: url('@/static/background.png') no-repeat center center / cover;
     padding: $size-3 $size-6 $size-6;
-  }
+}
 
-  .logo-section {
+.logo-section {
     text-align: center;
     margin-bottom: $size-5;
 
     .logo {
-      width: 220rpx;
-      height: 220rpx;
+        width: 220rpx;
+        height: 220rpx;
     }
 
     .title {
-      display: block;
-      font-size: $size-8;
-      font-weight: 700;
-      color: $color-primary;      
-      margin-bottom: 10rpx;
+        display: block;
+        font-size: $size-8;
+        font-weight: 700;
+        color: $color-primary;      
+        margin-bottom: 10rpx;
     }
 
     .subtitle {
-      display: block;
-      font-size: $size-3;
-      color: $color-secondory;
+        display: block;
+        font-size: $size-3;
+        color: $color-secondory;
     }
-  }
+}
 
-  .form-section {
+.form-section {
     background: rgba(252, 249, 248, 0.7);
     border-radius: $size-4;
     padding: $size-8;
     box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.12);
     .shadow-\[0_8px_24px_rgba\(160\2c 62\2c 64\2c 0\.06\)\] {
-      --tw-shadow: 0 8px 24px rgba(160,62,64,0.06);
-      --tw-shadow-colored: 0 8px 24px var(--tw-shadow-color);
-      box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
-  }
-
-  .input-wrapper {
-    .text{
-      font-weight: 700;
-      font-size: $size-3;
-      line-height: $size-5;
-      display: block;
-      margin-left: $size-1;
-      color: $color-label;
+        --tw-shadow: 0 8px 24px rgba(160,62,64,0.06);
+        --tw-shadow-colored: 0 8px 24px var(--tw-shadow-color);
+        box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
     }
+
+    .input-wrapper {
+        .text{
+            font-weight: 700;
+            font-size: $size-3;
+            line-height: $size-5;
+            display: block;
+            margin-left: $size-1;
+            color: $color-label;
+        }
   
-    .input-item {
-      position: relative;
-      margin-bottom: $size-3;
-      margin-top: $size-2;
-      margin-bottom: 0;
-      align-items: center;
-      display: flex;
-      position: relative;
+        .input-item {
+            position: relative;
+            margin-bottom: $size-3;
+            margin-top: $size-2;
+            margin-bottom: 0;
+            align-items: center;
+            display: flex;
+            position: relative;
       
-      &:not(:last-child)::after {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        left: $spacing-lg;
-        right: $spacing-lg;
-        height: 1rpx;
-        background: $fitness-border;
-        transform: scaleY(0.5);
-      }
+            &:not(:last-child)::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: $size-4;
+                right: $size-4;
+                height: 1rpx;
+                background: #ffffff;
+                transform: scaleY(0.5);
+            }
       
-      .icon{
-        margin-left: $size-5;
-        padding-bottom: $size-4;
-        align-items: center;
-        position: absolute;
-        width: $size-4;
-      }
+            .icon{
+                margin-left: $size-5;
+                padding-bottom: $size-4;
+                align-items: center;
+                position: absolute;
+                width: $size-4;
+            }
 
-      .input {
-        transition-property: all;
-          transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-          transition-duration: 150ms;
-          color: $color-input;
-          padding-right: $size-4;
-          padding-left: $size-12;
-          padding-top: $size-3;
-          padding-bottom: $size-3;
-          background-color: $fitness-primary;
-          border-style: none;
-          border-radius: $size-4;
-          border: 2px solid rgba(160, 62, 64, 0.1);
-          width: 100%;
-          margin-bottom: $size-4;
-          font-size: $size-4;
-      }
+            .input {
+                transition-property: all;
+                transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+                transition-duration: 150ms;
+                color: $color-input;
+                padding-right: $size-4;
+                padding-left: $size-12;
+                padding-top: $size-3;
+                padding-bottom: $size-3;
+                background-color: $fitness-primary;
+                border-style: none;
+                border-radius: $size-4;
+                border: 2px solid rgba(160, 62, 64, 0.1);
+                width: 100%;
+                margin-bottom: $size-4;
+                font-size: $size-4;
+            }
 
-      .input-focus {
-        border: 2px solid rgba(160, 62, 64, 0.2);
-      }
-    }
-  }
+            .input-focus {
+              border: 2px solid rgba(160, 62, 64, 0.2);
+            }
+        }
+}
   .password-tip {
     display: flex;
     margin-bottom: $size-2;
@@ -340,7 +340,7 @@ const navigateToLogin = () => {
     }
     .info{
       color: $color-label;
-      font-size: $font-md;
+      font-size: $size-3;
       line-height: $size-4;
       font-weight: 525;
     }    
@@ -356,8 +356,8 @@ const navigateToLogin = () => {
         width: $size-5;
         height: $size-5;
         border: 2px solid rgba(160, 62, 64, 0.1);
-        border-radius: $radius-sm;
-        margin-right: $spacing-md;
+        border-radius: $size-2;
+        margin-right: $size-3;
         display: flex;
         align-items: center;
         justify-content: center;

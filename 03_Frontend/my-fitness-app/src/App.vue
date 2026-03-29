@@ -15,8 +15,9 @@ export default {
 <style>
 /* 每个页面公共css */
 /* 设置全局字体和滚动条样式，符合iOS设计规范 */
+/*  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;*/
 page {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  font-family: Manrope;
   background-color: #F2F2F7;
   line-height: 1.6;
 }

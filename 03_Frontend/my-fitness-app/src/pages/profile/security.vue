@@ -93,7 +93,7 @@ const navigateToUpdatePassword = () => {
   background: $fitness-primary;
   border-radius: $radius-lg;
   padding: 20rpx;
-  margin: 0 $spacing-lg;
+  margin: 0 $size-5;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -114,24 +114,24 @@ const navigateToUpdatePassword = () => {
 .menu-section {
   background: $fitness-primary;
   border-radius: $radius-lg;
-  margin: 0 $spacing-lg $spacing-lg;
+  margin: 0 $size-5 $size-5;
   box-shadow: 0 1rpx 0 0 $divider-ios; // iOS风格阴影
   
   .menu-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 36rpx $spacing-lg;
+    padding: 36rpx $size-5;
     position: relative;
     
     &.border-bottom::after {
       content: '';
       position: absolute;
       bottom: 0;
-      left: $spacing-lg;
-      right: $spacing-lg;
+      left: $size-5;
+      right: $size-5;
       height: 1rpx;
-      background: $fitness-border;
+      background: #FFFFFF;
       transform: scaleY(0.5);
     }
     

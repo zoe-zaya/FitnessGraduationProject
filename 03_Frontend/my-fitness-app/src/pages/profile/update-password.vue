@@ -295,7 +295,7 @@
       align-items: center;
       justify-content: center;
       font-weight: 600;
-      margin-top: $spacing-lg;
+      margin-top: $size-5;
       
       &[disabled] {
         opacity: 0.6;

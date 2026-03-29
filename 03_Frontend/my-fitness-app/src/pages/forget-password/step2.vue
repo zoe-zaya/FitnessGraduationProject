@@ -4,29 +4,47 @@
     <view class="form-section">
       <view class="input-wrapper">
         <!-- 新密码输入 -->
+        <view class="text">新密码</view>
         <view class="input-item">
+          <img src="@/static/password2.png" class="icon"/>
           <input 
             v-model="formData.newPassword" 
             type="password" 
-            placeholder="8 位以上，含大小写数字符号"
+            placeholder="请输入新密码"
             class="input"
+            :class="{ 'input-focus': focusedInput === 'password' }"
+            @focus="onInputFocus('password')"
+            @blur="onInputBlur"
           />
         </view>
         
         <!-- 确认密码输入 -->
+        <view class="text">确认密码</view>
         <view class="input-item input-with-border">
+          <img src="@/static/password2.png" class="icon"/>
           <input 
             v-model="formData.confirmPassword" 
             type="password" 
             placeholder="请再次输入密码"
             class="input"
+            :class="{ 'input-focus': focusedInput === 'confirmPassword' }"
+            @focus="onInputFocus('confirmPassword')"
+            @blur="onInputBlur"
           />
+          <uni-icons type="eye-filled" size="20" color="#8E8E93"></uni-icons>
         </view>
       </view>
       
-      <view class="password-info">
-        <text class="tip">需包含大小写字母、数字和特殊符号</text>
-        
+      <view class="password-tip">
+          <img src="@/static/exclamation-icon.png" class="icon"/>
+          <text class="info">密码长度应大于8位，需包含大小写字母、数字和特殊符号。</text>
+      </view>
+      <view class="password-tip">
+          <img src="@/static/exclamation-icon.png" class="icon"/>
+          <text class="info">特殊符号是!@#$%^&*()_+-=。</text>
+      </view> 
+
+      <view class="password-info">       
         <!-- 密码强度提示 -->
         <view class="password-strength" v-if="formData.newPassword">
           <text class="strength-label">密码强度：</text>
@@ -55,11 +73,20 @@ import { API, PASSWORD_REGEX } from '@/utils/constants'
 
 const loading = ref(false)
 const phone = ref('')
+const focusedInput = ref(null)
 
 const formData = ref({
   newPassword: '',
   confirmPassword: ''
 })
+
+const onInputFocus = (inputName) => {
+  focusedInput.value = inputName
+}
+  
+const onInputBlur = () => {
+  focusedInput.value = null
+}
 
 /**
  * 计算密码强度
@@ -161,58 +188,99 @@ const handleSubmit = async () => {
 @import '@/uni.scss';
 
 .container {
-  min-height: 100vh;
-  background-color: $fitness-primary;
-  padding: 60rpx $size-5 $size-5;
+    min-height: 100vh;
+    background: url('@/static/background.png') no-repeat center center / cover;
+    padding: $size-8 $size-6 $size-6;
+    font-family: Manrope;
 }
 
 .form-section {
-  .input-wrapper {
-    background: $fitness-primary;
-    border-radius: $radius-lg;
-    border: 3.5rpx solid $fitness-border;
-    box-shadow: 0 1rpx 0 0 $divider-ios; // iOS风格阴影
-    overflow: hidden;
-  }
+    background: rgba(252, 249, 248, 0.7);
+    border-radius: $size-4;
+    padding: $size-8;
+    box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.12);
+    .shadow-\[0_8px_24px_rgba\(160\2c 62\2c 64\2c 0\.06\)\] {
+      --tw-shadow: 0 8px 24px rgba(160,62,64,0.06);
+      --tw-shadow-colored: 0 8px 24px var(--tw-shadow-color);
+      box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+    }
+
+    .input-wrapper {
+      .text{
+          font-weight: 700;
+          font-size: $size-3;
+          line-height: $size-5;
+          display: block;
+          margin-left: $size-1;
+          color: $color-label;
+      }
   
-  .input-item {
-    position: relative;
-    padding: 0 $spacing-lg;
+      .input-item {
+          position: relative;
+          margin-bottom: $size-3;
+          margin-top: $size-2;
+          margin-bottom: 0;
+          align-items: center;
+          display: flex;
+          position: relative;
+
+          .icon{
+              margin-left: $size-5;
+              padding-bottom: $size-4;
+              align-items: center;
+              position: absolute;
+              width: $size-4;
+          }
     
-    &:not(:last-child)::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: $spacing-lg;
-      right: $spacing-lg;
-      height: 1rpx;
-      background: $fitness-border;
-      transform: scaleY(0.5);
-    }
+          &:not(:last-child)::after {
+              content: '';
+              position: absolute;
+              bottom: 0;
+              left: $size-4;
+              right: $size-4;
+              height: 1rpx;
+              background: #ffffff;
+              transform: scaleY(0.5);
+          }
     
-    .input {
-      width: 100%;
-      height: $size-12;
-      font-size: $font-md;
-      color: $fitness-text;
-      padding: 0;
-      box-sizing: border-box;
-      border: none;
-      border-bottom: 1rpx solid $fitness-border;
+          .input {
+              transition-property: all;
+              transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+              transition-duration: 150ms;
+              color: $color-input;
+              padding-right: $size-4;
+              padding-left: $size-12;
+              padding-top: $size-3;
+              padding-bottom: $size-3;
+              background-color: $fitness-primary;
+              border-style: none;
+              border-radius: $size-4;
+              border: 2px solid rgba(160, 62, 64, 0.1);
+              width: 100%;
+              margin-bottom: $size-4;
+              font-size: $size-4;
+          }
+          .input-focus {
+              border: 2px solid rgba(160, 62, 64, 0.4);
+          }
+          uni-icons {
+              position: absolute;
+              right: $size-3;
+              top: 50%;
+              transform: translateY(-50%);
+          }
+      }
     }
-  }
   
   .password-info {
-    background: $fitness-primary;
-    border-radius: $radius-lg;
-    padding: 0 $spacing-sm;
-    margin: $spacing-lg 0;
+    padding: 0 $size-2;
+    margin-bottom: $size-4;
     
     .tip {
       display: block;
-      font-size: $font-sm;
-      color: $fitness-text-light;
-      margin-bottom: $spacing-md;
+      font-size: $size-3;
+      color: $color-label;
+      margin-bottom: $size-3;
     }
     
     .password-strength {
@@ -220,47 +288,66 @@ const handleSubmit = async () => {
       align-items: center;
       
       .strength-label {
-        font-size: $font-sm;
-        color: $fitness-text-light;
-        margin-right: 10rpx;
+        font-size: $size-3;
+        color: $color-label;
+        margin-right: $size-2;
       }
       
       .strength-value {
-        font-size: $font-sm;
+        font-size: $size-3;
         font-weight: 600;
-        padding: $size-1 $size-2;
-        border-radius: $radius-md;
+        padding: $size-1 $size-4;
+        border-radius: $size-2;
         
         &.strength-weak {
           color: $uni-error;
-          background: rgba(255, 59, 48, 0.1);
+          background: $uni-error-bg;
         }
         
         &.strength-medium {
           color: $uni-warning;
-          background: rgba(255, 149, 0, 0.1);
+          background: $uni-warning-bg;
         }
         
         &.strength-strong {
           color: $uni-success;
-          background: rgba(52, 199, 89, 0.1);
+          background: $uni-success-bg;
         }
       }
     }
   }
+
+  .password-tip {
+    display: flex;
+    margin-bottom: $size-2;
+
+    .icon{
+      margin-left: $size-1;
+      padding-bottom: $size-3;
+      padding-right: $size-3;
+      align-items: center;
+      width: $size-5;
+    }
+    .info{
+      color: $color-label;
+      font-size: $size-3;
+      line-height: $size-4;
+      font-weight: 525;
+    }    
+  }
   
   .submit-btn {
     width: 100%;
-    height: $size-11;
+    height: $size-12;
     background: $uni-primary;
     color: #FFFFFF;
-    font-size: $font-lg;
-    border-radius: $radius-lg;
+    font-size: $size-4;
+    border-radius: $size-6;
     border: none;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 600;
+    font-weight: 700;
     
     &[disabled] {
       opacity: 0.6;

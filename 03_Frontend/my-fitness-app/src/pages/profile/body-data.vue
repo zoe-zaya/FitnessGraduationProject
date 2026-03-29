@@ -260,7 +260,7 @@ const handleSubmit = async () => {
   min-height: 100vh;
   background: url('@/static/background2.png') no-repeat center center / cover;
   padding: $size-6;
-  //font-family: 'Plus Jakarta Sans', 'Manrope', sans-serif;
+  font-family: Manrope;
 }
 .step-indicator{
   padding-left: $size-2;
@@ -327,10 +327,10 @@ const handleSubmit = async () => {
           content: '';
           position: absolute;
           bottom: 0;
-          left: $spacing-lg;
-          right: $spacing-lg;
+          left: $size-5;
+          right: $size-5;
           height: 1rpx;
-          background: $fitness-border;
+          background: #FFFFFF;
           transform: scaleY(0.5);
       }
     
