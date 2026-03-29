@@ -364,10 +364,10 @@ const deleteGym = async (inventoryId) => {
   align-items: center;
   padding: 30rpx $size-5;
   background: #FFFFFF;
-  border-bottom: 1rpx solid $fitness-border;
+  border-bottom: 1rpx solid rgba(160, 62, 64, 0.1);
   
   .title {
-    font-size: $font-xl;
+    font-size: $size-6;
     font-weight: bold;
     color: $fitness-text;
   }
@@ -386,7 +386,7 @@ const deleteGym = async (inventoryId) => {
     }
     
     .add-text {
-      font-size: $font-sm;
+      font-size: $size-3;
       color: #FFFFFF;
     }
   }
@@ -397,7 +397,7 @@ const deleteGym = async (inventoryId) => {
   
   .gym-card {
     background: $fitness-secondary;
-    border-radius: $radius-md;
+    border-radius: $size-4;
     padding: 30rpx;
     margin-bottom: 30rpx;
     display: flex;
@@ -409,7 +409,7 @@ const deleteGym = async (inventoryId) => {
       
       .gym-name {
         display: block;
-        font-size: $font-lg;
+        font-size: $size-5;
         font-weight: bold;
         color: $fitness-text;
         margin-bottom: 10rpx;
@@ -417,15 +417,15 @@ const deleteGym = async (inventoryId) => {
       
       .gym-desc {
         display: block;
-        font-size: $font-sm;
-        color: $fitness-text-light;
+        font-size: $size-3;
+        color: $color-label;
         margin-bottom: 15rpx;
       }
       
       .gym-meta {
         display: block;
-        font-size: $font-xs;
-        color: $fitness-text-gray;
+        font-size: $size-2;
+        color: $color-label;
       }
     }
     
@@ -471,14 +471,14 @@ const deleteGym = async (inventoryId) => {
   }
   
   .empty-text {
-    font-size: $font-lg;
-    color: $fitness-text-light;
+    font-size: $size-5;
+    color: $color-label;
     margin-bottom: 10rpx;
   }
   
   .empty-subtext {
-    font-size: $font-sm;
-    color: $fitness-text-gray;
+    font-size: $size-3;
+    color: $color-label;
     margin-bottom: $size-5;
   }
 }
@@ -523,7 +523,7 @@ const deleteGym = async (inventoryId) => {
 
 .dialog-content {
   background: #FFFFFF;
-  border-radius: $radius-lg;
+  border-radius: $size-5;
   padding: $size-5;
   width: 600rpx;
   max-height: 80vh;
@@ -532,7 +532,7 @@ const deleteGym = async (inventoryId) => {
   
   .dialog-title {
     display: block;
-    font-size: $font-lg;
+    font-size: $size-5;
     font-weight: bold;
     text-align: center;
     margin-bottom: 30rpx;
@@ -544,7 +544,7 @@ const deleteGym = async (inventoryId) => {
     
     .form-label {
       display: block;
-      font-size: $font-md;
+      font-size: $size-4;
       color: $fitness-text;
       margin-bottom: 15rpx;
     }
@@ -552,10 +552,10 @@ const deleteGym = async (inventoryId) => {
     .form-input, .form-textarea {
       width: 100%;
       background: $fitness-primary;
-      border: 1rpx solid $fitness-border;
-      border-radius: $radius-sm;
+      border: 1rpx solid rgba(160, 62, 64, 0.1);
+      border-radius: $size-3;
       padding: 20rpx 30rpx;
-      font-size: $font-md;
+      font-size: $size-4;
       box-sizing: border-box;
       z-index: 1000; /* 确保输入框在最上层 */
       
@@ -584,13 +584,13 @@ const deleteGym = async (inventoryId) => {
       flex: 1;
       height: $size-10;
       border-radius: $size-5;
-      font-size: $font-lg;
+      font-size: $size-5;
       align-content: center;
     }
     
     .btn-cancel {
       background: #F5F5F5;
-      color: $fitness-text-light;
+      color: $color-label;
     }
     
     .btn-confirm {

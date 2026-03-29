@@ -149,12 +149,12 @@
   border-radius: $size-5;
   padding: 20rpx 30rpx;
   margin-bottom: 30rpx;
-  border: 1rpx solid $divider-ios; // iOS风格边框
+  border: 1rpx solid rgba(0, 0, 0, 0.12); // iOS风格边框
 
   
   .search-input {
     flex: 1;
-    font-size: $font-md;
+    font-size: $size-4;
     padding: 10rpx 0;
   }
   
@@ -170,7 +170,7 @@
 .search-results {
   .result-item {
     background:$fitness-secondary;
-    border-radius: $radius-md;
+    border-radius: $size-4;
     padding: 30rpx;
     margin-bottom: 20rpx;
     display: flex;
@@ -187,7 +187,7 @@
       .equipment-image {
         width: 100%;
         height: 100%;
-        border-radius: $radius-sm;
+        border-radius: $size-3;
         background: #F5F5F5;
       }
       
@@ -198,7 +198,7 @@
         right: 0;
         bottom: 0;
         background: #F5F5F5;
-        border-radius: $radius-sm;
+        border-radius: $size-3;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -225,8 +225,8 @@
         background: $fitness-secondary;
         color: $fitness-text;
         border: none;
-        border-radius: $radius-sm;
-        font-size: $font-md;
+        border-radius: $size-3;
+        font-size: $size-4;
         padding: 15rpx 20rpx;
         margin: 0;
         width: auto;
@@ -238,7 +238,7 @@
         color: white;
         border: none;
         border-radius: $radius-sm;
-        font-size: $font-md;
+        font-size: $size-4;
         padding: 15rpx 20rpx;
         margin: 0;
         width: auto;
@@ -248,7 +248,7 @@
     
     .item-name {
       display: block;
-      font-size: $font-lg;
+      font-size: $size-5;
       font-weight: bold;
       color: $fitness-text;
       margin-bottom: 10rpx;
@@ -256,7 +256,7 @@
     
     .item-category {
       display: block;
-      font-size: $font-sm;
+      font-size: $size-3;
       color: $uni-primary;
     }
   }
@@ -271,14 +271,14 @@
   text-align: center;
   
   .empty-text, .tip-text {
-    font-size: $font-lg;
-    color: $fitness-text-light;
+    font-size: $size-5;
+    color: $color-label;
     margin-bottom: 10rpx;
   }
   
   .empty-subtext, .tip-subtext {
-    font-size: $font-sm;
-    color: $fitness-text-gray;
+    font-size: $size-3;
+    color: $color-label;
   }
 }
 </style>

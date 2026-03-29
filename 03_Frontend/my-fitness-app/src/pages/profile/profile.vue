@@ -149,7 +149,7 @@
     border-radius: 0 0 $size-5 $size-5;
     display: flex;
     align-items: center;
-    box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.12);
+    box-shadow: 0 1rpx 10rpx rgba(0, 0, 0, 0.12);
 
     .avatar {
       width: 180rpx;
@@ -231,7 +231,6 @@
       align-items: center;
       padding: $size-3 $size-4;
       position: relative;
-      //background: $fitness-primary;
       border: none;
       border-bottom: 1px solid rgba(160, 62, 64, 0.1);
       
@@ -275,7 +274,8 @@
       
       .menu-label {
         font-size: $size-4;
-        color: $fitness-text;
+        //color: $fitness-text;
+        color: $color-input;
       }
       
       .logout-label {

@@ -182,7 +182,7 @@
     width: 100%;
     height: 350rpx;
     background: #FFFFFF;
-    border-radius: $radius-lg;
+    border-radius: $size-5;
     margin-bottom: 30rpx;
     display: flex;
     justify-content: center;
@@ -192,20 +192,20 @@
     .equipment-image {
       width: 100%;
       height: 100%;
-      border-radius: $radius-lg;
+      border-radius: $size-5;
     }
   }
 
   .info-card {
     background: #FFFFFF;
-    border-radius: $radius-lg;
+    border-radius: $size-5;
     padding: $size-5;
     margin-bottom: 30rpx;
     box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.08);
     
     .equipment-name {
       display: block;
-      font-size: $font-xl;
+      font-size: $size-6;
       font-weight: bold;
       color: $fitness-text;
       margin-bottom: 10rpx;
@@ -213,7 +213,7 @@
 
     .equipment-category {
       display: block;
-      font-size: $font-sm;
+      font-size: $size-3;
       color: $uni-primary;
       margin-bottom: 20rpx;
       padding: $size-1 20rpx;
@@ -224,22 +224,22 @@
 
     .equipment-desc {
       display: block;
-      font-size: $font-md;
-      color: $fitness-text-light;
+      font-size: $size-4;
+      color: $color-label;
       line-height: 1.6;
     }
   }
 
   .section {
     background: #FFFFFF;
-    border-radius: $radius-lg;
+    border-radius: $size-5;
     padding: 30rpx;
     margin-bottom: 30rpx;
     box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.08);
 
     .section-title {
       display: block;
-      font-size: $font-lg;
+      font-size: $size-5;
       font-weight: bold;
       color: $fitness-text;
       margin-bottom: 20rpx;
@@ -253,7 +253,7 @@
       .muscle-tag {
         background: #E8F4FD;
         color: #1976D2;
-        font-size: $font-sm;
+        font-size: $size-3;
         padding: 10rpx 20rpx;
         border-radius: 20rpx;
         border: 1rpx solid #BBDEFB;
@@ -261,8 +261,8 @@
     }
 
     .actions-count {
-      font-size: $font-md;
-      color: $fitness-text-light;
+      font-size: $size-4;
+      color: $color-label;
       margin-bottom: 20rpx;
     }
     
@@ -273,15 +273,15 @@
       padding: $size-5 0;
       
       .empty-text {
-        font-size: $font-md;
-        color: $fitness-text-gray;
+        font-size: $size-4;
+        color: $color-label;
       }
     }
     
     .actions-list {
       .action-item {
         padding: 25rpx 0;
-        border-bottom: 1rpx solid $fitness-border;
+        border-bottom: 1rpx solid rgba(160, 62, 64, 0.1);
         
         &.border-none {
           border-bottom: none;
@@ -294,7 +294,7 @@
           margin-bottom: 12rpx;
           
           .action-name {
-            font-size: $font-md;
+            font-size: $size-4;
             font-weight: 600;
             color: $fitness-text;
             flex: 1;
@@ -302,7 +302,7 @@
           }
           
           .action-badge {
-            font-size: $font-xs;
+            font-size: $size-2;
             padding: 6rpx $size-2;
             border-radius: $size-3;
             white-space: nowrap;
@@ -340,7 +340,7 @@
           margin-bottom: 12rpx;
           
           .action-difficulty {
-            font-size: $font-xs;
+            font-size: $size-2;
             padding: 6rpx $size-2;
             border-radius: 20rpx;
             
@@ -361,7 +361,7 @@
           }
           
           .action-duration {
-            font-size: $font-xs;
+            font-size: $size-2;
             padding: 6rpx $size-2;
             border-radius: 20rpx;
             background: #F1F3F4;
@@ -375,13 +375,13 @@
           flex-wrap: wrap;
           
           .muscles-label {
-            font-size: $font-sm;
-            color: $fitness-text-gray;
+            font-size: $size-3;
+            color: $color-label;
             margin-right: $size-1;
           }
           
           .muscles-value {
-            font-size: $font-sm;
+            font-size: $size-3;
             color: $fitness-text;
             flex: 1;
           }
@@ -392,17 +392,17 @@
           margin-top: 10rpx;
           padding: 15rpx;
           background: #FFF9C4;
-          border-radius: $radius-sm;
+          border-radius: $size-3;
           
           .safety-label {
-            font-size: $font-sm;
+            font-size: $size-3;
             color: #FF8F00;
             font-weight: 500;
             margin-right: $size-1;
           }
           
           .safety-value {
-            font-size: $font-sm;
+            font-size: $size-3;
             color: #5F6368;
             flex: 1;
           }

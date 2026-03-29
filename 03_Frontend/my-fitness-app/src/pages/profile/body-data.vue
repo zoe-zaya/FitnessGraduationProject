@@ -298,9 +298,10 @@ const handleSubmit = async () => {
 
 .form-section {
   .input-wrapper {
-      background:rgba(255, 255, 255, 0.7);
+      background:rgba(255, 255, 255, 0.9);
+      //background: #ffffff;
       border-radius: $size-6;
-      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+      box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.12);
       .shadow-\[0_8px_24px_rgba\(160\2c 62\2c 64\2c 0\.06\)\] {
           --tw-shadow: 0 8px 24px rgba(160, 62, 64, 0.12);
           --tw-shadow-colored: 0 8px 24px var(--tw-shadow-color);
@@ -365,12 +366,13 @@ const handleSubmit = async () => {
   }
 }
 .bmi-card {
-  background: #ffffff;
+  //background: #ffffff;
+  background:rgba(255, 255, 255, 0.7);
   border-radius: $size-6;
   padding: $size-8;
   margin-top: $size-4;
   line-height: $size-9;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.12);
     
   .bmi-label {
       display: block;

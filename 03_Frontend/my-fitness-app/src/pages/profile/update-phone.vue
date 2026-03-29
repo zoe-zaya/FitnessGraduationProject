@@ -3,6 +3,7 @@
       <!-- 当前手机号提示 -->
       <view class="current-phone-tip">
         <text class="tip-label">当前手机号</text>
+        <div class="line"> </div>
         <text class="tip-value">{{ maskedCurrentPhone }}</text>
       </view>
       
@@ -10,33 +11,42 @@
       <view class="form-section">
         <view class="input-wrapper">
           <!-- 旧手机号 -->
+          <view class="text">当前手机号</view>
           <view class="input-item">
+            <img src="@/static/phone2.png" class="icon"/>
             <input 
               v-model="formData.oldPhone" 
               type="number" 
               placeholder="请输入当前手机号"
               class="input"
               maxlength="11"
+              :class="{ 'input-focus': focusedInput === 'oldPhone' }"
+              @focus="onInputFocus('oldPhone')"
+              @blur="onInputBlur"
             />
           </view>
           
           <!-- 新手机号 -->
+          <view class="text">新手机号</view>
           <view class="input-item input-with-border">
+            <img src="@/static/phone2.png" class="icon"/>
             <input 
               v-model="formData.newPhone" 
               type="number" 
               placeholder="请输入新手机号"
               class="input"
               maxlength="11"
+              :class="{ 'input-focus': focusedInput === 'newPhone' }"
+              @focus="onInputFocus('newPhone')"
+              @blur="onInputBlur"
             />
           </view>
         </view>
-        
-        <!-- 提交按钮 -->
-        <button class="submit-btn" @click="handleSubmit" :loading="loading" :disabled="loading">
-          {{ loading ? '修改中...' : '确认修改' }}
-        </button>
       </view>
+      <!-- 提交按钮 -->
+      <button class="submit-btn" @click="handleSubmit" :loading="loading" :disabled="loading">
+          {{ loading ? '修改中...' : '确认修改' }}
+      </button>
     </view>
   </template>
   
@@ -49,7 +59,16 @@
   
   const userStore = useUserStore()
   const loading = ref(false)
+  const focusedInput = ref(null)
+
+const onInputFocus = (inputName) => {
+  focusedInput.value = inputName
+}
   
+const onInputBlur = () => {
+  focusedInput.value = null
+}
+
   const currentPhone = computed(() => userStore.userInfo.phone || '未绑定')
   const maskedCurrentPhone = computed(() => {
   if (!userStore.userInfo.phone) {
@@ -152,102 +171,130 @@
   
   .container {
     min-height: 100vh;
-    background-color: $fitness-primary;
-    padding: 0rpx $size-5 0;
+    background: url('@/static/background.png') no-repeat center center / cover;
+    //padding: 0rpx $size-5 0;
   }
   
   .current-phone-tip {
-    background: $fitness-primary;
-    border-radius: $radius-lg;
-    padding: 20rpx;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 0 0 $size-5 $size-5;
+    margin-bottom: $size-5;
+    padding: $size-4 $size-6;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    //box-shadow: 0 1rpx 0 0 $divider-ios; // iOS风格阴影
+    box-shadow: 0 1rpx 10rpx rgba(0, 0, 0, 0.15); // iOS风格阴影
     
     .tip-label {
-      font-size: $font-md;
-      color: $fitness-text-light;
+      font-size: $size-4;
+      color: $color-label;
     }
     
     .tip-value {
-      font-size: $font-md;
-      font-weight: 600;
-      color: $uni-primary;
+      font-size: $size-4;
+      font-weight: 700;
+      //color: $color-label;
+      color: $color-primary;
+    }
+    .line{
+      --tw-bg-opacity: 1;
+      background-color: $color-line;
+      flex: 1 1 0%;
+      height: 1px;
+      margin-left: $size-4;
+      margin-right: $size-4;
     }
   }
   
   .form-section {
+    background: rgba(252, 249, 248, 0.7);
+    border-radius: $size-4;
+    padding: $size-6;
+    box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.12);
+    margin: 0 $size-6;
+
     .input-wrapper {
-      background: $fitness-primary;
-      border-radius: $radius-lg;
-      border: 3.5rpx solid $fitness-border;
-      //box-shadow: 0 1rpx 0 0 $divider-ios; // iOS风格阴影
-      overflow: hidden;
-    }
-    
-    .input-item {
-      position: relative;
-      
-      &:not(:last-child)::after {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        left: $size-5;
-        right: $size-5;
-        height: 1rpx;
-        background: #FFFFFF;
-        transform: scaleY(0.5);
+      .text{
+          font-weight: 700;
+          font-size: $size-3;
+          line-height: $size-5;
+          display: block;
+          margin-left: $size-1;
+          color: $color-label;
       }
-      
-      .input {
-        width: 100%;
-        height: $size-12;
-        font-size: $font-md;
-        color: $fitness-text;
-        padding: 0 $size-5;
-        box-sizing: border-box;
-        border: none;
-        border-bottom: 1rpx solid $fitness-border;
-      }
-    }
-    
-    .phone-info {
-      background: $fitness-primary;
-      border-radius: $radius-lg;
-      padding: $size-5;
-      margin: $size-5 0;
-      box-shadow: 0 1rpx 0 0 $divider-ios; // iOS风格阴影
-      
-      .tip {
-        display: block;
-        font-size: $font-sm;
-        color: $fitness-text-light;
-        margin-bottom: $size-4;
-        
-        &:last-child {
+
+      .input-item {
+          position: relative;
+          margin-bottom: $size-3;
+          margin-top: $size-2;
           margin-bottom: 0;
+          align-items: center;
+          display: flex;
+          position: relative;
+
+          .icon{
+              margin-left: $size-5;
+              padding-bottom: $size-4;
+              align-items: center;
+              position: absolute;
+              width: $size-4;
+          }
+          &:not(:last-child)::after {
+              content: '';
+              position: absolute;
+              bottom: 0;
+              left: $size-4;
+              right: $size-4;
+              height: 1rpx;
+              background: #ffffff;
+              transform: scaleY(0.5);
+          }
+          .input {
+              transition-property: all;
+              transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+              transition-duration: 150ms;
+              color: $color-input;
+              padding-right: $size-4;
+              padding-left: $size-12;
+              padding-top: $size-3;
+              padding-bottom: $size-3;
+              background-color: $fitness-primary;
+              border-style: none;
+              border-radius: $size-4;
+              border: 2px solid rgba(160, 62, 64, 0.1);
+              width: 100%;
+              margin-bottom: $size-4;
+              font-size: $size-4;
+          }
+          .input-focus {
+              border: 2px solid rgba(160, 62, 64, 0.4);
+          }
+          uni-icons {
+              position: absolute;
+              right: $size-3;
+              top: 50%;
+              transform: translateY(-50%);
+          }
         }
-      }
     }
-    
-    .submit-btn {
-      width: 100%;
-      height: $size-11;
+  }
+
+  .submit-btn {
+      width: auto;
+      height: $size-12;
       background: $uni-primary;
       color: #FFFFFF;
-      font-size: $font-lg;
-      border-radius: $radius-lg;
+      font-size: $size-4;
+      border-radius: $size-6;
       border: none;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: 600;
-      margin-top: $size-5;
+      font-weight: 700;
+      margin: $size-6;
       
       &[disabled] {
         opacity: 0.6;
       }
     }
-  }
   </style>

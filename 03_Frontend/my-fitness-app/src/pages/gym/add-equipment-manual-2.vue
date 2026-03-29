@@ -154,7 +154,7 @@ const navigateToEquipmentList = (inventoryId) => {
 .equipment-image-container {
   width: 100%;
   height: 400rpx;
-  border-radius: $radius-lg;
+  border-radius: $size-5;
   margin-bottom: $size-5;
   position: relative;
   overflow: hidden;
@@ -185,7 +185,7 @@ const navigateToEquipmentList = (inventoryId) => {
 
 .info-card {
   background: #FFFFFF;
-  border-radius: $radius-lg;
+  border-radius: $size-5;
   padding: $size-5;
   margin-bottom: $size-5;
   box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.05);
@@ -193,12 +193,12 @@ const navigateToEquipmentList = (inventoryId) => {
   .info-header {
     margin-bottom: $size-5;
     padding-bottom: 30rpx;
-    border-bottom: 1rpx solid $fitness-border;
+    border-bottom: 1rpx solid rgba(160, 62, 64, 0.1);
     
     .info-label {
       display: block;
-      font-size: $font-sm;
-      color: $fitness-text-gray;
+      font-size: $size-3;
+      color: $color-label;
       margin-bottom: 10rpx;
     }
     
@@ -221,13 +221,13 @@ const navigateToEquipmentList = (inventoryId) => {
       }
       
       .detail-label {
-        font-size: $font-md;
-        color: $fitness-text-light;
+        font-size: $size-4;
+        color: $color-label;
         margin-bottom: 10rpx;
       }
       
       .detail-value {
-        font-size: $font-md;
+        font-size: $size-4;
         color: $fitness-text;
         word-break: break-word;
         line-height: 1.5;
@@ -247,7 +247,7 @@ const navigateToEquipmentList = (inventoryId) => {
     margin-bottom: 30rpx;
     
     .card-title {
-      font-size: $font-lg;
+      font-size: $size-5;
       font-weight: bold;
       color: $fitness-text;
     }
@@ -256,11 +256,11 @@ const navigateToEquipmentList = (inventoryId) => {
   .actions-list {
     .action-item {
       padding: 20rpx 0;
-      border-bottom: 1rpx solid $fitness-border;
+      border-bottom: 1rpx solid rgba(160, 62, 64, 0.1);
       
       .action-name {
         display: block;
-        font-size: $font-md;
+        font-size: $size-4;
         font-weight: bold;
         color: $fitness-text;
         margin-bottom: 10rpx;
@@ -268,8 +268,8 @@ const navigateToEquipmentList = (inventoryId) => {
       
       .action-description {
         display: block;
-        font-size: $font-sm;
-        color: $fitness-text-gray;
+        font-size: $size-3;
+        color: $color-label;
         line-height: 1.4;
       }
     }
@@ -290,7 +290,7 @@ const navigateToEquipmentList = (inventoryId) => {
     height: 90rpx;
     background: $uni-primary;
     color: #FFFFFF;
-    font-size: $font-lg;
+    font-size: $size-5;
     border-radius: 45rpx;
     border: none;
     display: flex;
@@ -303,9 +303,9 @@ const navigateToEquipmentList = (inventoryId) => {
     height: 90rpx;
     background:$fitness-placeholder;
     color: $fitness-primary;
-    font-size: $font-lg;
+    font-size: $size-5;
     border-radius: 45rpx;
-    border: 1rpx solid $fitness-border;
+    border: 1rpx solid rgba(160, 62, 64, 0.1);
     display: flex;
     align-items: center;
     justify-content: center;

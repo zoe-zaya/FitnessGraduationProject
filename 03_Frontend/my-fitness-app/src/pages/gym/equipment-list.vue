@@ -234,7 +234,7 @@ const generatePlan = () => {
 .gym-info-card {
   background: $fitness-card-bg;
   margin: 30rpx $size-5;
-  border-radius: $radius-lg;
+  border-radius: $size-5;
   padding: $size-5;
   box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.08);
   
@@ -243,7 +243,7 @@ const generatePlan = () => {
     
     .gym-name {
       display: block;
-      font-size: $font-xl;
+      font-size: $size-6;
       font-weight: bold;
       color: $fitness-text;
       margin-bottom: 10rpx;
@@ -251,8 +251,8 @@ const generatePlan = () => {
     
     .gym-count {
       display: block;
-      font-size: $font-sm;
-      color: $fitness-text-light;
+      font-size: $size-3;
+      color: $color-label;
     }
   }
   
@@ -260,23 +260,23 @@ const generatePlan = () => {
     margin-bottom: 30rpx;
     padding: 20rpx;
     background: $fitness-input-bg;
-    border-radius: $radius-md;
+    border-radius: $size-4;
     
     .desc-label {
-      font-size: $font-sm;
-      color: $fitness-text-light;
+      font-size: $size-3;
+      color: $color-label;
       margin-right: 10rpx;
     }
     
     .desc-text {
-      font-size: $font-sm;
+      font-size: $size-3;
       color: $fitness-text;
       line-height: 1.6;
     }
     
     .desc-text-empty {
-      font-size: $font-sm;
-      color: $fitness-text-gray;
+      font-size: $size-3;
+      color: $color-label;
       font-style: italic;
     }
   }
@@ -289,7 +289,7 @@ const generatePlan = () => {
     .action-btn {
       flex: 1;
       height: 100rpx;
-      border-radius: $radius-md;
+      border-radius: $size-4;
       border: none;
       display: flex;
       flex-direction: row;
@@ -301,7 +301,7 @@ const generatePlan = () => {
       }
       
       .btn-text {
-        font-size: $font-xs;
+        font-size: $size-2;
       }
       
       &.scan {
@@ -327,7 +327,7 @@ const generatePlan = () => {
   
   .equipment-card {
     background: $fitness-card-bg;
-    border-radius: $radius-md;
+    border-radius: $size-4;
     padding: 20rpx;
     margin-bottom: 30rpx;
     display: flex;
@@ -345,7 +345,7 @@ const generatePlan = () => {
       .equipment-image {
         width: 100%;
         height: 100%;
-        border-radius: $radius-sm;
+        border-radius: $size-3;
         background: #F5F5F5;
       }
       
@@ -356,7 +356,7 @@ const generatePlan = () => {
         right: 0;
         bottom: 0;
         background: #F5F5F5;
-        border-radius: $radius-sm;
+        border-radius: $size-3;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -373,7 +373,7 @@ const generatePlan = () => {
       
       .equipment-name {
         display: block;
-        font-size: $font-lg;
+        font-size: $size-5;
         font-weight: bold;
         color: $fitness-text;
         margin-bottom: 10rpx;
@@ -384,7 +384,7 @@ const generatePlan = () => {
       
       .equipment-category {
         display: block;
-        font-size: $font-sm;
+        font-size: $size-3;
         color: $uni-primary;
         margin-bottom: 10rpx;
         overflow: hidden;
@@ -394,8 +394,8 @@ const generatePlan = () => {
       
       .equipment-muscles {
         display: block;
-        font-size: $font-xs;
-        color: $fitness-text-gray;
+        font-size: $size-2;
+        color: $color-label;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
@@ -434,14 +434,14 @@ const generatePlan = () => {
   }
   
   .empty-text {
-    font-size: $font-lg;
-    color: $fitness-text-light;
+    font-size: $size-5;
+    color: $color-label;
     margin-bottom: 10rpx;
   }
   
   .empty-subtext {
-    font-size: $font-sm;
-    color: $fitness-text-gray;
+    font-size: $size-3;
+    color: $color-label;
   }
 }
 </style>

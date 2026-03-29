@@ -257,7 +257,7 @@ const uploadAndRecognize = (filePath) => {
     
     .scan-tip {
       margin-top: $size-5;
-      font-size: $font-md;
+      font-size: $size-4;
       color: #FFFFFF;
     }
   }
@@ -280,7 +280,7 @@ const uploadAndRecognize = (filePath) => {
   }
   
   .hint-text {
-    font-size: $font-md;
+    font-size: $size-4;
     color: #FFFFFF;
     text-align: center;
   }
@@ -313,7 +313,7 @@ const uploadAndRecognize = (filePath) => {
       }
       
       .btn-text {
-        font-size: $font-sm;
+        font-size: $size-3;
         color: #FFFFFF;
       }
       
@@ -350,7 +350,7 @@ const uploadAndRecognize = (filePath) => {
     }
     
     .loading-text {
-      font-size: $font-md;
+      font-size: $size-4;
       color: #FFFFFF;
     }
   }

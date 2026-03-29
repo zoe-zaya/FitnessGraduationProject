@@ -77,18 +77,18 @@ const recordExercise = () => {
 
 .welcome-section {
   background: $fitness-primary;
-  border-radius: $radius-lg;
+  border-radius: $size-5;
   padding: $size-5;
   margin-bottom: $size-5;
-  box-shadow: 0 1rpx 0 0 $divider-ios; // iOS风格阴影
+  box-shadow: 0 1rpx 0 0 rgba(0, 0, 0, 0.12); // iOS风格阴影
   
   .greeting {
     margin-bottom: $size-5;
     
     .greeting-text {
       display: block;
-      font-size: $font-xl;
-      color: $fitness-text-light;
+      font-size: $size-6;
+      color: $color-label;
       margin-bottom: 10rpx;
     }
     
@@ -118,8 +118,8 @@ const recordExercise = () => {
       
       .stat-label {
         display: block;
-        font-size: $font-sm;
-        color: $fitness-text-light;
+        font-size: $size-3;
+        color: $color-label;
       }
     }
   }
@@ -133,10 +133,10 @@ const recordExercise = () => {
   .action-card {
     flex: 1;
     background: $fitness-primary;
-    border-radius: $radius-lg;
+    border-radius: $size-5;
     padding: $size-5 20rpx;
     text-align: center;
-    box-shadow: 0 1rpx 0 0 $divider-ios; // iOS风格阴影
+    box-shadow: 0 1rpx 0 0 rgba(0, 0, 0, 0.12); // iOS风格阴影
     
     .action-icon {
       display: block;
@@ -146,7 +146,7 @@ const recordExercise = () => {
     
     .action-title {
       display: block;
-      font-size: $font-lg;
+      font-size: $size-5;
       font-weight: 600;
       color: $fitness-text;
       margin-bottom: 10rpx;
@@ -154,21 +154,21 @@ const recordExercise = () => {
     
     .action-desc {
       display: block;
-      font-size: $font-sm;
-      color: $fitness-text-light;
+      font-size: $size-3;
+      color: $color-label;
     }
   }
 }
 
 .recent-section {
   background: $fitness-primary;
-  border-radius: $radius-lg;
+  border-radius: $size-5;
   padding: $size-5;
-  box-shadow: 0 1rpx 0 0 $divider-ios; // iOS风格阴影
+  box-shadow: 0 1rpx 0 0 rgba(0, 0, 0, 0.12); // iOS风格阴影
   
   .section-title {
     display: block;
-    font-size: $font-lg;
+    font-size: $size-5;
     font-weight: 600;
     color: $fitness-text;
     margin-bottom: 30rpx;
@@ -179,8 +179,8 @@ const recordExercise = () => {
     padding: 60rpx 0;
     
     .no-data-text {
-      font-size: $font-md;
-      color: $fitness-text-light;
+      font-size: $size-4;
+      color: $color-label;
     }
   }
 }

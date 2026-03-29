@@ -212,8 +212,8 @@
       align-items: center;
       justify-content: space-between;
       flex-wrap: wrap;
-      border-radius: $radius-lg;
-      border: 3.2rpx solid $fitness-border;
+      border-radius: $size-5;
+      border: 3.2rpx solid rgba(160, 62, 64, 0.1);
 
       
       &:last-child {
@@ -222,7 +222,7 @@
       
       .label {
         width:25%;
-        font-size: $font-md;
+        font-size: $size-4;
         color: $fitness-text;
         margin-left: 15rpx;
       }
@@ -231,16 +231,16 @@
         width: 70%;
         height: 90rpx;
         background: $fitness-primary;
-        border-radius: $radius-sm;
+        border-radius: $size-3;
         padding: 0 30rpx;
-        font-size: $font-md;
+        font-size: $size-4;
         box-sizing: border-box;
       }
     }
     .tip {
         display: block;
-        font-size: $font-xs;
-        color: $fitness-text-gray;
+        font-size: $size-2;
+        color: $color-label;
         margin-left: 10rpx;
       }
     
@@ -250,21 +250,21 @@
       margin-top: 10rpx;
       padding: 10rpx;
       background: $fitness-primary;
-      border-radius: $radius-sm;
+      border-radius: $size-3;
       
       .strength-label {
         width: auto;
-        font-size: $font-xs;
-        color: $fitness-text-gray;
+        font-size: $size-2;
+        color: $color-label;
         margin-right: 10rpx;
       }
       
       .strength-value {
         width: auto;
-        font-size: $font-xs;
+        font-size: $size-2;
         font-weight: bold;
         padding: 4rpx $size-2;
-        border-radius: $radius-sm;
+        border-radius: $size-3;
         
         &.strength-weak {
           color: $uni-error;
@@ -288,8 +288,8 @@
       height: $size-11;
       background: $uni-primary;
       color: #FFFFFF;
-      font-size: $font-lg;
-      border-radius: $radius-lg;
+      font-size: $size-5;
+      border-radius: $size-5;
       border: none;
       display: flex;
       align-items: center;
@@ -305,19 +305,19 @@
 
   .forget-password {
       text-align: right;
-      font-size: $font-xs;
+      font-size: $size-2;
       color: $uni-primary;
       margin-top: $size-5;
     }
   
   .security-notice {
     background: linear-gradient(135deg, #E8F5E9, #C8E6C9);
-    border-radius: $radius-md;
+    border-radius: $size-4;
     padding: 30rpx;
     
     .notice-title {
       display: block;
-      font-size: $font-md;
+      font-size: $size-4;
       font-weight: bold;
       color: #2E7D32;
       margin-bottom: 10rpx;
@@ -325,7 +325,7 @@
     
     .notice-content {
       display: block;
-      font-size: $font-xs;
+      font-size: $size-2;
       color: #388E3C;
       line-height: 2;
       white-space: pre-line;
