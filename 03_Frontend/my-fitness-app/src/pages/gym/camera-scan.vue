@@ -16,37 +16,23 @@
       </view>
     </view>
     <!-- #endif -->
+
+    <!-- 显示从相册选择的图片 -->
+    <view class="camera-area" v-if="selectedImagePath">
+      <image :src="selectedImagePath" class="selected-image" mode="aspectFill"></image>
+      <view class="camera-overlay">
+        <view class="scan-frame"></view>
+        <text class="scan-tip">已选择图片</text>
+      </view>
+    </view>
     
-    <!-- 小程序提示 -->
+    <!-- 小程序提示（当没有选择图片时显示） -->
     <!-- #ifdef MP-WEIXIN -->
-    <view class="camera-hint">
+    <view class="camera-hint" v-if="!selectedImagePath">
       <text class="hint-icon">📷</text>
       <text class="hint-text">请点击下方按钮选择图片</text>
     </view>
     <!-- #endif -->
-    
-    <!-- 操作按钮 -->
-    <view class="action-area">
-      <view class="btn-group">
-        <!-- #ifdef MP-WEIXIN -->
-        <button class="action-btn album" @click="chooseFromAlbum">
-          <text class="btn-icon">🖼️</text>
-          <text class="btn-text">从相册选择</text>
-        </button>
-        <!-- #endif -->
-        
-        <!-- #ifndef MP-WEIXIN -->
-        <button class="action-btn album" @click="chooseFromAlbum">
-          <text class="btn-icon">🖼️</text>
-          <text class="btn-text">从相册选择</text>
-        </button>
-        <button class="action-btn capture" @click="captureImage">
-          <text class="btn-icon">📷</text>
-          <text class="btn-text">拍摄</text>
-        </button>
-        <!-- #endif -->
-      </view>
-    </view>
     
     <!-- 加载中遮罩 -->
     <view class="loading-mask" v-if="recognizing">
@@ -54,6 +40,29 @@
         <text class="loading-icon">🔄</text>
         <text class="loading-text">识别中...</text>
       </view>
+    </view>
+    
+    <!-- 操作按钮区域 -->
+    <view class="action-area">
+      <!-- #ifdef MP-WEIXIN -->
+      <button class="action-btn album-btn" @click="chooseFromAlbum">
+        <image class="btn-icon" src="/static/album.png" mode="aspectFit"></image>
+        <text class="btn-text">从相册选择</text>
+      </button>
+      <!-- #endif -->
+      
+      <!-- #ifndef MP-WEIXIN -->
+      <view class="btn-container">
+        <button class="action-btn album-btn" @click="chooseFromAlbum">
+          <image class="btn-icon" src="/static/album.png" mode="aspectFit"></image>
+          <text class="btn-text">从相册选择</text>
+        </button>
+        <button class="action-btn capture-btn" @click="captureImage">
+          <image class="btn-icon" src="/static/take-photo.png" mode="aspectFit"></image>
+          <text class="btn-text">拍摄</text>
+        </button>
+      </view>
+      <!-- #endif -->
     </view>
   </view>
 </template>
@@ -68,6 +77,7 @@ const inventoryId = ref('')
 const recognizing = ref(false)
 const recognitionResult = ref(null)
 const isWeixinMiniProgram = ref(false)
+const selectedImagePath = ref('')  // 新增：存储选择的图片路径
 
 onLoad((options) => {
   inventoryId.value = options.inventory_id || ''
@@ -96,6 +106,7 @@ const chooseFromAlbum = () => {
     sizeType: ['compressed'], // 压缩图片，减少上传时间
     success: (res) => {
       const filePath = res.tempFilePaths[0]
+      selectedImagePath.value = filePath  // 设置选择的图片路径
       uploadAndRecognize(filePath)
     },
     fail: (err) => {
@@ -116,6 +127,7 @@ const captureImage = () => {
     sizeType: ['compressed'],
     success: (res) => {
       const filePath = res.tempFilePaths[0]
+      selectedImagePath.value = filePath  // 设置拍摄的图片路径
       uploadAndRecognize(filePath)
     },
     fail: (err) => {
@@ -222,6 +234,7 @@ const uploadAndRecognize = (filePath) => {
   background: #000000;
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 
 // 相机区域（非小程序）
@@ -229,9 +242,14 @@ const uploadAndRecognize = (filePath) => {
 .camera-area {
   position: relative;
   width: 100%;
-  height: 60vh;
+  flex: 1;  // 占据除了按钮区域外的所有空间
   
   .camera {
+    width: 100%;
+    height: 100%;
+  }
+  
+  .selected-image {
     width: 100%;
     height: 100%;
   }
@@ -273,6 +291,7 @@ const uploadAndRecognize = (filePath) => {
   justify-content: center;
   padding: 100rpx $size-5;
   background: #1A1A1A;
+  flex: 1;  // 占据剩余空间
   
   .hint-icon {
     font-size: $size-10;
@@ -288,13 +307,18 @@ const uploadAndRecognize = (filePath) => {
 // #endif
 
 .action-area {
-  flex: 1;
-  padding: $size-5;
+  width: 100%;
+  //padding: $size-5;
   background: #000000;
   display: flex;
-  align-items: flex-end;
+  flex-direction: column;
+  justify-content: center;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  z-index: 999;
   
-  .btn-group {
+  .btn-container {
     display: flex;
     justify-content: space-around;
     width: 100%;
@@ -306,9 +330,13 @@ const uploadAndRecognize = (filePath) => {
       background: transparent;
       border: none;
       padding: 20rpx;
+      flex: 1;
+      max-width: 300rpx;
+      margin: 0 20rpx;
       
       .btn-icon {
-        font-size: $size-6;
+        width: $size-6;
+        height: $size-6;
         margin-bottom: 10rpx;
       }
       
@@ -317,11 +345,41 @@ const uploadAndRecognize = (filePath) => {
         color: #FFFFFF;
       }
       
-      &.album {
+      &.album-btn {
         .btn-icon {
-          font-size: $size-5;
+          width: $size-5;
+          height: $size-5;
         }
       }
+      
+      &.capture-btn {
+        .btn-icon {
+          width: $size-6;
+          height: $size-6;
+        }
+      }
+    }
+  }
+  
+  // 小程序环境下居中显示一个按钮
+  .action-btn.album-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: transparent;
+    border: none;
+    padding: 20rpx;
+    margin: 0 auto;
+    
+    .btn-icon {
+      width: $size-6;
+      height: $size-6;
+      margin-bottom: 10rpx;
+    }
+    
+    .btn-text {
+      font-size: $size-3;
+      color: #FFFFFF;
     }
   }
 }

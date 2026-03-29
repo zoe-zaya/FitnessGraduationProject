@@ -452,7 +452,7 @@ const generatePlan = () => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding-top: $size-12;
+  padding-top: 106rpx;
   
   .empty-image {
     width: 500rpx;
