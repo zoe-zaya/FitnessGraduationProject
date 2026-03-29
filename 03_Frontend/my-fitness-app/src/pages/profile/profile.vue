@@ -167,7 +167,6 @@
         display: flex;
         font-size: $size-6;
         font-weight: 700;
-        border: 4rpx solid #ffffff;
         color: $color-input;
         margin-bottom: $size-1;
         align-items: center;
@@ -291,12 +290,14 @@
         font-size: $size-3;
         color: $color-secondory;
         margin-right: 10rpx;
+        font-weight: bold;
       }
       
       .arrow {
         font-size: $size-5;
         color: $color-secondory;
         padding-bottom: $size-1;
+        font-weight: bold;
       }
     }
   }

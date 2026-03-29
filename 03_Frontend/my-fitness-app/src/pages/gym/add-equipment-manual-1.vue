@@ -169,7 +169,8 @@
 
 .search-results {
   .result-item {
-    background:$fitness-secondary;
+    background:rgba(252, 249, 248, 0.5);
+;
     border-radius: $size-4;
     padding: 30rpx;
     margin-bottom: 20rpx;
@@ -222,7 +223,8 @@
       gap: 15rpx;
       
       .select-btn {
-        background: $fitness-secondary;
+        background: rgba(252, 249, 248, 0.5);
+;
         color: $fitness-text;
         border: none;
         border-radius: $size-3;

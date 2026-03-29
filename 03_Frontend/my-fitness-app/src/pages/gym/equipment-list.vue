@@ -227,7 +227,8 @@ const generatePlan = () => {
 
 .container {
   min-height: 100vh;
-  background: $fitness-secondary;
+  background: rgba(252, 249, 248, 0.5);
+;
 }
 
 // ✅ 新增：健身房信息卡片样式

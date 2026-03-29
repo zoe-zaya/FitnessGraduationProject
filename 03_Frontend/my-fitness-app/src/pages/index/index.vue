@@ -71,7 +71,8 @@ const recordExercise = () => {
 
 .container {
   min-height: 100vh;
-  background-color: $fitness-secondary;
+  background-color: rgba(252, 249, 248, 0.5);
+;
   padding: $size-5 $size-5 0;
 }
 
