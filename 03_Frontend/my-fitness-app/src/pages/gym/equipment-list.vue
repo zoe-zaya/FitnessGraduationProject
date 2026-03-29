@@ -2,35 +2,41 @@
   <view class="container">
     <!-- ✅ 新增：健身房信息卡片 -->
     <view class="gym-info-card" v-if="gymInfo">
-      <view class="gym-header">
-        <text class="gym-name">{{ gymInfo.location_tag }}</text>
-        <text class="gym-count">器材数量：{{ gymInfo.equipment_count }} 个</text>
+      <view class="gym-content">
+        <!-- 信息区域 -->
+        <view class="info-section">
+          <view class="gym-header">
+            <text class="gym-name">{{ gymInfo.location_tag }}</text>
+            <text class="gym-extra-info">
+              <text class="gym-count">{{ gymInfo.equipment_count }} 个器材</text>
+              <text class="gym-created" v-if="gymInfo.create_time">· {{ formatDate(gymInfo.create_time) }}</text>
+            </text>
+          </view>
+          <view class="gym-description" v-if="gymInfo.description">
+            <text class="desc-text">{{ gymInfo.description }}</text>
+          </view>
+          
+          <view class="gym-description" v-else>
+            <text class="desc-text-empty">暂无描述</text>
+          </view>
+        </view>
       </view>
-      
-      <view class="gym-description" v-if="gymInfo.description">
-        <text class="desc-label">📝 描述：</text>
-        <text class="desc-text">{{ gymInfo.description }}</text>
-      </view>
-      
-      <view class="gym-description" v-else>
-        <text class="desc-label">📝 描述：</text>
-        <text class="desc-text-empty">暂无描述</text>
-      </view>
-      
-      <view class="action-buttons">
-        <button class="action-btn scan" @click="navigateToCameraScan">
-          <text class="btn-icon">📷</text>
-          <text class="btn-text">拍摄识别</text>
-        </button>
-        <button class="action-btn manual" @click="navigateToManualAdd">
-          <text class="btn-icon">🔍</text>
-          <text class="btn-text">手动添加</text>
-        </button>
-        <button class="action-btn plan" @click="generatePlan">
-          <text class="btn-icon">📋</text>
-          <text class="btn-text">生成计划</text>
-        </button>
-      </view>
+    </view>
+    
+    <!-- 操作按钮区域 -->
+    <view class="action-section" v-if="gymInfo">
+      <button class="action-btn scan" @click="navigateToCameraScan">
+        <img src="/static/camera3.png" class="btn-icon" />
+        <text class="btn-text">拍摄识别</text>
+      </button>
+      <button class="action-btn manual" @click="navigateToManualAdd">
+        <img src="/static/search.png" class="btn-icon" />
+        <text class="btn-text">手动添加</text>
+      </button>
+      <button class="action-btn plan" @click="generatePlan">
+        <img src="/static/generate3.png" class="btn-icon" />
+        <text class="btn-text">生成计划</text>
+      </button>
     </view>
     
     <!-- 器材列表 -->
@@ -74,7 +80,7 @@
     
     <!-- 空状态提示 -->
     <view class="empty-state" v-else>
-      <image src="/static/empty-equipment.png" class="empty-image" mode="aspectFit" />
+      <image src="/static/empty-data.png" class="empty-image" mode="aspectFit" />
       <text class="empty-text">暂无器材</text>
       <text class="empty-subtext">拍摄识别或手动添加器材</text>
     </view>
@@ -118,6 +124,14 @@ const loadGymDetail = async () => {
   } catch (error) {
     console.error('加载健身房详情失败:', error)
   }
+}
+
+/**
+ * 格式化日期
+ */
+const formatDate = (dateString) => {
+  const date = new Date(dateString)
+  return `${date.getFullYear()}-${(date.getMonth()+1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`
 }
 
 /**
@@ -227,107 +241,119 @@ const generatePlan = () => {
 
 .container {
   min-height: 100vh;
-  background: rgba(252, 249, 248, 0.5);
-;
+  background: url('@/static/background3.png') no-repeat center center / cover;
+  padding: $size-5;
 }
 
-// ✅ 新增：健身房信息卡片样式
+/* 健身房信息卡片样式 */
 .gym-info-card {
-  background: $fitness-card-bg;
-  margin: 30rpx $size-5;
+  background: #FFFFFF url('/static/foot-icon.png') no-repeat;
+  background-size: $size-9 $size-9;     //背景图片的宽度
+  background-position: right $size-3 bottom $size-3; /* 右上角 */
   border-radius: $size-5;
   padding: $size-5;
-  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.12);
   
-  .gym-header {
-    margin-bottom: 20rpx;
-    
-    .gym-name {
-      display: block;
-      font-size: $size-6;
-      font-weight: bold;
-      color: $fitness-text;
-      margin-bottom: 10rpx;
-    }
-    
-    .gym-count {
-      display: block;
-      font-size: $size-3;
-      color: $color-label;
-    }
-  }
-  
-  .gym-description {
-    margin-bottom: 30rpx;
-    padding: 20rpx;
-    background: $fitness-input-bg;
-    border-radius: $size-4;
-    
-    .desc-label {
-      font-size: $size-3;
-      color: $color-label;
-      margin-right: 10rpx;
-    }
-    
-    .desc-text {
-      font-size: $size-3;
-      color: $fitness-text;
-      line-height: 1.6;
-    }
-    
-    .desc-text-empty {
-      font-size: $size-3;
-      color: $color-label;
-      font-style: italic;
-    }
-  }
-  
-  .action-buttons {
+  .gym-content {
     display: flex;
-    justify-content: space-between;
-    gap: 20rpx;
-    
-    .action-btn {
-      flex: 1;
-      height: 100rpx;
-      border-radius: $size-4;
-      border: none;
-      display: flex;
-      flex-direction: row;
-      justify-content: center;
-      align-items: center;
-      
-      .btn-icon {
-        font-size: $size-5;
+    flex-direction: column; // 改为垂直布局
+    .info-section {
+      flex: auto; // 占据剩余空间
+
+      .gym-header {     
+        .gym-name {
+          display: block;
+          font-size: $size-6;
+          font-weight: bold;
+          color: $fitness-text;
+          margin-bottom: 10rpx;
+        }
+        
+        .gym-extra-info {
+          display: flex;
+          font-size: $size-3;
+          color: $color-label;
+          padding-left: $size-1;
+          
+          .gym-count,
+          .gym-created {
+            margin-right: $size-1;
+          }
+        }
       }
       
-      .btn-text {
-        font-size: $size-2;
-      }
-      
-      &.scan {
-        background: linear-gradient(135deg, #007AFF, #00C6FB);
-        color: #FFFFFF;
-      }
-      
-      &.manual {
-        background: linear-gradient(135deg, #34C759, #30D158);
-        color: #FFFFFF;
-      }
-      
-      &.plan {
-        background: linear-gradient(135deg, #FF9500, #FFAD33);
-        color: #FFFFFF;
+      .gym-description {
+        margin-top: $size-1;
+        padding-left: $size-1;  
+        .desc-text, .desc-text-empty{
+          display: flex;
+          font-size: $size-3;
+          color: $color-label;
+          font-weight: 500;
+        }
       }
     }
   }
 }
 
+.action-section {
+  width: 100%; // 按钮区域占满整行
+  display: flex; // 水平排列按钮
+  flex-direction: row; // 水平方向排列
+  justify-content: space-between; // 按钮平均分布
+  margin-top: $size-4;
+
+  .action-btn {
+    flex: 1; // 每个按钮平均分配空间
+    height: 76rpx;
+    border-radius: $size-4;
+    border: none;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    justify-content: space-between;
+    align-items: center;
+    margin-right: $size-2; // 按钮之间添加间距
+    line-height: 2; // 调整文本垂直居中
+    box-shadow: 2rpx 4rpx 12rpx rgba(0, 0, 0, 0.12);
+
+    &:last-child {
+      margin-right: 0; // 最后一个按钮不需要右边距
+    }
+
+    &::after{
+      border: none;
+    }
+        
+    .btn-icon {
+      width: 40rpx;
+      height: 40rpx;
+    }
+        
+    .btn-text {
+      font-size: $size-3;
+      align-items: center;
+    }
+        
+    &.scan{
+      background: $uni-success-bg;
+      color: $uni-success;
+    }
+    &.manual{
+      background: $color-primary-light;
+      color: $color-primary;
+    }
+    &.plan {
+      background: $uni-warning-bg;
+      color: $uni-warning;
+    }
+  }
+}
 .equipment-list {
   padding: 0 $size-5 $size-5;
   
   .equipment-card {
-    background: $fitness-card-bg;
+    background: #ffffff;
     border-radius: $size-4;
     padding: 20rpx;
     margin-bottom: 30rpx;
@@ -426,23 +452,26 @@ const generatePlan = () => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 100rpx $size-5;
+  padding-top: $size-12;
   
   .empty-image {
-    width: 300rpx;
-    height: 300rpx;
-    margin-bottom: $size-5;
+    width: 500rpx;
+    height: 200rpx;
   }
   
   .empty-text {
-    font-size: $size-5;
-    color: $color-label;
+    font-size: $size-4;
+    color: $color-input;
     margin-bottom: 10rpx;
+    font-weight: 600;
+    text-align: center;
   }
   
   .empty-subtext {
     font-size: $size-3;
     color: $color-label;
+    text-align: center;
+    font-weight: 400;
   }
 }
 </style>
