@@ -2,73 +2,85 @@
     <view class="container">
       <!-- 表单区域 -->
       <view class="form-section">
-        <!-- 旧密码 -->
-        <view class="input-item">
-          <text class="label">当前密码</text>
-          <input 
-            v-model="formData.oldPassword" 
-            type="password" 
-            placeholder="请输入当前密码"
-            class="input"
-          />
-        </view>
+        <view class="input-wrapper">
+          <!-- 旧密码 -->
+          <view class="text">当前密码</view>
+          <view class="input-item">
+            <img src="@/static/password2.png" class="icon"/>
+            <input 
+              v-model="formData.oldPassword" 
+              type="password" 
+              placeholder="请输入当前密码"
+              class="input"
+              :class="{ 'input-focus': focusedInput === 'oldPassword' }"
+              @focus="onInputFocus('oldPassword')"
+              @blur="onInputBlur"
+            />
+          </view>
         
-        <!-- 新密码 -->
-        <view class="input-item">
-          <text class="label">新密码</text>
-          <input 
-            v-model="formData.newPassword" 
-            type="password" 
-            placeholder="8 位以上，含大小写数字符号"
-            class="input"
-          />
-        </view>
+          <!-- 新密码 -->
+          <view class="text">新密码</view>
+          <view class="input-item">
+            <img src="@/static/password2.png" class="icon"/>
+            <input 
+              v-model="formData.newPassword" 
+              type="password" 
+              placeholder="请输入新密码"
+              class="input"
+              :class="{ 'input-focus': focusedInput === 'newPassword' }"
+              @focus="onInputFocus('newPassword')"
+              @blur="onInputBlur"
+            />
+          </view>
         
-        <!-- 确认新密码 -->
-        <view class="input-item">
-          <text class="label">确认新密码</text>
-          <input 
-            v-model="formData.confirmPassword" 
-            type="password" 
-            placeholder="请再次输入新密码"
-            class="input"
-          />
+          <!-- 确认新密码 -->
+          <view class="text">确认新密码</view>
+          <view class="input-item">
+            <img src="@/static/password2.png" class="icon"/>
+            <input 
+              v-model="formData.confirmPassword" 
+              type="password" 
+              placeholder="请再次输入新密码"
+              class="input"
+              :class="{ 'input-focus': focusedInput === 'confirmPassword' }"
+              @focus="onInputFocus('confirmPassword')"
+              @blur="onInputBlur"
+            />
+            <uni-icons type="eye-filled" size="20" color="#8E8E93"></uni-icons>
+          </view>
         </view>
-        <text class="tip">需包含大小写字母、数字和特殊符号</text>
+        <view class="password-tip">
+          <img src="@/static/exclamation-icon.png" class="icon"/>
+          <text class="info">密码长度应大于8位，需包含大小写字母、数字和特殊符号。</text>
+        </view>
+        <view class="password-tip">
+          <img src="@/static/exclamation-icon.png" class="icon"/>
+          <text class="info">特殊符号是!@#$%^&*()_+-=。</text>
+        </view> 
 
-        
-        <!-- 密码强度提示 -->
-        <view class="password-strength" v-if="formData.newPassword">
-          <text class="strength-label">密码强度：</text>
-          <text 
-            class="strength-value" 
-            :class="passwordStrengthClass"
-          >
-            {{ passwordStrengthText }}
-          </text>
+        <view class="password-info">       
+          <!-- 密码强度提示 -->
+          <view class="password-strength" v-if="formData.newPassword">
+            <text class="strength-label">密码强度：</text>
+            <text 
+              class="strength-value" 
+              :class="passwordStrengthClass"
+            >
+              {{ passwordStrengthText }}
+            </text>
+          </view>
         </view>
-        
-        <!-- 提交按钮 -->
-        <button class="submit-btn" @click="handleSubmit" :loading="loading">
+
+      <!-- 提交按钮 -->
+      <button class="submit-btn" @click="handleSubmit" :loading="loading">
           确认修改
-        </button>
+      </button>
 
-        <view class="forget-password" @click="navigateToForget">
-          忘记密码？
-        </view>
+      <view class="forget-password" @click="navigateToForget">
+        忘记密码？
       </view>
-      
-      <!-- 安全提示 -->
-      <!--<view class="security-notice">
-        <text class="notice-title">💡 密码安全建议</text>
-        <text class="notice-content">
-          1. 不要使用生日、手机号等易猜信息\n
-          2. 定期更换密码，建议每 3 个月一次\n
-          3. 不要与其他网站使用相同密码\n
-          4. 密码修改后需使用新密码登录
-        </text>
-      </view>-->
     </view>
+  </view>
   </template>
   
   <script setup>
@@ -78,6 +90,7 @@
   import { useUserStore } from '@/store/user'
   
   const loading = ref(false)
+  const focusedInput = ref(null)
   
   const formData = ref({
     oldPassword: '',
@@ -85,6 +98,14 @@
     confirmPassword: ''
   })
   
+const onInputFocus = (inputName) => {
+  focusedInput.value = inputName
+}
+  
+const onInputBlur = () => {
+  focusedInput.value = null
+}
+
   /**
    * 计算密码强度
    */
@@ -132,7 +153,7 @@
       uni.showToast({ 
         title: '密码需 8 位以上，含大小写字母、数字和特殊符号', 
         icon: 'none',
-        duration: 3000
+        duration: 2000
       })
       return
     }
@@ -168,17 +189,10 @@
       })
       
       // 6. 修改成功提示
-      uni.showModal({
-        title: '提示',
-        content: '密码修改成功，请使用新密码重新登录',
-        showCancel: false,
-        success: () => {
-          // 退出登录，返回登录页面
-          const userStore = useUserStore()
-          userStore.logout()
-          uni.redirectTo({ url: '/pages/login/login' })
-        }
-      })
+      uni.showToast({ title: '密码修改成功', icon: 'success', duration: 1500 })
+      const userStore = useUserStore()
+      userStore.logout()
+      uni.redirectTo({ url: '/pages/login/login' })
       
     } catch (error) {
       console.error('修改失败:', error)
@@ -197,105 +211,159 @@
   
   .container {
     min-height: 100vh;
-    background: $fitness-primary;
-    padding: 20rpx;
+    background: url('@/static/background.png') no-repeat center center / cover;
+    padding: $size-8 $size-6 $size-6;
   }
   
   .form-section {
-    background: #FFFFFF;
-    padding: 30rpx;
-    margin-bottom: 30rpx;
-    
-    .input-item {
-      margin-bottom: 20rpx;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      border-radius: $size-5;
-      border: 3.2rpx solid rgba(160, 62, 64, 0.1);
+    background: rgba(252, 249, 248, 0.7);
+    border-radius: $size-4;
+    padding: $size-8;
+    box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.12);
 
-      
-      &:last-child {
-        margin-bottom: 0;
+    .input-wrapper {
+      .text{
+          font-weight: 700;
+          font-size: $size-3;
+          line-height: $size-5;
+          display: block;
+          margin-left: $size-1;
+          color: $color-label;
       }
-      
-      .label {
-        width:25%;
-        font-size: $size-4;
-        color: $fitness-text;
-        margin-left: 15rpx;
-      }
-      
-      .input {
-        width: 70%;
-        height: 90rpx;
-        background: $fitness-primary;
-        border-radius: $size-3;
-        padding: 0 30rpx;
-        font-size: $size-4;
-        box-sizing: border-box;
+  
+      .input-item {
+          position: relative;
+          margin-bottom: $size-3;
+          margin-top: $size-2;
+          margin-bottom: 0;
+          align-items: center;
+          display: flex;
+          position: relative;
+
+          .icon{
+              margin-left: $size-5;
+              padding-bottom: $size-4;
+              align-items: center;
+              position: absolute;
+              width: $size-4;
+          }
+    
+          &:not(:last-child)::after {
+              content: '';
+              position: absolute;
+              bottom: 0;
+              left: $size-4;
+              right: $size-4;
+              height: 1rpx;
+              background: #ffffff;
+              transform: scaleY(0.5);
+          }
+    
+          .input {
+              transition-property: all;
+              transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+              transition-duration: 150ms;
+              color: $color-input;
+              padding-right: $size-4;
+              padding-left: $size-12;
+              padding-top: $size-3;
+              padding-bottom: $size-3;
+              background-color: $fitness-primary;
+              border-style: none;
+              border-radius: $size-4;
+              border: 2px solid rgba(160, 62, 64, 0.1);
+              width: 100%;
+              margin-bottom: $size-4;
+              font-size: $size-4;
+          }
+          .input-focus {
+              border: 2px solid rgba(160, 62, 64, 0.4);
+          }
+          uni-icons {
+              position: absolute;
+              right: $size-3;
+              top: 50%;
+              transform: translateY(-50%);
+          }
       }
     }
+
+    .password-info {
+    padding: 0 $size-2;
+    margin-bottom: $size-4;
+    
     .tip {
-        display: block;
-        font-size: $size-2;
-        color: $color-label;
-        margin-left: 10rpx;
-      }
+      display: block;
+      font-size: $size-3;
+      color: $color-label;
+      margin-bottom: $size-3;
+    }
     
     .password-strength {
       display: flex;
       align-items: center;
-      margin-top: 10rpx;
-      padding: 10rpx;
-      background: $fitness-primary;
-      border-radius: $size-3;
       
       .strength-label {
-        width: auto;
-        font-size: $size-2;
+        font-size: $size-3;
         color: $color-label;
-        margin-right: 10rpx;
+        margin-right: $size-2;
       }
       
       .strength-value {
-        width: auto;
-        font-size: $size-2;
-        font-weight: bold;
-        padding: 4rpx $size-2;
-        border-radius: $size-3;
+        font-size: $size-3;
+        font-weight: 600;
+        padding: $size-1 $size-4;
+        border-radius: $size-2;
         
         &.strength-weak {
           color: $uni-error;
-          background: rgba(255, 68, 68, 0.1);
+          background: $uni-error-bg;
         }
         
         &.strength-medium {
           color: $uni-warning;
-          background: rgba(255, 159, 0, 0.1);
+          background: $uni-warning-bg;
         }
         
         &.strength-strong {
           color: $uni-success;
-          background: rgba(24, 179, 123, 0.1);
+          background: $uni-success-bg;
         }
       }
     }
+  }
+    
+  .password-tip {
+    display: flex;
+    margin-bottom: $size-2;
+
+    .icon{
+      margin-left: $size-1;
+      padding-bottom: $size-3;
+      padding-right: $size-3;
+      align-items: center;
+      width: $size-5;
+    }
+    .info{
+      color: $color-label;
+      font-size: $size-3;
+      line-height: $size-4;
+      font-weight: 525;
+    }    
+  }
     
     .submit-btn {
       width: 100%;
-      height: $size-11;
+      height: $size-12;
       background: $uni-primary;
       color: #FFFFFF;
-      font-size: $size-5;
-      border-radius: $size-5;
+      font-size: $size-4;
+      border-radius: $size-6;
       border: none;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: 600;
-      margin-top: $size-5;
+      font-weight: 700;
       
       &[disabled] {
         opacity: 0.6;
@@ -305,30 +373,9 @@
 
   .forget-password {
       text-align: right;
-      font-size: $size-2;
-      color: $uni-primary;
-      margin-top: $size-5;
+      font-size: $size-3;
+      color: $color-primary;
+      font-weight: 600;
+      margin-top: $size-3;
     }
-  
-  .security-notice {
-    background: linear-gradient(135deg, #E8F5E9, #C8E6C9);
-    border-radius: $size-4;
-    padding: 30rpx;
-    
-    .notice-title {
-      display: block;
-      font-size: $size-4;
-      font-weight: bold;
-      color: #2E7D32;
-      margin-bottom: 10rpx;
-    }
-    
-    .notice-content {
-      display: block;
-      font-size: $size-2;
-      color: #388E3C;
-      line-height: 2;
-      white-space: pre-line;
-    }
-  }
   </style>
