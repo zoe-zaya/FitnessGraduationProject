@@ -10,7 +10,7 @@
           @confirm="searchEquipment"
         />
         <view class="search-btn" @click="searchEquipment">
-          <text class="search-icon">🔍</text>
+          <image src="/static/search.png" class="search-icon" mode="widthFix" />
         </view>
       </view>
       
@@ -18,6 +18,7 @@
       <view class="search-results" v-if="searchResults.length > 0">
         <view 
           class="result-item" 
+          @click="selectEquipment(item)"
           v-for="(item, index) in searchResults" 
           :key="item.equipment_id"
         >
@@ -39,10 +40,9 @@
             <text class="item-category">{{ item.category }}</text>
           </view>
           
-          <view class="button-group">
-            <button class="select-btn" @click="selectEquipment(item)">选择</button>
-            <button class="add-btn" @click="addEquipmentToGym(item)">添加</button>
-          </view>
+            <view class="add-btn" @click="addEquipmentToGym(item)">
+              <img src="/static/add.png" class="add-icon" mode="widthFix" />
+            </view>
         </view>
       </view>
       
@@ -138,7 +138,7 @@
 
 .container {
   min-height: 100vh;
-  background: $fitness-primary;
+  background: url('@/static/background4.png') no-repeat center center / cover;
   padding: 30rpx $size-5;
 }
 
@@ -150,7 +150,7 @@
   padding: 20rpx 30rpx;
   margin-bottom: 30rpx;
   border: 1rpx solid rgba(0, 0, 0, 0.12); // iOS风格边框
-
+  line-height: 1;
   
   .search-input {
     flex: 1;
@@ -158,19 +158,16 @@
     padding: 10rpx 0;
   }
   
-  .search-btn {
-    padding: 10rpx 20rpx;
-    
+  .search-btn {    
     .search-icon {
-      font-size: $size-4;
+      width: 48rpx;
     }
   }
 }
 
 .search-results {
   .result-item {
-    background:rgba(252, 249, 248, 0.5);
-;
+    background:rgb(255, 255, 255);
     border-radius: $size-4;
     padding: 30rpx;
     margin-bottom: 20rpx;
@@ -182,7 +179,7 @@
       position: relative;
       width: 160rpx;
       height: 160rpx;
-      margin-right: 20rpx;
+      margin-right: 48rpx;
       flex-shrink: 0;
       
       .equipment-image {
@@ -216,42 +213,17 @@
       flex-direction: column;
       justify-content: center;
     }
-    
-    .button-group {
-      display: flex;
-      flex-direction: column;
-      gap: 15rpx;
-      
-      .select-btn {
-        background: rgba(252, 249, 248, 0.5);
-;
-        color: $fitness-text;
-        border: none;
-        border-radius: $size-3;
-        font-size: $size-4;
-        padding: 15rpx 20rpx;
-        margin: 0;
-        width: auto;
-        height: auto;
-      }
-      
-      .add-btn {
-        background: $uni-primary;
-        color: white;
-        border: none;
-        border-radius: $radius-sm;
-        font-size: $size-4;
-        padding: 15rpx 20rpx;
-        margin: 0;
-        width: auto;
-        height: auto;
+        
+    .add-btn {
+      .add-icon {
+        width: 64rpx;
       }
     }
     
     .item-name {
       display: block;
       font-size: $size-5;
-      font-weight: bold;
+      font-weight: 600;
       color: $fitness-text;
       margin-bottom: 10rpx;
     }
@@ -259,7 +231,8 @@
     .item-category {
       display: block;
       font-size: $size-3;
-      color: $uni-primary;
+      color: $color-primary;
+      font-weight: 500;
     }
   }
 }

@@ -67,13 +67,13 @@
           <text class="equipment-name">{{ equipment.name }}</text>
           <text class="equipment-category">{{ equipment.category }}</text>
           <text class="equipment-muscles" v-if="equipment.target_muscles && equipment.target_muscles.length > 0">
-            目标肌群：{{ equipment.target_muscles.slice(0, 3).join('、') }}{{ equipment.target_muscles.length > 3 ? '...' : '' }}
+            {{ equipment.target_muscles.slice(0, 3).join('、') }}{{ equipment.target_muscles.length > 3 ? '...' : '' }}
           </text>
         </view>
         
         <!-- 删除按钮 -->
         <view class="delete-btn" @click.stop="confirmDeleteEquipment(equipment)">
-          <text class="delete-icon">🗑️</text>
+          <img src="/static/delete.png" class="delete-icon" />
         </view>
       </view>
     </view>
@@ -185,8 +185,8 @@ const navigateToEquipmentDetail = (equipmentId) => {
  */
 const confirmDeleteEquipment = (equipment) => {
   uni.showModal({
-    title: '提示',
     content: `确定要从清单中删除"${equipment.name}"吗？`,
+    confirmColor: '#FF4D4F',
     success: async (res) => {
       if (res.confirm) {
         await deleteEquipment(equipment.equipment_id)
@@ -315,7 +315,7 @@ const generatePlan = () => {
     align-items: center;
     margin-right: $size-2; // 按钮之间添加间距
     line-height: 2; // 调整文本垂直居中
-    box-shadow: 2rpx 4rpx 12rpx rgba(0, 0, 0, 0.12);
+    box-shadow: 0rpx 4rpx 16rpx rgba(0, 0, 0, 0.12);
 
     &:last-child {
       margin-right: 0; // 最后一个按钮不需要右边距
@@ -349,24 +349,22 @@ const generatePlan = () => {
     }
   }
 }
-.equipment-list {
-  padding: 0 $size-5 $size-5;
-  
+.equipment-list {  
   .equipment-card {
     background: #ffffff;
     border-radius: $size-4;
-    padding: 20rpx;
-    margin-bottom: 30rpx;
+    padding: $size-5;
+    margin: $size-4 0;
     display: flex;
-    align-items: center;
-    box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
+    align-items: flex-start;
+    box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.12);
     
     // 图片区域样式
     .equipment-image-wrapper {
       position: relative;
       width: 160rpx;
       height: 160rpx;
-      margin-right: 20rpx;
+      margin-right: $size-4;
       flex-shrink: 0;
       
       .equipment-image {
@@ -401,9 +399,9 @@ const generatePlan = () => {
       .equipment-name {
         display: block;
         font-size: $size-5;
-        font-weight: bold;
+        font-weight: 600;
         color: $fitness-text;
-        margin-bottom: 10rpx;
+        margin-bottom: $size-1;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
@@ -412,8 +410,9 @@ const generatePlan = () => {
       .equipment-category {
         display: block;
         font-size: $size-3;
-        color: $uni-primary;
-        margin-bottom: 10rpx;
+        font-weight: 500;
+        color: $color-primary;
+        margin-bottom: $size-1;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
@@ -421,7 +420,7 @@ const generatePlan = () => {
       
       .equipment-muscles {
         display: block;
-        font-size: $size-2;
+        font-size: $size-3;
         color: $color-label;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -432,16 +431,17 @@ const generatePlan = () => {
     .delete-btn {
       width: 60rpx;
       height: 60rpx;
-      background: #FFEBEE;
+      background: #ffffff;
       border-radius: 30rpx;
       display: flex;
       justify-content: center;
-      align-items: center;
+      align-items: end;
       margin-left: 10rpx;
       flex-shrink: 0;
       
       .delete-icon {
-        font-size: 2$size-1;
+        width: 40rpx;
+        height: 40rpx;
       }
     }
   }

@@ -95,7 +95,7 @@ const recordExercise = () => {
     
     .username {
       display: block;
-      font-size: $font-xxl;
+      font-size: $size-7;
       font-weight: 700;
       color: $fitness-text;
     }
@@ -111,7 +111,7 @@ const recordExercise = () => {
       
       .stat-number {
         display: block;
-        font-size: $font-xxl;
+        font-size: $size-7;
         font-weight: 700;
         color: $fitness-text;
         margin-bottom: 10rpx;
@@ -141,7 +141,7 @@ const recordExercise = () => {
     
     .action-icon {
       display: block;
-      font-size: $font-xxl;
+      font-size: $size-7;
       margin-bottom: 20rpx;
     }
     
