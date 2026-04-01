@@ -132,6 +132,27 @@
         "navigationBarTitleText": "器材详情",
         "navigationStyle": "default"
       }
+    },
+    {
+      "path": "pages/scan/camera-scan",
+      "style": {
+        "navigationBarTitleText": "拍摄识别",
+        "navigationStyle": "default"
+      }
+    },
+    {
+      "path": "pages/scan/equipment-detail",
+      "style": {
+        "navigationBarTitleText": "器材详情",
+        "navigationStyle": "default"
+      }
+    },
+    {
+      "path": "pages/scan/add-equipment",
+      "style": {
+        "navigationBarTitleText": "添加器材",
+        "navigationStyle": "default"
+      }
     }
   ],
   "globalStyle": {
@@ -159,7 +180,7 @@
         "selectedIconPath": "static/tabbar/gym-active.png"
       },
       {
-        "pagePath": "pages/index/index",
+        "pagePath": "pages/scan/camera-scan",
         "text": "识别",
         "iconPath": "static/tabbar/camera.png",
         "selectedIconPath": "static/tabbar/camera-active.png"

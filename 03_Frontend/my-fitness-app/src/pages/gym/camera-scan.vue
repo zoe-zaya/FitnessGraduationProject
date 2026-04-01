@@ -19,7 +19,7 @@
 
     <!-- 显示从相册选择的图片 -->
     <view class="camera-area" v-if="selectedImagePath">
-      <image :src="selectedImagePath" class="selected-image" mode="aspectFill"></image>
+      <image :src="'/static/' + selectedImagePath" class="selected-image" mode="aspectFill"></image>
       <view class="camera-overlay">
         <view class="scan-frame"></view>
         <text class="scan-tip">已选择图片</text>
@@ -107,6 +107,7 @@ const chooseFromAlbum = () => {
     success: (res) => {
       const filePath = res.tempFilePaths[0]
       selectedImagePath.value = filePath  // 设置选择的图片路径
+      console.log('选择的图片路径:', filePath)
       uploadAndRecognize(filePath)
     },
     fail: (err) => {
