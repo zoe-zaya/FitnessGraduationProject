@@ -5,20 +5,6 @@
         <text class="greeting-text">欢迎回来</text>
         <text class="username">{{ userInfo.name || '用户' }}</text>
       </view>
-      <view class="today-stats">
-        <view class="stat-item">
-          <text class="stat-number">0</text>
-          <text class="stat-label">今日运动</text>
-        </view>
-        <view class="stat-item">
-          <text class="stat-number">7</text>
-          <text class="stat-label">连续打卡</text>
-        </view>
-        <view class="stat-item">
-          <text class="stat-number">2.5</text>
-          <text class="stat-label">本月小时</text>
-        </view>
-      </view>
     </view>
     
     <view class="quick-actions">
@@ -28,10 +14,10 @@
         <text class="action-desc">开始今天的锻炼计划</text>
       </view>
       
-      <view class="action-card" @click="recordExercise">
-        <text class="action-icon">📷</text>
-        <text class="action-title">动作识别</text>
-        <text class="action-desc">拍照识别健身动作</text>
+      <view class="action-card" @click="navigateToactions"">
+        <text class="action-icon">💪</text>
+        <text class="action-title">动作库</text>
+        <text class="action-desc">看看有哪些动作可以练习吧</text>
       </view>
     </view>
     
@@ -58,10 +44,9 @@ const startExercise = () => {
   })
 }
 
-const recordExercise = () => {
-  uni.showToast({
-    title: '功能即将开放',
-    icon: 'none'
+const navigateToactions = () => {
+  uni.navigateTo({
+    url: `/pages/action/action-library`
   })
 }
 </script>

@@ -61,7 +61,14 @@ export const FITNESS_GOALS = [
     EQUIPMENT_ADD_AUTO: '/api/equipment/addEquipment',
     EQUIPMENT_DETAIL: '/api/equipment/getEquipmentById',
     EQUIPMENT_SEARCH: '/api/equipment/getEquipmentByKey/search',
-    EQUIPMENT_DELETE: '/api/equipment/deleteEquipment'
+    EQUIPMENT_DELETE: '/api/equipment/deleteEquipment',
+
+    //动作管理
+    ACTION_RECOMMEND: 'api/action/recommend',
+    ACTION_DETAIL: 'api/action/detail',
+    ACTION_LIBRARY: 'api/action/library',
+    ACTION_MUSCLES: 'api/action/muscles',
+    ACTION_QUERY: 'api/action/query'
   }
   
   // 默认配置

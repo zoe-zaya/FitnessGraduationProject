@@ -153,6 +153,20 @@
         "navigationBarTitleText": "添加器材",
         "navigationStyle": "default"
       }
+    },
+    {
+      "path": "pages/action/action-detail",
+      "style": {
+        "navigationBarTitleText": "动作详情",
+        "navigationStyle": "default"
+      }
+    },
+    {
+      "path": "pages/action/action-library",
+      "style": {
+        "navigationBarTitleText": "动作库",
+        "navigationStyle": "default"
+      }
     }
   ],
   "globalStyle": {

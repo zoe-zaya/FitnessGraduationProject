@@ -112,7 +112,7 @@ async def recommend_actions(
     
     return response_list
 
-
+#前端中没有调用
 @router.get("/recommend", response_model=List[ActionRecommendationResponse], summary="推荐训练动作（GET 版本）")
 async def recommend_actions_get(
     equipment_id: str = Query(..., description="识别到的器材 ID"),
@@ -208,7 +208,7 @@ async def get_action_detail(
         duration_range=duration_range
     )
 
-
+#前端中没有调用
 @router.get("/category/{equipment_id}", response_model=List[ActionRecommendationResponse], summary="按类别获取动作")
 async def get_actions_by_category(
     equipment_id: str,
@@ -262,6 +262,7 @@ async def get_actions_by_category(
     
     return response_list
 
+#前端中没有调用
 @router.post("/query", response_model=List[ActionInfoResponse], summary="按类别和/或肌群查询动作")
 async def query_actions(
     request: ActionQueryRequest,
@@ -337,7 +338,7 @@ async def query_actions(
     
     return response_list
 
-
+#前端中没有调用
 @router.get("/query", response_model=List[ActionInfoResponse], summary="按类别和/或肌群查询动作（GET 版本）")
 async def query_actions_get(
     action_category: Optional[str] = Query(None, description="动作类别（warmup/main_cardio/main_strength/cooldown）"),
