@@ -293,9 +293,10 @@ const addToPlan = (action) => {
     content: `确定要将"${action.name}"添加到训练计划吗？`,
     success: (res) => {
       if (res.confirm) {
-        uni.navigateTo({
+        /*uni.navigateTo({
           url: `/pages/plan/select-plan?action_id=${action.action_id}`
-        })
+        })*/
+       
       }
     }
   })

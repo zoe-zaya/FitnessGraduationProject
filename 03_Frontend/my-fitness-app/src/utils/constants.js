@@ -23,7 +23,31 @@ export const FITNESS_GOALS = [
     { label: '男', value: 'male' },
     { label: '女', value: 'female' }
   ]
-  
+  // 训练部位选项
+  export const TRAINING_PARTS = [
+    { label: '胸部', value: '胸部' },
+    { label: '背部', value: '背部' },
+    { label: '肩部', value: '肩部' },
+    { label: '手臂', value: '手臂' },
+    { label: '腿部', value: '腿部' },
+    { label: '臀部', value: '臀部' },
+    { label: '核心', value: '核心' },
+    { label: '全身', value: '全身' }
+  ]
+
+  // 阶段类型映射
+  export const SESSION_TYPE_MAP = {
+    'warmup': { label: '热身激活', color: '#FF9F00', icon: '🔥' },
+    'main': { label: '正式训练', color: '#007AFF', icon: '💪' },
+    'cooldown': { label: '拉伸放松', color: '#34C759', icon: '🧘' }
+  }
+
+  // 难度等级映射
+  export const DIFFICULTY_MAP = {
+    '初级': { label: '初级', color: '#34C759' },
+    '中级': { label: '中级', color: '#FF9F00' },
+    '高级': { label: '高级', color: '#FF4444' }
+  }
   // 密码复杂度正则（对应《需求规格说明书》3.2 节扩展事件流）
   //密码需 8 位以上，含大小写字母、数字和特殊符号!@#$%^&*()_+-=
   export const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+=-]).{8,}$/
@@ -68,7 +92,20 @@ export const FITNESS_GOALS = [
     ACTION_DETAIL: 'api/action/detail',
     ACTION_LIBRARY: 'api/action/library',
     ACTION_MUSCLES: 'api/action/muscles',
-    ACTION_QUERY: 'api/action/query'
+    ACTION_QUERY: 'api/action/query',
+
+    // 训练计划
+    PLAN_GENERATE: '/api/plan/generate',
+    PLAN_LIST: '/api/plan/',
+    PLAN_DETAIL: '/api/plan',
+    PLAN_DELETE: '/api/plan',
+    PLAN_UPDATE: '/api/plan',       //修改名称或有效日期
+    PLAN_EDITNAME: 'api/plan/editName',
+    PLAN_ADD_ACTION: '/api/plan/addActions',
+    PLAN_UPDATE_ACTION: '/api/plan/editActions',
+    PLAN_DELETE_ACTION: '/api/plan/deleteActions',
+    PLAN_EXTEND: '/api/plan/extend',
+  
   }
   
   // 默认配置

@@ -180,7 +180,7 @@ async def delete_plan(
 
 # ==================== 计划修改 ====================
 
-@router.put("/{plan_id}/name", response_model=TrainingPlanResponse, summary="修改计划名称")
+@router.put("/editName/{plan_id}", response_model=TrainingPlanResponse, summary="修改计划名称")
 async def update_plan_name(
     plan_id: str,
     request: PlanNameUpdateRequest,
@@ -230,7 +230,7 @@ async def update_plan_basic(
     return _build_plan_response(plan, db)
 
 
-@router.post("/{plan_id}/actions", response_model=SessionActionItemResponse, summary="添加动作项到训练计划")
+@router.post("/addActions/{plan_id}", response_model=SessionActionItemResponse, summary="添加动作项到训练计划")
 async def add_action_item(
     plan_id: str,
     request: ActionItemAddRequest,
@@ -268,7 +268,7 @@ async def add_action_item(
     )
 
 
-@router.put("/{plan_id}/actions/{item_id}", response_model=SessionActionItemResponse, summary="修改动作项参数")
+@router.put("/editActions/{plan_id}/{item_id}", response_model=SessionActionItemResponse, summary="修改动作项参数")
 async def update_action_item(
     plan_id: str,
     item_id: str,
@@ -307,7 +307,7 @@ async def update_action_item(
     )
 
 
-@router.delete("/{plan_id}/actions/{item_id}", response_model=DeleteResponse, summary="删除动作项")
+@router.delete("/deleteActions/{plan_id}/{item_id}", response_model=DeleteResponse, summary="删除动作项")
 async def delete_action_item(
     plan_id: str,
     item_id: str,
@@ -326,7 +326,7 @@ async def delete_action_item(
     return DeleteResponse(message="动作项删除成功")
 
 
-@router.post("/{plan_id}/extend", response_model=TrainingPlanResponse, summary="延长计划有效期")
+@router.post("/extend/{plan_id}", response_model=TrainingPlanResponse, summary="延长计划有效期")
 async def extend_plan_validity(
     plan_id: str,
     days: int = 30,

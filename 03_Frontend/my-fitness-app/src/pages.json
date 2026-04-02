@@ -167,6 +167,41 @@
         "navigationBarTitleText": "动作库",
         "navigationStyle": "default"
       }
+    },
+    {
+      "path": "pages/plan/plan-list",
+      "style": {
+        "navigationBarTitleText": "训练计划",
+        "navigationStyle": "default"
+      }
+    },
+    {
+      "path": "pages/plan/generate-plan",
+      "style": {
+        "navigationBarTitleText": "生成训练计划",
+        "navigationStyle": "default"
+      }
+    },
+    {
+      "path": "pages/plan/plan-detail",
+      "style": {
+        "navigationBarTitleText": "计划详情",
+        "navigationStyle": "default"
+      }
+    },
+    {
+      "path": "pages/plan/plan-edit",
+      "style": {
+        "navigationBarTitleText": "编辑计划",
+        "navigationStyle": "default"
+      }
+    },
+    {
+      "path": "pages/plan/select-action",
+      "style": {
+        "navigationBarTitleText": "选择动作",
+        "navigationStyle": "default"
+      }
     }
   ],
   "globalStyle": {
@@ -200,7 +235,7 @@
         "selectedIconPath": "static/tabbar/camera-active.png"
       },
       {
-        "pagePath": "pages/index/index",
+        "pagePath": "pages/plan/plan-list",
         "text": "计划",
         "iconPath": "static/tabbar/plan.png",
         "selectedIconPath": "static/tabbar/plan-active.png"
