@@ -1,7 +1,7 @@
 """
-训练计划生成 API
+训练计划生成与管理 API
 对应《需求规格说明书》3.2 节生成训练计划用例
-修订：支持训练部位选择，确保三阶段肌群一致
+功能：生成、删除、修改、查询训练计划
 """
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -21,15 +21,22 @@ from app.schemas.plan import (
     PlanListResponse,
     PlanSessionResponse,
     SessionActionItemResponse,
-    PlanUpdateRequest
+    PlanUpdateRequest,
+    PlanNameUpdateRequest,
+    ActionItemAddRequest,
+    ActionItemUpdateRequest,
+    DeleteResponse
 )
 from app.core.security import get_current_user
 from app.services.plan_generator import PlanGenerator
+from app.services.plan_service import PlanService
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/plan", tags=["训练计划"])
 
+
+# ==================== 计划生成 ====================
 
 @router.post("/generate", response_model=TrainingPlanResponse, summary="生成训练计划")
 async def generate_training_plan(
@@ -37,25 +44,7 @@ async def generate_training_plan(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """
-    根据用户身体数据、健身目标、训练部位和器材清单生成个性化训练计划
-    
-    对应《需求规格说明书》3.2 节生成训练计划用例
-    
-    前置条件：
-    - 用户已录入身体基本数据和健身目标
-    - 用户至少拥有一个健身房的器材信息
-    - 增肌/塑形目标需指定训练部位（胸部/背部/肩部/手臂/腿部/臀部/核心）
-    - 减脂/体能目标默认为全身训练
-    
-    返回：
-    完整的三阶段训练计划，包含：
-    - 计划基础信息（ID、名称、有效期、总时长、训练部位）
-    - 健身目标（存储在计划中）
-    - 三阶段结构（热身→正式→拉伸，目标肌群一致）
-    - 每个阶段的动作项列表及执行参数
-    - 个性化执行备注
-    """
+    """根据用户身体数据、健身目标、训练部位和器材清单生成个性化训练计划"""
     # 1. 验证器材清单归属
     inventory = db.query(EquipmentInventory).filter(
         EquipmentInventory.inventory_id == request.inventory_id,
@@ -87,7 +76,7 @@ async def generate_training_plan(
     )
     
     try:
-        # 4. 执行计划生成（传入 fitness_goal、plan_name、training_part）
+        # 4. 执行计划生成
         logger.info(f"开始生成计划：user_id={current_user.user_id}, inventory_id={request.inventory_id}, "
                    f"fitness_goal={fitness_goal}, training_part={training_part}")
         
@@ -105,20 +94,20 @@ async def generate_training_plan(
         return _build_plan_response(plan, db)
         
     except ValueError as e:
-        # 业务验证错误
         logger.warning(f"计划生成验证失败：{str(e)}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(e)
         )
     except Exception as e:
-        # 记录详细异常堆栈
         logger.error(f"计划生成异常：{type(e).__name__}: {str(e)}", exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"计划生成失败：{str(e)}"
         )
 
+
+# ==================== 计划查询 ====================
 
 @router.get("/", response_model=List[PlanListResponse], summary="获取用户所有训练计划")
 async def get_user_plans(
@@ -132,7 +121,6 @@ async def get_user_plans(
     
     response_list = []
     for plan in plans:
-        # 查询器材清单名称
         inventory = db.query(EquipmentInventory).filter(
             EquipmentInventory.inventory_id == plan.inventory_id
         ).first()
@@ -143,7 +131,7 @@ async def get_user_plans(
             plan_name=plan.plan_name or "未命名计划",
             inventory_name=inventory_name,
             fitness_goal=plan.fitness_goal or "未设置",
-            training_part=plan.training_part or "全身",  # ✅ 新增：训练部位
+            training_part=plan.training_part or "全身",
             total_duration_minutes=plan.total_duration_minutes,
             create_time=plan.create_time,
             is_expired=_is_plan_expired(plan)
@@ -159,10 +147,7 @@ async def get_plan_detail(
     db: Session = Depends(get_db)
 ):
     """获取指定训练计划的详细信息"""
-    plan = db.query(TrainingPlan).filter(
-        TrainingPlan.plan_id == plan_id,
-        TrainingPlan.user_id == current_user.user_id
-    ).first()
+    plan = PlanService.get_plan_detail(db, plan_id, current_user.user_id)
     
     if not plan:
         raise HTTPException(
@@ -173,14 +158,55 @@ async def get_plan_detail(
     return _build_plan_response(plan, db)
 
 
-@router.put("/{plan_id}", response_model=TrainingPlanResponse, summary="更新训练计划")
-async def update_plan(
+# ==================== 计划删除 ====================
+
+@router.delete("/{plan_id}", response_model=DeleteResponse, summary="删除训练计划")
+async def delete_plan(
+    plan_id: str,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """删除指定训练计划"""
+    success = PlanService.delete_plan(db, plan_id, current_user.user_id)
+    
+    if not success:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="训练计划不存在或无权访问"
+        )
+    
+    return DeleteResponse(message="训练计划删除成功")
+
+
+# ==================== 计划修改 ====================
+
+@router.put("/{plan_id}/name", response_model=TrainingPlanResponse, summary="修改计划名称")
+async def update_plan_name(
+    plan_id: str,
+    request: PlanNameUpdateRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """修改训练计划名称"""
+    plan = PlanService.update_plan_name(db, plan_id, current_user.user_id, request)
+    
+    if not plan:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="训练计划不存在或无权访问"
+        )
+    
+    return _build_plan_response(plan, db)
+
+
+@router.put("/{plan_id}", response_model=TrainingPlanResponse, summary="更新训练计划基本信息")
+async def update_plan_basic(
     plan_id: str,
     request: PlanUpdateRequest,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """更新训练计划信息（名称、有效期等）"""
+    """更新训练计划基本信息（名称、有效期等）"""
     plan = db.query(TrainingPlan).filter(
         TrainingPlan.plan_id == plan_id,
         TrainingPlan.user_id == current_user.user_id
@@ -204,31 +230,103 @@ async def update_plan(
     return _build_plan_response(plan, db)
 
 
-@router.delete("/{plan_id}", summary="删除训练计划")
-async def delete_plan(
+@router.post("/{plan_id}/actions", response_model=SessionActionItemResponse, summary="添加动作项到训练计划")
+async def add_action_item(
     plan_id: str,
+    request: ActionItemAddRequest,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """删除指定训练计划"""
-    plan = db.query(TrainingPlan).filter(
-        TrainingPlan.plan_id == plan_id,
-        TrainingPlan.user_id == current_user.user_id
-    ).first()
+    """添加指定动作到指定训练计划中"""
+    new_item = PlanService.add_action_item_to_plan(db, plan_id, current_user.user_id, request)
     
-    if not plan:
+    if not new_item:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="训练计划不存在或无权访问"
+            detail="计划、阶段或动作不存在，或类别不匹配"
         )
     
-    db.delete(plan)
-    db.commit()
+    # 构建响应
+    action = db.query(TrainingAction).filter(
+        TrainingAction.action_id == new_item.action_id
+    ).first()
     
-    return {"message": "训练计划删除成功"}
+    return SessionActionItemResponse(
+        item_id=new_item.item_id,
+        action_id=new_item.action_id,
+        action_name=action.name if action else "未知动作",
+        action_category=action.action_category if action else "unknown",
+        difficulty_level=action.difficulty_level if action else "未知",
+        target_muscles=action.get_target_muscles_list() if action else [],
+        sets=new_item.sets,
+        reps_per_set=new_item.reps_per_set,
+        rest_seconds=new_item.rest_seconds,
+        duration_seconds=new_item.duration_seconds,
+        lateral_coeff=new_item.lateral_coeff,
+        total_duration_seconds=new_item.total_duration_seconds,
+        execution_notes=new_item.execution_notes
+    )
 
 
-@router.post("/{plan_id}/extend", summary="延长计划有效期")
+@router.put("/{plan_id}/actions/{item_id}", response_model=SessionActionItemResponse, summary="修改动作项参数")
+async def update_action_item(
+    plan_id: str,
+    item_id: str,
+    request: ActionItemUpdateRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """修改训练计划中指定动作的组数和每组次数或持续时长"""
+    updated_item = PlanService.update_action_item(db, plan_id, current_user.user_id, item_id, request)
+    
+    if not updated_item:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="动作项不存在或无权修改"
+        )
+    
+    # 构建响应
+    action = db.query(TrainingAction).filter(
+        TrainingAction.action_id == updated_item.action_id
+    ).first()
+    
+    return SessionActionItemResponse(
+        item_id=updated_item.item_id,
+        action_id=updated_item.action_id,
+        action_name=action.name if action else "未知动作",
+        action_category=action.action_category if action else "unknown",
+        difficulty_level=action.difficulty_level if action else "未知",
+        target_muscles=action.get_target_muscles_list() if action else [],
+        sets=updated_item.sets,
+        reps_per_set=updated_item.reps_per_set,
+        rest_seconds=updated_item.rest_seconds,
+        duration_seconds=updated_item.duration_seconds,
+        lateral_coeff=updated_item.lateral_coeff,
+        total_duration_seconds=updated_item.total_duration_seconds,
+        execution_notes=updated_item.execution_notes
+    )
+
+
+@router.delete("/{plan_id}/actions/{item_id}", response_model=DeleteResponse, summary="删除动作项")
+async def delete_action_item(
+    plan_id: str,
+    item_id: str,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """删除指定的健身动作"""
+    success = PlanService.delete_action_item(db, plan_id, current_user.user_id, item_id)
+    
+    if not success:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="动作项不存在或无权删除"
+        )
+    
+    return DeleteResponse(message="动作项删除成功")
+
+
+@router.post("/{plan_id}/extend", response_model=TrainingPlanResponse, summary="延长计划有效期")
 async def extend_plan_validity(
     plan_id: str,
     days: int = 30,
@@ -249,8 +347,9 @@ async def extend_plan_validity(
     
     plan.valid_days += days
     db.commit()
+    db.refresh(plan)
     
-    return {"message": f"计划有效期已延长{days}天"}
+    return _build_plan_response(plan, db)
 
 
 # ==================== 辅助函数 ====================
@@ -264,11 +363,7 @@ def _is_plan_expired(plan: TrainingPlan) -> bool:
 
 
 def _build_plan_response(plan: TrainingPlan, db: Session) -> TrainingPlanResponse:
-    """
-    构建计划响应对象
-    注意：fitness_goal 和 training_part 从 plan 对象获取
-    target_muscles 通过属性转换器解析为列表
-    """
+    """构建计划响应对象"""
     # 查询器材清单名称
     inventory = db.query(EquipmentInventory).filter(
         EquipmentInventory.inventory_id == plan.inventory_id
@@ -280,7 +375,6 @@ def _build_plan_response(plan: TrainingPlan, db: Session) -> TrainingPlanRespons
     for session in sorted(plan.sessions, key=lambda s: s.sequence_order):
         action_items_response = []
         for item in session.action_items:
-            # 查询动作信息
             action = db.query(TrainingAction).filter(
                 TrainingAction.action_id == item.action_id
             ).first()
@@ -291,7 +385,7 @@ def _build_plan_response(plan: TrainingPlan, db: Session) -> TrainingPlanRespons
                 action_name=action.name if action else "未知动作",
                 action_category=action.action_category if action else "unknown",
                 difficulty_level=action.difficulty_level if action else "未知",
-                target_muscles=action.get_target_muscles_list() if action else [],  # ✅ 新增：目标肌群
+                target_muscles=action.get_target_muscles_list() if action else [],
                 sets=item.sets,
                 reps_per_set=item.reps_per_set,
                 rest_seconds=item.rest_seconds,
@@ -301,13 +395,12 @@ def _build_plan_response(plan: TrainingPlan, db: Session) -> TrainingPlanRespons
                 execution_notes=item.execution_notes
             ))
         
-        # ✅ 使用属性转换器解析 target_muscles 为列表
         sessions_response.append(PlanSessionResponse(
             session_id=session.session_id,
             session_type=session.session_type,
             sequence_order=session.sequence_order,
             estimated_duration_minutes=session.estimated_duration_minutes,
-            target_muscles=session.target_muscles_list,  # ✅ 使用属性转换器解析为列表
+            target_muscles=session.target_muscles_list,
             description=session.description,
             action_items=action_items_response
         ))
@@ -322,7 +415,7 @@ def _build_plan_response(plan: TrainingPlan, db: Session) -> TrainingPlanRespons
         valid_days=plan.valid_days,
         total_duration_minutes=plan.total_duration_minutes,
         fitness_goal=plan.fitness_goal,
-        training_part=plan.training_part,  # ✅ 新增：训练部位
+        training_part=plan.training_part,
         status=plan.status,
         sessions=sessions_response,
         is_expired=_is_plan_expired(plan)
