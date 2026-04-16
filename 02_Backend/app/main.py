@@ -4,7 +4,7 @@ FastAPI 应用入口
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api import auth, user, equipment, action, plan
+from app.api import auth, user, equipment, action, plan_v2      #,plan
 from app.core.config import settings
 from fastapi.security import OAuth2PasswordBearer
 
@@ -34,7 +34,8 @@ app.include_router(auth.router)
 app.include_router(user.router)
 app.include_router(equipment.router)
 app.include_router(action.router)
-app.include_router(plan.router) 
+# app.include_router(plan.router) 
+app.include_router(plan_v2.router)  # 注册计划模块 V2 路由
 
 @app.get("/")
 async def root():
