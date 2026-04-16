@@ -106,7 +106,7 @@ async def generate_training_plan(
 
 # ==================== 计划查询 ====================
 
-@router.get("/", response_model=List[PlanListResponse], summary="获取用户所有训练计划")
+@router.get("/getAllPlan", response_model=List[PlanListResponse], summary="获取用户所有训练计划")
 async def get_user_plans(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
@@ -137,7 +137,7 @@ async def get_user_plans(
     return response_list
 
 
-@router.get("/{plan_id}", response_model=TrainingPlanResponse, summary="获取训练计划详情")
+@router.get("/getPlan/{plan_id}", response_model=TrainingPlanResponse, summary="获取训练计划详情")
 async def get_plan_detail(
     plan_id: str,
     current_user: User = Depends(get_current_user),
@@ -158,7 +158,7 @@ async def get_plan_detail(
     return _build_plan_response(plan, db)
 
 
-@router.get("/{plan_id}/schedule", response_model=List[TrainingScheduleResponse], summary="获取 7 天训练日程")
+@router.get("/schedule/{plan_id}", response_model=List[TrainingScheduleResponse], summary="获取 7 天训练日程")
 async def get_weekly_schedule(
     plan_id: str,
     current_user: User = Depends(get_current_user),
@@ -211,7 +211,7 @@ async def get_weekly_schedule(
 
 # ==================== 计划管理 ====================
 
-@router.put("/{plan_id}", response_model=TrainingPlanResponse, summary="更新训练计划基本信息")
+@router.put("/updatePlan/{plan_id}", response_model=TrainingPlanResponse, summary="更新训练计划基本信息")
 async def update_plan(
     plan_id: str,
     request: PlanUpdateRequest,
@@ -241,7 +241,7 @@ async def update_plan(
     return _build_plan_response(plan, db)
 
 
-@router.delete("/{plan_id}", response_model=DeleteResponse, summary="删除训练计划")
+@router.delete("/deletePlan/{plan_id}", response_model=DeleteResponse, summary="删除训练计划")
 async def delete_plan(
     plan_id: str,
     current_user: User = Depends(get_current_user),
@@ -267,7 +267,7 @@ async def delete_plan(
 
 # ==================== 动作项管理 ====================
 
-@router.post("/{plan_id}/actions", response_model=SessionActionItemResponse, summary="添加动作项")
+@router.post("/addAction/{plan_id}", response_model=SessionActionItemResponse, summary="添加动作项")
 async def add_action_item(
     plan_id: str,
     request: ActionItemAddRequest,
@@ -353,7 +353,7 @@ async def add_action_item(
     )
 
 
-@router.put("/{plan_id}/actions/{item_id}", response_model=SessionActionItemResponse, summary="修改动作项参数")
+@router.put("/updateAction/{plan_id}/{item_id}", response_model=SessionActionItemResponse, summary="修改动作项参数")
 async def update_action_item(
     plan_id: str,
     item_id: str,
@@ -417,7 +417,7 @@ async def update_action_item(
     )
 
 
-@router.delete("/{plan_id}/actions/{item_id}", response_model=DeleteResponse, summary="删除动作项")
+@router.delete("/deleteAction/{plan_id}/{item_id}", response_model=DeleteResponse, summary="删除动作项")
 async def delete_action_item(
     plan_id: str,
     item_id: str,
@@ -444,7 +444,7 @@ async def delete_action_item(
     return DeleteResponse(message="动作项删除成功")
 
 
-@router.post("/{plan_id}/actions/{item_id}/replace", response_model=SessionActionItemResponse, summary="替换动作项")
+@router.post("/replaceAction/{plan_id}/{item_id}", response_model=SessionActionItemResponse, summary="替换动作项")
 async def replace_action_item(
     plan_id: str,
     item_id: str,
@@ -507,7 +507,7 @@ async def replace_action_item(
 
 # ==================== 日程管理 ====================
 
-@router.post("/{plan_id}/schedule/{schedule_id}/postpone", response_model=PostponeResponse, summary="延后训练")
+@router.post("/postponeSchedule/{plan_id}/{schedule_id}", response_model=PostponeResponse, summary="延后训练")
 async def postpone_schedule(
     plan_id: str,
     schedule_id: str,
