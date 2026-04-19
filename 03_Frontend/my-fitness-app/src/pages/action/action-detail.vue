@@ -58,11 +58,6 @@
         <text class="section-label">🏋️ 所需器材</text>
         <text class="equipment-text">{{ actionInfo.equipment_name }}</text>
       </view>
-
-      <view class="info-section" v-if="actionInfo.estimated_seconds">
-        <text class="section-label">⏱️ 单次时长</text>
-        <text class="duration-text">{{ formatDuration(actionInfo.estimated_seconds) }}</text>
-      </view>
     </view>
 
     <view class="keypoints-card">
@@ -217,8 +212,7 @@
   const keypointItems = computed(() => {
     const text = actionInfo.value.safety_tips || '请根据自身身体状况调整训练强度，如有不适请立即停止。'
     const parts = text.split('·')
-    return parts.filter(p => p.trim()).map((part, index) => {
-      if (index === 0) return part.trim()
+    return parts.filter(p => p.trim()).map((part) => {
       return '·' + part.trim()
     })
   })
