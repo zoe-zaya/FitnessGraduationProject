@@ -2,8 +2,9 @@
   <view class="container">
     <!-- Logo 区域 -->
     <view class="logo-section">
-        <text class="title">TFit</text>
-        <text class="subtitle">能够识别健身器材并生成健身计划的健身APP</text>
+      <image src="@/static/logo.png" class="logo" mode="aspectFit" />
+      <text class="title">TFit</text>
+      <text class="subtitle">能够识别健身器材并生成健身计划的健身APP</text>
     </view>
       
     <!-- 表单区域 -->
@@ -25,32 +26,37 @@
         </view>
 
         <view class="text">密码</view>
-        <view class="input-item input-with-border">
+        <view class="input-item">
           <img src="@/static/password2.png" class="icon"/>
-          <input 
-            v-model="formData.password" 
-            type="password" 
+          <input
+            v-model="formData.password"
+            :type="showPassword ? 'text' : 'password'"
             placeholder="输入 8 位以上的密码"
             class="input"
             :class="{ 'input-focus': focusedInput === 'password' }"
             @focus="onInputFocus('password')"
             @blur="onInputBlur"
           />
+          <view class="eye-icon" @click="toggleShowPassword">
+            <uni-icons :type="showPassword ? 'eye' : 'eye-filled'" size="20" color="#8E8E93"></uni-icons>
+          </view>
         </view>
 
         <view class="text">确认密码</view>
         <view class="input-item">
           <img src="@/static/password2.png" class="icon"/>
-          <input 
-            v-model="formData.confirmPassword" 
-            type="password" 
+          <input
+            v-model="formData.confirmPassword"
+            :type="showConfirmPassword ? 'text' : 'password'"
             placeholder="请再次输入密码"
             class="input"
             :class="{ 'input-focus': focusedInput === 'confirmPassword' }"
             @focus="onInputFocus('confirmPassword')"
             @blur="onInputBlur"
-
           />
+          <view class="eye-icon" @click="toggleShowConfirmPassword">
+            <uni-icons :type="showConfirmPassword ? 'eye' : 'eye-filled'" size="20" color="#8E8E93"></uni-icons>
+          </view>
         </view>
       </view>
 
@@ -64,7 +70,6 @@
       </view>
 
       <view class="agreement-section">
-        <!-- 使用自定义图标代替checkbox -->
         <view class="agreement-item" @click="toggleAgreement">
           <view class="custom-checkbox" :class="{ checked: agreed }">
             <text v-if="agreed" class="checkmark">√</text>
@@ -83,13 +88,13 @@
         :disabled="!isFormValid"
         @click="handleRegister" 
       >
-      注册
+        注册
       </button>
 
       <view class="login-link" @click="navigateToLogin">
-      已有账号？
-      <text class="link-text">立即登录</text>
-    </view>
+        已有账号？
+        <text class="link-text">立即登录</text>
+      </view>
     </view>    
   </view>
 </template>
@@ -99,9 +104,10 @@ import { ref, computed } from 'vue'
 import request from '@/utils/request'
 import { API, PASSWORD_REGEX, PHONE_REGEX } from '@/utils/constants'
 
-//const loading = ref(false)
 const agreed = ref(false)
 const focusedInput = ref(null)
+const showPassword = ref(false)
+const showConfirmPassword = ref(false)
 
 const formData = ref({
   phone: '',
@@ -109,8 +115,16 @@ const formData = ref({
   confirmPassword: ''
 })
 
+const toggleShowPassword = () => {
+  showPassword.value = !showPassword.value
+}
+
+const toggleShowConfirmPassword = () => {
+  showConfirmPassword.value = !showConfirmPassword.value
+}
+
 const onInputFocus = (inputName) => {
-    focusedInput.value = inputName
+  focusedInput.value = inputName
 }
   
 const onInputBlur = () => {
@@ -131,7 +145,6 @@ const isFormValid = computed(() => {
  */
 const handleRegister = async () => {
   // 1. 验证协议（对应扩展事件流）
-  console.log('agreed.value', agreed.value)
   if (!agreed.value) {
     uni.showToast({ title: '请先同意用户协议', icon: 'none', duration: 2000 })
     return
@@ -162,8 +175,6 @@ const handleRegister = async () => {
     uni.showToast({ title: '两次密码不一致', icon: 'none', duration: 2000 })
     return
   }
-  
-  //loading.value = true
   
   try {
     // 5. 调用注册 API
@@ -200,9 +211,7 @@ const handleRegister = async () => {
       });
     }
   } finally {
-    //loading.value = false
     agreed.value = false; // 注册完成后重置协议同意状态
-    uni.reLaunch({ url: '/pages/register/register' });
   }
 }
 
@@ -226,132 +235,122 @@ const navigateToLogin = () => {
 @import '@/uni.scss';
 
 .container {
-    min-height: 100vh;
-    background: url('@/static/background.png') no-repeat center center / cover;
-    padding: $size-3 $size-6 $size-6;
+  min-height: 100vh;
+  background: url('@/static/background.png') no-repeat center center / cover;
+  padding: $size-3 $size-6 $size-6;
+  font-family: Manrope;
 }
 
 .logo-section {
-    text-align: center;
-    margin-bottom: $size-5;
+  text-align: center;
+  margin-bottom: $size-5;
 
-    .logo {
-        width: 220rpx;
-        height: 220rpx;
-    }
+  .logo {
+    width: 220rpx;
+    height: 220rpx;
+    margin-bottom: $size-3;
+  }
 
-    .title {
-        display: block;
-        font-size: $size-8;
-        font-weight: 700;
-        color: $color-primary;      
-        margin-bottom: 10rpx;
-    }
+  .title {
+    display: block;
+    font-size: $size-8;
+    font-weight: 700;
+    color: $color-primary;
+    margin-bottom: $size-2;
+  }
 
-    .subtitle {
-        display: block;
-        font-size: $size-3;
-        color: $color-secondory;
-    }
+  .subtitle {
+    display: block;
+    font-size: $size-3;
+    color: $color-secondory;
+  }
 }
 
 .form-section {
-    background: rgba(252, 249, 248, 0.7);
-    border-radius: $size-4;
-    padding: $size-8;
-    box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.12);
-    .shadow-\[0_8px_24px_rgba\(160\2c 62\2c 64\2c 0\.06\)\] {
-        --tw-shadow: 0 8px 24px rgba(160,62,64,0.06);
-        --tw-shadow-colored: 0 8px 24px var(--tw-shadow-color);
-        box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+  background: rgba(252, 249, 248, 0.7);
+  border-radius: $size-4;
+  padding: $size-8;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.12);
+
+  .input-wrapper {
+    .text {
+      font-weight: 700;
+      font-size: $size-3;
+      line-height: $size-5;
+      display: block;
+      margin-left: $size-1;
+      color: $color-label;
+      margin-bottom: $size-2;
     }
 
-    .input-wrapper {
-        .text{
-            font-weight: 700;
-            font-size: $size-3;
-            line-height: $size-5;
-            display: block;
-            margin-left: $size-1;
-            color: $color-label;
-        }
-  
-        .input-item {
-            position: relative;
-            margin-bottom: $size-3;
-            margin-top: $size-2;
-            margin-bottom: 0;
-            align-items: center;
-            display: flex;
-            position: relative;
-      
-            &:not(:last-child)::after {
-                content: '';
-                position: absolute;
-                bottom: 0;
-                left: $size-4;
-                right: $size-4;
-                height: 1rpx;
-                background: #ffffff;
-                transform: scaleY(0.5);
-            }
-      
-            .icon{
-                margin-left: $size-5;
-                padding-bottom: $size-4;
-                align-items: center;
-                position: absolute;
-                width: $size-4;
-            }
+    .input-item {
+      position: relative;
+      align-items: center;
+      display: flex;
+      margin-bottom: $size-4;
 
-            .input {
-                transition-property: all;
-                transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-                transition-duration: 150ms;
-                color: $color-input;
-                padding-right: $size-4;
-                padding-left: $size-12;
-                padding-top: $size-3;
-                padding-bottom: $size-3;
-                background-color: $fitness-primary;
-                border-style: none;
-                border-radius: $size-4;
-                border: 2px solid rgba(160, 62, 64, 0.1);
-                width: 100%;
-                margin-bottom: $size-4;
-                font-size: $size-4;
-            }
+      .icon {
+        position: absolute;
+        left: $size-5;
+        width: $size-4;
+        height: $size-4;
+        align-items: center;
+      }
 
-            .input-focus {
-              border: 2px solid rgba(160, 62, 64, 0.2);
-            }
-        }
-}
+      .input {
+        transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+        color: $color-input;
+        padding-right: $size-4;
+        padding-left: $size-12;
+        padding-top: $size-4;
+        padding-bottom: $size-4;
+        background-color: $fitness-primary;
+        border: 2px solid rgba(160, 62, 64, 0.1);
+        border-radius: $size-4;
+        width: 100%;
+        font-size: $size-4;
+        font-family: Manrope;
+      }
+
+      .input-focus {
+        border: 2px solid rgba(160, 62, 64, 0.4);
+      }
+
+      .eye-icon {
+        position: absolute;
+        right: $size-4;
+        top: 50%;
+        transform: translateY(-50%);
+        padding: 10rpx;
+      }
+    }
+  }
+
   .password-tip {
     display: flex;
     margin-bottom: $size-2;
 
-    .icon{
+    .icon {
       margin-left: $size-1;
-      padding-bottom: $size-3;
       padding-right: $size-3;
       align-items: center;
       width: $size-5;
+      height: $size-5;
     }
-    .info{
+    .info {
       color: $color-label;
       font-size: $size-3;
       line-height: $size-4;
       font-weight: 525;
-    }    
+    }
   }
-  
+
   .agreement-section {
-    margin-bottom: $size-3;
+    margin-bottom: $size-5;
     .agreement-item {
       display: flex;
       align-items: center;
-      
+
       .custom-checkbox {
         width: $size-5;
         height: $size-5;
@@ -364,12 +363,12 @@ const navigateToLogin = () => {
         flex-shrink: 0;
         background: $fitness-primary;
         transition: background-color 0.3s;
-        
+
         &.checked {
           background: $button-bg2;
-          border-color: $uni-primary;
+          border-color: $button-bg2;
         }
-        
+
         .checkmark {
           color: white;
           font-size: $size-3;
@@ -377,24 +376,23 @@ const navigateToLogin = () => {
           font-weight: bold;
         }
       }
-      
+
       .agreement-text {
-        --tw-text-opacity: 1;
         color: $color-label;
-        line-height: 1;
+        line-height: 1.4;
         font-size: $size-3;
 
         .link {
           color: $color-primary;
-          font-weight:700;
+          font-weight: 700;
         }
       }
     }
   }
-  
+
   .register-btn {
     width: 100%;
-    height: $size-11;
+    height: $size-12;
     background: $button-bg2;
     color: #FFFFFF;
     font-size: $size-4;
@@ -404,23 +402,24 @@ const navigateToLogin = () => {
     align-items: center;
     justify-content: center;
     font-weight: 700;
-    
+    font-family: Manrope;
+
     &[disabled] {
-      opacity: 6;
+      opacity: 0.6;
     }
   }
-}
 
-.login-link {
-  text-align: center;
-  font-size: $size-3;
-  color: $color-secondory;
-  margin-top: $size-4;
-  
-  .link-text {
-    color: $color-primary;
-    font-weight: 700;
-    font-family: Manrope;
+  .login-link {
+    text-align: center;
+    font-size: $size-3;
+    color: $color-secondory;
+    margin-top: $size-4;
+
+    .link-text {
+      color: $color-primary;
+      font-weight: 700;
+      font-family: Manrope;
+    }
   }
 }
 </style>

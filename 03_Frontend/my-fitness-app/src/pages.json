@@ -202,13 +202,27 @@
         "navigationBarTitleText": "选择动作",
         "navigationStyle": "default"
       }
+    },
+    {
+      "path": "pages/plan/weekly-schedule",
+      "style": {
+        "navigationBarTitleText": "7天训练日程",
+        "navigationStyle": "default"
+      }
+    },
+    {
+      "path": "pages/plan/training-execution",
+      "style": {
+        "navigationBarTitleText": "训练执行",
+        "navigationStyle": "default"
+      }
     }
   ],
   "globalStyle": {
     "navigationBarTextStyle": "black",
     "navigationBarTitleText": "健身管理系统",
     "navigationBarBackgroundColor": "#FFFFFF",
-    "backgroundColor": "#F5F5F5"
+    "backgroundColor": "#FCF9F8"
   },
   "tabBar": {
     "color": "#999999",

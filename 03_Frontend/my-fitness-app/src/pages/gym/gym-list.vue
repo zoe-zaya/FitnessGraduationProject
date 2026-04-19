@@ -406,8 +406,9 @@ const deleteGym = async (inventoryId) => {
 
 .container {
   min-height: 100vh;
-  background: url('@/static/background3.png') no-repeat center center / cover;
-  padding: 0 0 150rpx; /* 为悬浮按钮预留空间 */
+  //background: url('@/static/background3.png') no-repeat center center / cover;
+  background-color: #FFFFFF;
+  padding: 0 0 150rpx;
 }
 
 .header {
@@ -417,26 +418,26 @@ const deleteGym = async (inventoryId) => {
   padding: 30rpx $size-5;
   background: #FFFFFF;
   border-bottom: 1rpx solid rgba(160, 62, 64, 0.1);
-  
+
   .title {
     font-size: $size-6;
     font-weight: bold;
     color: $fitness-text;
   }
-  
+
   .add-btn {
     display: flex;
     align-items: center;
     padding: 10rpx 20rpx;
     background: $uni-primary;
     border-radius: 30rpx;
-    
+
     .add-icon {
       font-size: $size-4;
       color: #FFFFFF;
       margin-right: 5rpx;
     }
-    
+
     .add-text {
       font-size: $size-3;
       color: #FFFFFF;
@@ -446,69 +447,51 @@ const deleteGym = async (inventoryId) => {
 
 .gym-list {
   padding: $size-5;
-  
+
   .gym-card {
-    background: #FFFFFF url('/static/foot-icon.png') no-repeat;
-    background-size: $size-7 $size-7;     //背景图片的宽度
-    background-position: right $size-3 top $size-3; /* 右上角 */
-    border-radius: $size-4;
-    padding: $size-4;
+    background: rgba(252, 249, 248, 0.7);
+    border: 1rpx solid rgba(160, 62, 64, 0.1);
+    border-radius: 32rpx;
+    padding: 40rpx 32rpx;
     margin-bottom: $size-3;
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
-    box-shadow: 4rpx 4rpx 14rpx rgba(0, 0, 0, 0.12);
-    position: relative; /* 添加相对定位 */
-  }
-
-  .gym-card::before {
-    content: '';
-    position: absolute;
-    left: $size-3;
-    bottom: $size-3;
-    width: $size-7;
-    height: $size-7;
-    background: url('/static/foot-icon.png') no-repeat center;
-    background-size: contain;
-    z-index: 1;
+    box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.12);
+    position: relative;
   }
 
   .gym-card .gym-info {
     flex: 1;
-    margin-right: 120rpx; /* 为右侧操作按钮留出空间 */
-    position: relative; /* 确保内容在背景图标之上 */
-    z-index: 2; /* 确保内容在伪元素之上 */
+    margin-right: 120rpx;
   }
 
   .gym-card .gym-info .gym-name {
     display: block;
-    font-size: $size-5;
-    font-weight: bold;
-    color: $fitness-text;
+    font-size: 24px;
+    font-weight: 700;
+    color: rgb(160, 62, 64);
     margin-bottom: 10rpx;
   }
 
   .gym-card .gym-info .gym-desc {
     display: block;
     font-size: $size-3;
-    color: $color-label;
+    color: #8E8E93;
     margin-bottom: 15rpx;
   }
 
   .gym-card .gym-info .gym-meta {
     display: block;
     font-size: $size-2;
-    color: $color-label;
+    color: #8E8E93;
   }
 
   .gym-card .gym-actions {
     position: absolute;
-    display: flex;
-    
     right: 20rpx;
     display: flex;
     gap: 20rpx;
-    z-index: 2; /* 确保操作按钮在伪元素之上 */
   }
 
   .gym-card .gym-actions .action-btn {
@@ -531,7 +514,6 @@ const deleteGym = async (inventoryId) => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  //相对于页面居中
   position: absolute;
   top: 50%;
   left: 50%;
@@ -541,24 +523,22 @@ const deleteGym = async (inventoryId) => {
     width: 500rpx;
     height: 200rpx;
   }
-  
+
   .empty-text {
     font-size: $size-4;
-    color: $color-input;
+    color: #8E8E93;
     margin-bottom: 10rpx;
     font-weight: 600;
   }
-  
+
   .empty-subtext {
     font-size: $size-3;
-    color: $color-label;
+    color: #8E8E93;
     text-align: center;
     margin-bottom: $size-5;
     font-weight: 400;
   }
 }
-
-// ==================== 悬浮按钮样式 ====================
 
 .fab-button {
   position: fixed;
@@ -570,17 +550,15 @@ const deleteGym = async (inventoryId) => {
   display: flex;
   justify-content: center;
   align-items: center;
-  box-shadow: 0 $size-1 $size-3 rgba(7, 4, 4, 0.2);
+  box-shadow: 0 4rpx 12rpx rgba(7, 4, 4, 0.2);
   z-index: 998;
   margin-bottom: 20rpx;
-  
+
   &:active {
     transform: scale(0.95);
     opacity: 0.9;
   }
 }
-
-// ==================== 弹窗样式 ====================
 
 .dialog-mask {
   position: fixed;
@@ -592,67 +570,70 @@ const deleteGym = async (inventoryId) => {
   display: flex;
   justify-content: center;
   align-items: end;
-  z-index: 999; /* 确保弹窗在最上层 */
-  pointer-events: auto; /* 确保弹窗内元素可交互 */
+  z-index: 999;
+  pointer-events: auto;
 }
 
 .dialog-content {
   background: #FFFFFF;
-  border-radius: $size-5 $size-5 0 0;
+  border-radius: 32rpx 32rpx 0 0;
+  border: 1rpx solid rgba(160, 62, 64, 0.1);
   padding: $size-5;
-  width: stretch;  //适配不同屏幕宽度
-  //max-height: 80vh;
+  width: stretch;
   overflow-y: auto;
-  pointer-events: auto; /* 确保内容区域可交互 */
-  box-shadow: none; /* 移除默认阴影 */
-  border: none; /* 移除默认边框 */
-  
+  pointer-events: auto;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.12);
+
   .dialog-title {
     display: block;
     font-size: $size-5;
-    font-weight: bold;
+    font-weight: 700;
     text-align: center;
     margin-bottom: $size-4;
     color: $fitness-text;
   }
-  
+
   .form-item {
     margin-bottom: $size-4;
-    
+
     .form-label {
       font-weight: 700;
-      font-size: 28rpx;
+      font-size: 24rpx;
       display: block;
       margin-left: $size-1;
-      color: $color-label;
+      color: #564241;
       margin-bottom: $size-2;
     }
-    
+
     .form-input, .form-textarea {
       width: 100%;
-      background: $fitness-primary;
-      border: 1rpx solid rgba(160, 62, 64, 0.2);
-      border-radius: $size-4;
+      background: #F2F2F7;
+      border: 2px solid rgba(160, 62, 64, 0.1);
+      border-radius: 32rpx;
       padding: 20rpx 30rpx;
       font-size: $size-4;
+      font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: #1B1C1C;
       box-sizing: border-box;
-      z-index: 1000; /* 确保输入框在最上层 */
+      z-index: 1000;
     }
+
     .input-focus {
-      border: 2px solid rgba(160, 62, 64, 0.4);
+      border-color: rgba(160, 62, 64, 0.4);
     }
-    
+
     .form-input {
-      height: $size-12;
+      height: 96rpx;
     }
+
     .form-textarea {
       height: 200rpx;
-      white-space: pre-wrap; /* 保证长文本自动换行 */
-      word-wrap: break-word; /* 强制长单词换行 */
-      overflow-wrap: break-word; /* 兼容性处理 */
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
     }
   }
-  
+
   .dialog-buttons {
     display: flex;
     gap: $size-3;
@@ -660,10 +641,10 @@ const deleteGym = async (inventoryId) => {
 
     .btn-cancel, .btn-confirm {
       flex: 1;
-      height: $size-10;
-      border-radius: $size-4;
+      height: 96rpx;
+      border-radius: 32rpx;
       font-size: $size-5;
-      font-weight: 500;
+      font-weight: 700;
       display: flex;
       align-content: center;
       align-items: center;
@@ -671,19 +652,20 @@ const deleteGym = async (inventoryId) => {
       overflow: hidden;
       border: none;
     }
-    
+
     .btn-cancel {
-      background: #F5F5F5;
-      color: $color-label;
-      border: 1rpx solid rgba(0, 0, 0, 0.2);
+      background: transparent;
+      color: #a03e40;
+      border: 2px solid #a03e40;
     }
+
     .btn-cancel:after {
       border: none;
     }
-    
+
     .btn-confirm {
-      background: $uni-primary;
-      color: #FFFFFF;    
+      background: #d8696a;
+      color: #FFFFFF;
     }
   }
 }

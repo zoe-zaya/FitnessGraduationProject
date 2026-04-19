@@ -26,7 +26,7 @@ import json
 EQUIPMENT_DATA = [
     {
         "equipment_id": "eq_0",
-        "name": "卷腹机",
+        "name": "坐姿卷腹器械",
         "category": "力量训练 - 固定器械",
         "description": "专门用于腹部卷腹训练的固定器械，可调节阻力，适合核心肌群强化训练",
         "image_url": "eq_0.png",

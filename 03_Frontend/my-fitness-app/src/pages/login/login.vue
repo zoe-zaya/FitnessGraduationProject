@@ -27,17 +27,19 @@
           
           <view class="text">密码</view>
           <view class="input-item input-with-margin">
-            <img src="@/static/password2.png" class="icon"/>            
-            <input 
-              v-model="formData.password" 
-              type="password" 
+            <img src="@/static/password2.png" class="icon"/>
+            <input
+              v-model="formData.password"
+              :type="showPassword ? 'text' : 'password'"
               placeholder="请输入密码"
               class="input"
               :class="{ 'input-focus': focusedInput === 'password' }"
               @focus="onInputFocus('password')"
               @blur="onInputBlur"
             />
-            <uni-icons type="eye-filled" size="20" color="#8E8E93"></uni-icons>
+            <view class="eye-icon" @click="toggleShowPassword">
+              <uni-icons :type="showPassword ? 'eye' : 'eye-filled'" size="20" color="#8E8E93"></uni-icons>
+            </view>
           </view>
         </view>
         
@@ -64,13 +66,18 @@
   import { API } from '@/utils/constants'
   
   const userStore = useUserStore()
-  const loading = ref(false)
-  const focusedInput = ref(null)
-  
-  const formData = ref({
+const loading = ref(false)
+const focusedInput = ref(null)
+const showPassword = ref(false)
+
+const formData = ref({
     phone: '',
     password: ''
-  })
+})
+
+const toggleShowPassword = () => {
+    showPassword.value = !showPassword.value
+}
   
   const onInputFocus = (inputName) => {
     focusedInput.value = inputName
@@ -263,11 +270,12 @@
           border: 2px solid rgba(160, 62, 64, 0.4);
         }
 
-        uni-icons {
+        .eye-icon {
           position: absolute;
           right: $size-3;
           top: 50%;
           transform: translateY(-50%);
+          padding: 10rpx;
         }
       }
     }

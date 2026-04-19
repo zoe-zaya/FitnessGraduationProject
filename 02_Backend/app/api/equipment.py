@@ -359,23 +359,90 @@ async def delete_inventory(
             detail="健身房不存在"
         )
     
-    # 2. 删除关联关系
-    db.query(inventory_equipment_rel).filter(
-        inventory_equipment_rel.c.inventory_id == inventory_id
-    ).delete()
+    # 获取健身房对象
+    gym = db.query(EquipmentInventory).filter(
+        EquipmentInventory.inventory_id == inventory_id,
+        EquipmentInventory.user_id == current_user.user_id
+    ).first()
     
-    # 3. 删除健身房
-    successDelete = db.query(EquipmentInventory).filter(
-        EquipmentInventory.user_id == current_user.user_id,
-        EquipmentInventory.inventory_id == inventory_id
-    ).delete()
-    if successDelete == 0:
+    if not gym:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="删除健身房失败，请重试"
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="健身房不存在或无权删除"
         )
-    db.commit()
-    return {"message": "健身房删除成功"}
+    
+    try:
+        # 导入训练计划相关模型
+        from app.models.plan import TrainingPlan, PlanSession, SessionActionItem, TrainingSchedule
+        
+        # 1. 删除所有关联的训练计划及其关联数据
+        plans = db.query(TrainingPlan).filter(
+            TrainingPlan.inventory_id == inventory_id
+        ).all()
+        
+        for plan in plans:
+            # 1.1 删除训练日程
+            schedules = db.query(TrainingSchedule).filter(
+                TrainingSchedule.plan_id == plan.plan_id
+            ).all()
+            for schedule in schedules:
+                db.delete(schedule)
+            
+            # 1.2 删除计划阶段及其动作项
+            sessions = db.query(PlanSession).filter(
+                PlanSession.plan_id == plan.plan_id
+            ).all()
+            for session in sessions:
+                # 删除动作项
+                items = db.query(SessionActionItem).filter(
+                    SessionActionItem.session_id == session.session_id
+                ).all()
+                for item in items:
+                    db.delete(item)
+                # 删除阶段
+                db.delete(session)
+            
+            # 1.3 删除训练计划
+            db.delete(plan)
+        
+        # 2. 删除器材关联关系（多对多关联表）
+        db.query(inventory_equipment_rel).filter(
+            inventory_equipment_rel.c.inventory_id == inventory_id
+        ).delete(synchronize_session=False)
+        
+        # 3. 删除健身房对象
+        db.delete(gym)
+        
+        # 4. 提交事务
+        db.commit()
+        return {"message": "健身房删除成功"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        error_msg = str(e).lower()
+        if "foreign key constraint" in error_msg or "foreignkey" in error_msg:
+            if "training_plan" in error_msg or "plan_session" in error_msg:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="删除失败：请先删除关联的训练计划"
+                )
+            elif "inventory_equipment_rel" in error_msg or "equipment" in error_msg:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="删除失败：请先删除健身房内的器材"
+                )
+            else:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"删除失败：存在外键约束，请先处理相关数据"
+                )
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"删除失败：{str(e)}"
+            )
 
 
 # ==================== 器材添加（自动/手动） ====================

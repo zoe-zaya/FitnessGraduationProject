@@ -77,12 +77,12 @@
             <view class="input-item input-with-border">
                 <text class="input-label">经验水平</text>
                 <picker 
-                :range="EXPERIENCE_LEVELS" 
-                range-key="label"
+                :range="experienceLevelsWithDescription" 
+                range-key="displayLabel"
                 @change="onLevelChange"
                 >
                 <view class="picker">
-                    {{ formData.experience_level ? EXPERIENCE_LEVELS.find(l => l.value === formData.experience_level)?.label : '请选择' }}
+                    {{ formData.experience_level ? formData.experience_level : '请选择' }}
                 </view>
                 </picker>
             </view>
@@ -107,11 +107,19 @@
   </template>
   
   <script setup>
-  import { ref, computed, onMounted } from 'vue'
-  import { onShow, onLoad } from '@dcloudio/uni-app'
-  import { useUserStore } from '@/store/user'
-  import request from '@/utils/request'
-  import { API, GENDERS, FITNESS_GOALS, EXPERIENCE_LEVELS } from '@/utils/constants'
+import { ref, computed, onMounted } from 'vue'
+import { onShow, onLoad } from '@dcloudio/uni-app'
+import { useUserStore } from '@/store/user'
+import request from '@/utils/request'
+import { API, GENDERS, FITNESS_GOALS, EXPERIENCE_LEVELS } from '@/utils/constants'
+
+// 为经验水平选择器创建带描述的选项
+const experienceLevelsWithDescription = computed(() => {
+  return EXPERIENCE_LEVELS.map(level => ({
+    ...level,
+    displayLabel: `${level.label} - ${level.description}`
+  }))
+})
   
   const userStore = useUserStore()
   const loading = ref(false)
@@ -189,11 +197,11 @@
   }
   
   const onGoalChange = (e) => {
-    formData.value.fitness_goal = FITNESS_GOALS[e.detail.value].value
+    formData.value.fitness_goal = FITNESS_GOALS[e.detail.value].label
   }
   
   const onLevelChange = (e) => {
-    formData.value.experience_level = EXPERIENCE_LEVELS[e.detail.value].value
+    formData.value.experience_level = experienceLevelsWithDescription.value[e.detail.value].label
   }
   
   /**

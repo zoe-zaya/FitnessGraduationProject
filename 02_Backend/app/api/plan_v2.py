@@ -259,10 +259,62 @@ async def delete_plan(
             detail="训练计划不存在或无权访问"
         )
     
-    db.delete(plan)
-    db.commit()
-    
-    return DeleteResponse(message="训练计划删除成功")
+    try:
+        # 先删除关联的动作项和阶段
+        from app.models.plan import PlanSession, SessionActionItem, TrainingSchedule
+        
+        # 删除关联的训练日程
+        db.query(TrainingSchedule).filter(
+            TrainingSchedule.plan_id == plan_id
+        ).delete()
+        
+        # 删除关联的阶段和动作项
+        sessions = db.query(PlanSession).filter(
+            PlanSession.plan_id == plan_id
+        ).all()
+        
+        for session in sessions:
+            # 删除关联的动作项
+            db.query(SessionActionItem).filter(
+                SessionActionItem.session_id == session.session_id
+            ).delete()
+            # 删除阶段
+            db.delete(session)
+        
+        # 最后删除训练计划
+        db.delete(plan)
+        db.commit()
+        
+        return DeleteResponse(message="训练计划删除成功")
+        
+    except Exception as e:
+        db.rollback()
+        if "foreign key constraint" in str(e):
+            if "plan_session" in str(e):
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="删除失败：请先删除关联的计划阶段"
+                )
+            elif "session_action_item" in str(e):
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="删除失败：请先删除关联的动作项"
+                )
+            elif "training_schedule" in str(e):
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="删除失败：请先删除关联的训练日程"
+                )
+            else:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"删除失败：存在外键约束，请先处理相关数据"
+                )
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"删除失败：{str(e)}"
+            )
 
 
 # ==================== 动作项管理 ====================
@@ -454,7 +506,8 @@ async def replace_action_item(
 ):
     """替换训练动作"""
     from app.models.plan import SessionActionItem, PlanSession
-    
+    from app.models.equipment import inventory_equipment_rel
+
     item = db.query(SessionActionItem).join(PlanSession).filter(
         SessionActionItem.item_id == item_id,
         PlanSession.plan_id == plan_id
@@ -475,7 +528,20 @@ async def replace_action_item(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="新动作不存在"
         )
-    
+
+    # 检查新动作的器材可用性
+    if new_action.equipment_id and new_action.equipment_id != "none":
+        has_equipment = db.query(inventory_equipment_rel).filter(
+            inventory_equipment_rel.c.inventory_id == plan.inventory_id,
+            inventory_equipment_rel.c.equipment_id == new_action.equipment_id
+        ).first()
+
+        if not has_equipment:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="该动作所需器材您当前健身房未配备"
+            )
+
     # 更新动作 ID
     item.action_id = request.new_action_id
     

@@ -15,22 +15,19 @@ class FitnessGoalEnum(str, enum.Enum):
     """健身目标枚举"""
     MUSCLE_GAIN = "增肌"
     FAT_LOSS = "减脂"
-    SHAPING = "塑形"
-    FITNESS_IMPROVEMENT = "增强体能"
 
 
 class ExperienceLevelEnum(str, enum.Enum):
     """健身经验水平枚举"""
-    BEGINNER = "初学者"
-    INTERMEDIATE = "中级"
-    ADVANCED = "高级"
-
+    BEGINNER = "新手"
+    INTERMEDIATE = "初级"
+    ADVANCED = "中级"
+    ADVANCED_PLUS = "中高级"
 
 class GenderEnum(str, enum.Enum):
     """性别枚举"""
     MALE = "male"
     FEMALE = "female"
-    OTHER = "other"
 
 
 class User(Base):

@@ -1,53 +1,49 @@
 <template>
   <view class="container">
-    <!-- ✅ 新增：健身房信息卡片 -->
-    <view class="gym-info-card" v-if="gymInfo">
-      <view class="gym-content">
-        <!-- 信息区域 -->
-        <view class="info-section">
-          <view class="gym-header">
-            <text class="gym-name">{{ gymInfo.location_tag }}</text>
-            <text class="gym-extra-info">
-              <text class="gym-count">{{ gymInfo.equipment_count }} 个器材</text>
-              <text class="gym-created" v-if="gymInfo.create_time">· {{ formatDate(gymInfo.create_time) }}</text>
-            </text>
-          </view>
-          <view class="gym-description" v-if="gymInfo.description">
-            <text class="desc-text">{{ gymInfo.description }}</text>
-          </view>
-          
-          <view class="gym-description" v-else>
-            <text class="desc-text-empty">暂无描述</text>
+    <view class="top-section" v-if="gymInfo">
+      <view class="gym-info-card">
+        <view class="gym-content">
+          <view class="info-section">
+            <view class="gym-header">
+              <text class="gym-name">{{ gymInfo.location_tag }}</text>
+              <text class="gym-extra-info">
+                <text class="gym-count">{{ gymInfo.equipment_count }} 个器材</text>
+                <text class="gym-created" v-if="gymInfo.create_time">· {{ formatDate(gymInfo.create_time) }}</text>
+              </text>
+            </view>
+            <view class="gym-description" v-if="gymInfo.description">
+              <text class="desc-text">{{ gymInfo.description }}</text>
+            </view>
+            <view class="gym-description" v-else>
+              <text class="desc-text-empty">暂无描述</text>
+            </view>
           </view>
         </view>
       </view>
+      
+      <view class="action-section">
+        <button class="action-btn scan" @click="navigateToCameraScan">
+          <image src="/static/camera3.png" class="btn-icon" mode="aspectFit" />
+          <text class="btn-text">拍摄识别</text>
+        </button>
+        <button class="action-btn manual" @click="navigateToManualAdd">
+          <image src="/static/search.png" class="btn-icon" mode="aspectFit" />
+          <text class="btn-text">手动添加</text>
+        </button>
+        <button class="action-btn plan" @click="generatePlan">
+          <image src="/static/generate3.png" class="btn-icon" mode="aspectFit" />
+          <text class="btn-text">生成计划</text>
+        </button>
+      </view>
     </view>
     
-    <!-- 操作按钮区域 -->
-    <view class="action-section" v-if="gymInfo">
-      <button class="action-btn scan" @click="navigateToCameraScan">
-        <img src="/static/camera3.png" class="btn-icon" />
-        <text class="btn-text">拍摄识别</text>
-      </button>
-      <button class="action-btn manual" @click="navigateToManualAdd">
-        <img src="/static/search.png" class="btn-icon" />
-        <text class="btn-text">手动添加</text>
-      </button>
-      <button class="action-btn plan" @click="generatePlan">
-        <img src="/static/generate3.png" class="btn-icon" />
-        <text class="btn-text">生成计划</text>
-      </button>
-    </view>
-    
-    <!-- 器材列表 -->
     <view class="equipment-list" v-if="equipmentList.length > 0">
       <view 
         class="equipment-card" 
-        v-for="(equipment, index) in equipmentList" 
+        v-for="equipment in equipmentList" 
         :key="equipment.equipment_id"
         @click="navigateToEquipmentDetail(equipment.equipment_id)"
       >
-        <!-- 器材图片 -->
         <view class="equipment-image-wrapper">
           <image 
             :src="'/static/' + equipment.image_url" 
@@ -56,13 +52,11 @@
             @error="onImageError"
             lazy-load
           />
-          <!-- 图片加载失败时的备用显示 -->
           <view class="image-placeholder" v-if="!equipment.image_url">
             <text class="placeholder-icon">🏋️</text>
           </view>
         </view>
         
-        <!-- 器材信息 -->
         <view class="equipment-info">
           <text class="equipment-name">{{ equipment.name }}</text>
           <text class="equipment-category">{{ equipment.category }}</text>
@@ -71,14 +65,12 @@
           </text>
         </view>
         
-        <!-- 删除按钮 -->
         <view class="delete-btn" @click.stop="confirmDeleteEquipment(equipment)">
-          <img src="/static/delete.png" class="delete-icon" />
+          <image src="/static/delete.png" class="delete-icon" mode="aspectFit" />
         </view>
       </view>
     </view>
     
-    <!-- 空状态提示 -->
     <view class="empty-state" v-else>
       <image src="/static/empty-data.png" class="empty-image" mode="aspectFit" />
       <text class="empty-text">暂无器材</text>
@@ -241,55 +233,74 @@ const generatePlan = () => {
 
 .container {
   min-height: 100vh;
-  background: url('@/static/background3.png') no-repeat center center / cover;
-  padding: $size-5;
+  background: #FFFFFF;
+  padding: 32rpx;
+  font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
-/* 健身房信息卡片样式 */
+.top-section {
+  display: flex;
+  flex-direction: row;
+  gap: 24rpx;
+  margin-bottom: 48rpx;
+  align-items: stretch;
+}
+
 .gym-info-card {
-  background: #FFFFFF url('/static/foot-icon.png') no-repeat;
-  background-size: $size-9 $size-9;     //背景图片的宽度
-  background-position: right $size-3 bottom $size-3; /* 右上角 */
-  border-radius: $size-5;
-  padding: $size-5;
-  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.12);
+  flex: 1;
+  background: rgba(252, 249, 248, 0.7);
+  border-radius: 32rpx;
+  padding: 48rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.12);
+  border: 2rpx solid #efefef;
   
   .gym-content {
     display: flex;
-    flex-direction: column; // 改为垂直布局
+    flex-direction: column;
+    height: 100%;
+    
     .info-section {
-      flex: auto; // 占据剩余空间
+      flex: auto;
 
-      .gym-header {     
+      .gym-header {
         .gym-name {
           display: block;
-          font-size: $size-6;
-          font-weight: bold;
-          color: $fitness-text;
-          margin-bottom: 10rpx;
+          font-size: 48rpx;
+          font-weight: 700;
+          color: #a03e40;
+          margin-bottom: 16rpx;
+          line-height: 1.3;
         }
         
         .gym-extra-info {
           display: flex;
-          font-size: $size-3;
-          color: $color-label;
-          padding-left: $size-1;
+          font-size: 24rpx;
+          color: #8E8E93;
+          line-height: 1.4;
           
           .gym-count,
           .gym-created {
-            margin-right: $size-1;
+            margin-right: 8rpx;
           }
         }
       }
       
       .gym-description {
-        margin-top: $size-1;
-        padding-left: $size-1;  
-        .desc-text, .desc-text-empty{
-          display: flex;
-          font-size: $size-3;
-          color: $color-label;
-          font-weight: 500;
+        margin-top: 24rpx;
+        
+        .desc-text {
+          display: block;
+          font-size: 24rpx;
+          color: #564241;
+          line-height: 1.4;
+        }
+        
+        .desc-text-empty {
+          display: block;
+          font-size: 24rpx;
+          color: #8E8E93;
+          line-height: 1.4;
+          font-style: italic;
         }
       }
     }
@@ -297,81 +308,93 @@ const generatePlan = () => {
 }
 
 .action-section {
-  width: 100%; // 按钮区域占满整行
-  display: flex; // 水平排列按钮
-  flex-direction: row; // 水平方向排列
-  justify-content: space-between; // 按钮平均分布
-  margin-top: $size-4;
+  width: max-content;
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+  flex-shrink: 0;
 
   .action-btn {
-    flex: 1; // 每个按钮平均分配空间
-    height: 76rpx;
-    border-radius: $size-4;
+    width: 100%;
+    height: 96rpx;
+    border-radius: 32rpx;
     border: none;
     display: flex;
     flex-direction: row;
     justify-content: center;
-    justify-content: space-between;
     align-items: center;
-    margin-right: $size-2; // 按钮之间添加间距
-    line-height: 2; // 调整文本垂直居中
-    box-shadow: 0rpx 4rpx 16rpx rgba(0, 0, 0, 0.12);
+    padding: 0 32rpx;
+    box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.12);
+    transition: all 0.2s ease;
 
-    &:last-child {
-      margin-right: 0; // 最后一个按钮不需要右边距
+    &:active {
+      transform: scale(0.96);
+      box-shadow: 0 1rpx 6rpx rgba(0, 0, 0, 0.08);
     }
 
-    &::after{
+    &::after {
       border: none;
     }
-        
+      
     .btn-icon {
       width: 40rpx;
       height: 40rpx;
+      margin-right: 12rpx;
     }
-        
+      
     .btn-text {
-      font-size: $size-3;
-      align-items: center;
+      font-size: 32rpx;
+      font-weight: 700;
+      line-height: 1.2;
     }
-        
-    &.scan{
-      background: $uni-success-bg;
-      color: $uni-success;
+      
+    &.scan {
+      background: rgba(82, 196, 26, 0.15);
+      color: #52C41A;
     }
-    &.manual{
-      background: $color-primary-light;
-      color: $color-primary;
+    
+    &.manual {
+      background: rgba(255, 107, 143, 0.15);
+      color: #FF6B8F;
     }
+    
     &.plan {
-      background: $uni-warning-bg;
-      color: $uni-warning;
+      background: rgba(255, 193, 7, 0.15);
+      color: #E6AC00;
     }
   }
 }
-.equipment-list {  
+
+.equipment-list {
   .equipment-card {
-    background: #ffffff;
-    border-radius: $size-4;
-    padding: $size-5;
-    margin: $size-4 0;
+    background: #FFFFFF;
+    border-radius: 32rpx;
+    padding: 32rpx;
+    margin-bottom: 24rpx;
     display: flex;
-    align-items: flex-start;
-    box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.12);
+    align-items: center;
+    box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.12);
+    border: 2rpx solid #efefef;
+    transition: all 0.2s ease;
     
-    // 图片区域样式
+    &:active {
+      transform: scale(0.98);
+      box-shadow: 0 1rpx 6rpx rgba(0, 0, 0, 0.08);
+    }
+    
     .equipment-image-wrapper {
       position: relative;
       width: 160rpx;
       height: 160rpx;
-      margin-right: $size-4;
+      margin-right: 32rpx;
       flex-shrink: 0;
       
       .equipment-image {
         width: 100%;
         height: 100%;
-        border-radius: $size-3;
-        background: #F5F5F5;
+        border-radius: 32rpx;
+        background: #F2F2F7;
+        object-fit: cover;
       }
       
       .image-placeholder {
@@ -380,14 +403,14 @@ const generatePlan = () => {
         left: 0;
         right: 0;
         bottom: 0;
-        background: #F5F5F5;
-        border-radius: $size-3;
+        background: #F2F2F7;
+        border-radius: 32rpx;
         display: flex;
         justify-content: center;
         align-items: center;
         
         .placeholder-icon {
-          font-size: 60rpx;
+          font-size: 64rpx;
         }
       }
     }
@@ -398,50 +421,59 @@ const generatePlan = () => {
       
       .equipment-name {
         display: block;
-        font-size: $size-5;
-        font-weight: 600;
-        color: $fitness-text;
-        margin-bottom: $size-1;
+        font-size: 32rpx;
+        font-weight: 700;
+        color: #1B1C1C;
+        margin-bottom: 12rpx;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+        line-height: 1.3;
       }
       
       .equipment-category {
         display: block;
-        font-size: $size-3;
-        font-weight: 500;
-        color: $color-primary;
-        margin-bottom: $size-1;
+        font-size: 24rpx;
+        font-weight: 700;
+        color: #a03e40;
+        margin-bottom: 8rpx;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+        line-height: 1.4;
       }
       
       .equipment-muscles {
         display: block;
-        font-size: $size-3;
-        color: $color-label;
+        font-size: 24rpx;
+        color: #8E8E93;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+        line-height: 1.4;
       }
     }
     
     .delete-btn {
-      width: 60rpx;
-      height: 60rpx;
-      background: #ffffff;
-      border-radius: 30rpx;
+      width: 64rpx;
+      height: 64rpx;
+      background: transparent;
+      border-radius: 32rpx;
       display: flex;
       justify-content: center;
-      align-items: end;
-      margin-left: 10rpx;
+      align-items: center;
+      margin-left: 16rpx;
       flex-shrink: 0;
+      transition: all 0.2s ease;
+      
+      &:active {
+        transform: scale(0.95);
+        opacity: 0.6;
+      }
       
       .delete-icon {
-        width: 40rpx;
-        height: 40rpx;
+        width: 36rpx;
+        height: 36rpx;
       }
     }
   }
@@ -452,26 +484,29 @@ const generatePlan = () => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding-top: 106rpx;
+  padding: 160rpx 0;
   
   .empty-image {
-    width: 500rpx;
-    height: 200rpx;
+    width: 400rpx;
+    height: 300rpx;
+    margin-bottom: 40rpx;
   }
   
   .empty-text {
-    font-size: $size-4;
-    color: $color-input;
-    margin-bottom: 10rpx;
-    font-weight: 600;
+    font-size: 32rpx;
+    color: #1B1C1C;
+    margin-bottom: 16rpx;
+    font-weight: 700;
     text-align: center;
+    line-height: 1.3;
   }
   
   .empty-subtext {
-    font-size: $size-3;
-    color: $color-label;
+    font-size: 24rpx;
+    color: #8E8E93;
     text-align: center;
-    font-weight: 400;
+    font-weight: 525;
+    line-height: 1.4;
   }
 }
 </style>
