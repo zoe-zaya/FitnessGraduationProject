@@ -1,126 +1,97 @@
 <template>
     <view class="container">
         <view class="header">
-            <view class="header-content">
-                <view class="plan-title-row">
-                    <text class="plan-name">{{ planInfo.plan_name }}</text>
-                    <view class="plan-type-badge" :class="planInfo.plan_type?.toLowerCase()">
-                        {{ planInfo.plan_type === 'FAT_LOSS' ? '减脂' : '增肌' }}
-                    </view>
-                </view>
-                <view class="plan-meta">
-                    <view class="meta-item">
-                        <text class="meta-icon">📋</text>
-                        <text class="meta-text" v-if="planInfo.scheme_type">{{ getSchemeName(planInfo.scheme_type) }}</text>
-                        <text class="meta-text" v-else>全身训练</text>
-                    </view>
-                    <view class="meta-item">
-                        <text class="meta-icon">📅</text>
-                        <text class="meta-text">{{ planInfo.cycle_rule }}</text>
-                    </view>
+            <view class="plan-title-row">
+                <text class="plan-name">{{ planInfo.plan_name }}</text>
+                <view class="plan-type-badge" :class="planInfo.plan_type?.toLowerCase()">
+                    {{ planInfo.plan_type === 'FAT_LOSS' ? '减脂' : '增肌' }}
                 </view>
             </view>
-            <view class="header-actions">
-                <view class="action-btn schedule" @click="viewSchedule">
-                    <text class="btn-icon">📅</text>
-                    <text class="btn-text">日程</text>
-                </view>
-                <view class="action-btn execute" @click="startExecution">
-                    <text class="btn-icon">▶️</text>
-                    <text class="btn-text">执行</text>
+
+            <view class="week-strip">
+                <view
+                    class="day-cell"
+                    v-for="(day, index) in weekDays"
+                    :key="index"
+                    :class="{ today: day.isToday, rest: day.isRest, selected: selectedDayIndex === index }"
+                    @click="selectDay(index)"
+                >
+                    <text class="day-weekday">{{ day.weekday }}</text>
+                    <text class="day-date">{{ day.dateNum }}</text>
+                    <view class="day-status" :class="day.isRest ? 'rest' : 'train'">
+                        <text class="status-text">{{ day.isRest ? '休' : '练' }}</text>
+                    </view>
+                    <view class="today-dot" v-if="day.isToday"></view>
                 </view>
             </view>
         </view>
 
         <view class="content">
-            <view class="sessions-section">
-                <view
-                    class="session-card"
-                    v-for="(session, index) in planInfo.sessions"
-                    :key="session.session_id"
-                >
-                    <view class="session-header" :style="{ borderLeftColor: SESSION_TYPE_MAP[session.session_type]?.color }">
-                        <view class="session-info">
-                            <text class="session-icon">{{ SESSION_TYPE_MAP[session.session_type]?.icon }}</text>
-                            <view class="session-details">
+            <view class="today-card" v-if="todaySession">
+                <view class="today-header">
+                    <view class="today-header-left">
+                        <view class="part-badge" :class="todaySession.training_part" v-if="todaySession.training_part">
+                            {{ getPartLabel(todaySession.training_part) }}
+                        </view>
+                        <text class="today-muscles">{{ todayMusclesDesc }}</text>
+                    </view>
+                    <view class="postpone-btn" v-if="canPostpone" @click="showPostponeOptions">
+                        <uni-icons type="redo" size="16" color="#a03e40"></uni-icons>
+                        <text class="postpone-text">延后</text>
+                    </view>
+                </view>
+
+                <view class="session-list">
+                    <view
+                        class="session-item"
+                        v-for="session in todaySessions"
+                        :key="session.session_id"
+                    >
+                        <view class="session-type-bar" :style="{ backgroundColor: getSessionColor(session.session_type) }"></view>
+                        <view class="session-body">
+                            <view class="session-top">
                                 <text class="session-name">{{ SESSION_TYPE_MAP[session.session_type]?.label }}</text>
-                                <text class="session-duration">⏱️ 约{{ session.estimated_duration_minutes }}分钟</text>
+                                <text class="session-duration">约{{ session.estimated_duration_minutes }}分钟</text>
                             </view>
-                        </view>
-                        <text class="session-order">{{ session.sequence_order }}/3</text>
-                    </view>
-
-                    <view class="target-muscles" v-if="session.target_muscles && session.target_muscles.length > 0">
-                        <text class="muscles-label">🎯 目标肌群：</text>
-                        <view class="muscles-tags">
-                            <text class="muscle-tag" v-for="(muscle, mIndex) in session.target_muscles" :key="mIndex">
-                                {{ muscle }}
-                            </text>
-                        </view>
-                    </view>
-
-                    <view class="action-list">
-                        <view
-                            class="action-item"
-                            v-for="(action, aIndex) in session.action_items"
-                            :key="action.item_id"
-                            @click="viewActionDetail(action)"
-                        >
-                            <view class="action-main">
-                                <view class="action-info">
-                                    <text class="action-name">{{ action.action_name }}</text>
-                                    <text class="action-difficulty" :style="{ backgroundColor: getDifficultyColor(action.difficulty_level) }">
-                                        {{ action.difficulty_level }}
-                                    </text>
-                                </view>
-
-                                <view class="action-params" v-if="action.sets">
-                                    <text class="param-item">📊 {{ action.sets }}组 × {{ action.reps_per_set }}次</text>
-                                    <text class="param-item">⏸️ 休息{{ action.rest_seconds_default }}秒</text>
-                                </view>
-
-                                <view class="action-params" v-else-if="action.duration_minutes">
-                                    <text class="param-item">⏱️ {{ action.duration_minutes }}分钟</text>
-                                </view>
-
-                                <view class="weight-display" v-if="action.weight_records && action.weight_records.length > 0">
-                                    <text class="weight-label">重量记录：</text>
-                                    <text class="weight-values">{{ action.weight_records.join('kg, ') }}kg</text>
+                            <view class="action-list">
+                                <view
+                                    class="action-row"
+                                    v-for="action in session.action_items"
+                                    :key="action.item_id"
+                                    @click="viewActionDetail(action)"
+                                >
+                                    <view class="action-left">
+                                        <text class="action-name">{{ action.action_name }}</text>
+                                        <text class="action-difficulty" :style="{ backgroundColor: getDifficultyColor(action.difficulty_level) }">
+                                            {{ action.difficulty_level }}
+                                        </text>
+                                    </view>
+                                    <view class="action-right">
+                                        <text class="action-param" v-if="action.sets">{{ action.sets }}×{{ action.reps_per_set }}</text>
+                                        <text class="action-param" v-else-if="action.duration_minutes">{{ action.duration_minutes }}分钟</text>
+                                    </view>
                                 </view>
                             </view>
-
-                            <view class="action-operations">
-                                <view class="op-btn replace" @click.stop="replaceAction(action, session)">
-                                    <text class="op-icon">🔄</text>
-                                </view>
-                                <view class="op-btn delete" @click.stop="confirmDeleteAction(action)">
-                                    <text class="op-icon">🗑️</text>
-                                </view>
-                            </view>
-                        </view>
-
-                        <view class="add-action-btn" @click="addActionToSession(session)">
-                            <text class="btn-icon">+</text>
-                            <text class="btn-text">添加动作</text>
                         </view>
                     </view>
                 </view>
             </view>
+
+            <view class="rest-card" v-else>
+                <text class="rest-title">今天是休息日</text>
+                <text class="rest-sub">好好休息，为下次训练蓄力</text>
+            </view>
         </view>
 
         <view class="bottom-bar">
-            <button class="btn archive-btn" @click="archivePlan" v-if="planInfo.status === 'ACTIVE'">
-                <text>归档计划</text>
-            </button>
-            <button class="btn edit-btn" @click="editPlan">
-                <text>编辑计划</text>
-            </button>
+            <button class="btn edit-btn" @click="editPlan">编辑计划</button>
+            <button class="btn start-btn" @click="startExecution">开始训练</button>
         </view>
     </view>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { onLoad, onShow } from '@dcloudio/uni-app'
 import request from '@/utils/request'
 import { API_V2, SESSION_TYPE_MAP, DIFFICULTY_MAP, SCHEME_TYPES } from '@/utils/constants'
@@ -132,8 +103,88 @@ const planInfo = ref({
     scheme_type: '',
     cycle_rule: '',
     status: '',
-    sessions: []
+    sessions: [],
+    weekly_schedule: []
 })
+
+const selectedDayIndex = ref(-1)
+
+const SESSION_COLORS = {
+    WARMUP: '#FF9500',
+    MAIN: '#a03e40',
+    COOLDOWN: '#24a978'
+}
+
+const PART_LABEL_MAP = {
+    '推': '推日',
+    '腿': '腿日',
+    '拉': '拉日'
+}
+
+const PART_MUSCLES_DESC = {
+    '推': '胸 · 肩 · 三头',
+    '腿': '臀 · 腿',
+    '拉': '背 · 二头'
+}
+
+const getPartLabel = (part) => PART_LABEL_MAP[part] || part
+const getSessionColor = (type) => SESSION_COLORS[type] || '#a03e40'
+
+const weekDays = computed(() => {
+    const schedule = planInfo.value.weekly_schedule || []
+    const weekdays = ['日', '一', '二', '三', '四', '五', '六']
+    const today = new Date()
+
+    return schedule.map((item, index) => {
+        const date = new Date(item.scheduled_date)
+        const isToday = date.toDateString() === today.toDateString()
+        const isRest = item.status === 'REST'
+
+        if (isToday && selectedDayIndex.value === -1) {
+            selectedDayIndex.value = index
+        }
+
+        return {
+            weekday: '周' + weekdays[date.getDay()],
+            dateNum: date.getDate(),
+            isToday,
+            isRest,
+            schedule: item
+        }
+    })
+})
+
+const currentSchedule = computed(() => {
+    const idx = selectedDayIndex.value >= 0 ? selectedDayIndex.value : 0
+    const schedule = planInfo.value.weekly_schedule || []
+    return schedule[idx] || null
+})
+
+const todaySession = computed(() => {
+    if (!currentSchedule.value || currentSchedule.value.status === 'REST') return null
+    return currentSchedule.value
+})
+
+const todayTrainingPart = computed(() => {
+    return currentSchedule.value?.training_part || null
+})
+
+const todaySessions = computed(() => {
+    const part = todayTrainingPart.value
+    if (!part) return []
+    const sessions = planInfo.value.sessions || []
+    return sessions.filter(s => s.training_part === part)
+})
+
+const todayMusclesDesc = computed(() => {
+    const part = todayTrainingPart.value
+    if (!part) return ''
+    return PART_MUSCLES_DESC[part] || currentSchedule.value?.target_muscles?.join(' · ') || ''
+})
+
+const selectDay = (index) => {
+    selectedDayIndex.value = index
+}
 
 onLoad((options) => {
     planId.value = options.plan_id || ''
@@ -161,19 +212,24 @@ const getSchemeName = (schemeType) => {
 }
 
 const getDifficultyColor = (level) => {
-    return DIFFICULTY_MAP[level]?.color || '#999999'
-}
-
-const viewSchedule = () => {
-    uni.navigateTo({ url: `/pages/plan/weekly-schedule?plan_id=${planId.value}` })
+    return DIFFICULTY_MAP[level]?.color || '#8E8E93'
 }
 
 const startExecution = () => {
-    const mainSession = planInfo.value.sessions?.find(s => s.session_type === 'main')
+    const part = todayTrainingPart.value
+    const sessions = planInfo.value.sessions || []
+    const mainSession = sessions.find(s => s.session_type === 'MAIN' && s.training_part === part)
     if (mainSession && mainSession.session_id) {
         uni.navigateTo({
             url: `/pages/plan/training-execution?plan_id=${planId.value}&session_id=${mainSession.session_id}`
         })
+    } else {
+        const fallback = sessions.find(s => s.session_type === 'MAIN')
+        if (fallback && fallback.session_id) {
+            uni.navigateTo({
+                url: `/pages/plan/training-execution?plan_id=${planId.value}&session_id=${fallback.session_id}`
+            })
+        }
     }
 }
 
@@ -216,123 +272,150 @@ const deleteActionItem = async (itemId) => {
     }
 }
 
-const archivePlan = () => {
-    uni.showModal({
-        title: '归档计划',
-        content: '确定要归档此计划吗？归档后可以在"已归档"中查看。',
+const editPlan = () => {
+    uni.navigateTo({ url: `/pages/plan/plan-edit?plan_id=${planId.value}` })
+}
+
+const canPostpone = computed(() => {
+    const schedule = currentSchedule.value
+    if (!schedule) return false
+    if (schedule.status === 'REST' || schedule.status === 'COMPLETED') return false
+    return schedule.can_postpone === true
+})
+
+const showPostponeOptions = () => {
+    const schedule = currentSchedule.value
+    if (!schedule) return
+
+    const maxDays = 3 - (schedule.postpone_count || 0)
+    const options = []
+    for (let i = 1; i <= maxDays; i++) {
+        options.push(`延后${i}天`)
+    }
+
+    uni.showActionSheet({
+        itemList: options,
         success: async (res) => {
-            if (res.confirm) {
-                try {
-                    await request.put(`${API_V2.PLAN_UPDATE}/${planId.value}`, { status: 'ARCHIVED' })
-                    uni.showToast({ title: '归档成功', icon: 'success' })
-                    setTimeout(() => {
-                        uni.navigateBack()
-                    }, 1000)
-                } catch (error) {
-                    console.error('归档失败:', error)
-                    uni.showToast({ title: '归档失败', icon: 'none' })
-                }
-            }
+            const days = res.tapIndex + 1
+            await postponeSchedule(schedule.schedule_id, days)
         }
     })
 }
 
-const editPlan = () => {
-    uni.navigateTo({ url: `/pages/plan/plan-edit?plan_id=${planId.value}` })
+const postponeSchedule = async (scheduleId, days) => {
+    try {
+        await request.post(`${API_V2.SCHEDULE_POSTPONE}/${planId.value}/${scheduleId}`, { days })
+        uni.showToast({ title: '已延后', icon: 'success' })
+        await loadPlanDetail()
+    } catch (error) {
+        console.error('延后失败:', error)
+        uni.showToast({ title: '延后失败', icon: 'none' })
+    }
 }
 </script>
 
 <style lang="scss" scoped>
+@import '../../uni.scss';
+
 .container {
     min-height: 100vh;
-    background: #F5F5F5;
+    background: $fitness-secondary;
     padding-bottom: 140rpx;
+    font-family: Manrope;
 }
 
 .header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    padding: 40rpx;
+    background: linear-gradient(135deg, #a03e40 0%, #c05557 100%);
+    padding: $size-5 $size-5 $size-6;
 
-    .header-content {
-        margin-bottom: 30rpx;
+    .plan-title-row {
+        display: flex;
+        align-items: center;
+        margin-bottom: $size-4;
 
-        .plan-title-row {
-            display: flex;
-            align-items: center;
-            margin-bottom: 16rpx;
-
-            .plan-name {
-                font-size: 40rpx;
-                font-weight: bold;
-                color: #FFFFFF;
-                margin-right: 16rpx;
-            }
-
-            .plan-type-badge {
-                font-size: 22rpx;
-                padding: 6rpx 16rpx;
-                border-radius: 12rpx;
-                color: #FFFFFF;
-
-                &.fat_loss {
-                    background: rgba(255, 107, 107, 0.8);
-                }
-
-                &.muscle_gain {
-                    background: rgba(255, 255, 255, 0.2);
-                }
-            }
+        .plan-name {
+            font-size: $size-5;
+            font-weight: 700;
+            color: #FFFFFF;
+            margin-right: $size-2;
         }
 
-        .plan-meta {
-            display: flex;
-            gap: 24rpx;
+        .plan-type-badge {
+            font-size: $size-3;
+            padding: $size-1 $size-2;
+            border-radius: $size-2;
+            color: #FFFFFF;
 
-            .meta-item {
-                display: flex;
-                align-items: center;
+            &.fat_loss {
+                background: rgba(255, 255, 255, 0.25);
+            }
 
-                .meta-icon {
-                    font-size: 28rpx;
-                    margin-right: 8rpx;
-                }
-
-                .meta-text {
-                    font-size: 26rpx;
-                    color: rgba(255, 255, 255, 0.9);
-                }
+            &.muscle_gain {
+                background: rgba(255, 255, 255, 0.15);
             }
         }
     }
 
-    .header-actions {
+    .week-strip {
         display: flex;
-        gap: 16rpx;
+        background: transparent;
+        border-radius: $size-4;
+        //padding: $size-2;
 
-        .action-btn {
+        .day-cell {
             flex: 1;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: center;
-            padding: 20rpx;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 20rpx;
+            padding: $size-2 0;
+            border-radius: $size-3;
+            transition: all 0.2s;
 
-            .btn-icon {
-                font-size: 28rpx;
-                margin-right: 8rpx;
+            &.selected {
+                background: rgba(255, 255, 255, 0.3);
             }
 
-            .btn-text {
-                font-size: 26rpx;
+            &.today {
+                .today-dot {
+                    width: 8rpx;
+                    height: 8rpx;
+                    border-radius: 50%;
+                    background: #FFFFFF;
+                    margin-top: 6rpx;
+                }
+            }
+
+            &.rest {
+                .day-weekday, .day-date {
+                    opacity: 0.5;
+                }
+            }
+
+            .day-weekday {
+                font-size: 20rpx;
+                color: rgba(255, 255, 255, 0.7);
+                margin-bottom: 4rpx;
+            }
+
+            .day-date {
+                font-size: $size-3;
+                font-weight: 700;
                 color: #FFFFFF;
+                margin-bottom: $size-1;
             }
 
-            &.execute {
-                background: #FFFFFF;
+            .day-status {
+                //width: 36rpx;
+                //height: 36rpx;
+                //border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
 
-                .btn-icon, .btn-text {
-                    color: #667eea;
+                .status-text {
+                    font-size: 18rpx;
+                    font-weight: 700;
+                    color: #FFFFFF;
                 }
             }
         }
@@ -340,185 +423,183 @@ const editPlan = () => {
 }
 
 .content {
-    padding: 30rpx 40rpx;
+    padding: $size-4 $size-5;
 }
 
-.sessions-section {
-    .session-card {
-        background: #FFFFFF;
-        border-radius: 24rpx;
-        padding: 32rpx;
-        margin-bottom: 24rpx;
-        box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.08);
+.today-card {
+    background: $glass-bg1;
+    border-radius: $size-5;
+    overflow: hidden;
+    box-shadow: 0 4rpx 20rpx $border-shadow;
 
-        .session-header {
+    .today-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: $size-4 $size-5;
+        border-bottom: 1rpx solid $fitness-border;
+
+        .today-header-left {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            margin-bottom: 24rpx;
-            padding-left: 20rpx;
-            border-left: 6rpx solid #007AFF;
+            gap: $size-3;
+        }
 
-            .session-info {
-                display: flex;
-                align-items: center;
+        .part-badge {
+            font-size: $size-4;
+            font-weight: 700;
+            padding: $size-1 $size-3;
+            border-radius: $size-2;
+            color: #FFFFFF;
 
-                .session-icon {
-                    font-size: 40rpx;
-                    margin-right: 16rpx;
-                }
+            &.推 {
+                background: #e74c3c;
+            }
 
-                .session-details {
+            &.腿 {
+                background: #3498db;
+            }
+
+            &.拉 {
+                background: #2ecc71;
+            }
+        }
+
+        .today-muscles {
+            font-size: $size-3;
+            color: $color-secondory;
+        }
+
+        .postpone-btn {
+            display: flex;
+            align-items: center;
+            gap: 6rpx;
+            padding: $size-1 $size-3;
+            border-radius: $size-6;
+            background: rgba(160, 62, 64, 0.08);
+
+            .postpone-text {
+                font-size: $size-3;
+                color: $color-primary;
+                font-weight: 700;
+            }
+        }
+    }
+
+    .session-list {
+        .session-item {
+            display: flex;
+            border-bottom: 1rpx solid $fitness-border;
+
+            &:last-child {
+                border-bottom: none;
+            }
+
+            .session-type-bar {
+                width: 8rpx;
+                flex-shrink: 0;
+            }
+
+            .session-body {
+                flex: 1;
+                padding: $size-3 $size-4;
+
+                .session-top {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    margin-bottom: $size-3;
+
                     .session-name {
-                        display: block;
-                        font-size: 30rpx;
-                        font-weight: bold;
-                        color: #333333;
-                        margin-bottom: 4rpx;
+                        font-size: $size-3;
+                        font-weight: 700;
+                        color: $color-input;
                     }
 
                     .session-duration {
-                        display: block;
-                        font-size: 24rpx;
-                        color: #666666;
+                        font-size: $size-3;
+                        color: $color-secondory;
                     }
                 }
-            }
 
-            .session-order {
-                font-size: 24rpx;
-                color: #999999;
-                font-weight: bold;
-            }
-        }
-
-        .target-muscles {
-            margin-bottom: 24rpx;
-
-            .muscles-label {
-                display: block;
-                font-size: 26rpx;
-                color: #666666;
-                margin-bottom: 12rpx;
-            }
-
-            .muscles-tags {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 12rpx;
-
-                .muscle-tag {
-                    background: #F5F5F5;
-                    color: #333333;
-                    font-size: 24rpx;
-                    padding: 8rpx 20rpx;
-                    border-radius: 16rpx;
-                }
-            }
-        }
-
-        .action-list {
-            .action-item {
-                background: #F9F9F9;
-                border-radius: 16rpx;
-                padding: 24rpx;
-                margin-bottom: 16rpx;
-                display: flex;
-                justify-content: space-between;
-
-                .action-main {
-                    flex: 1;
-
-                    .action-info {
+                .action-list {
+                    .action-row {
                         display: flex;
                         align-items: center;
-                        margin-bottom: 12rpx;
+                        justify-content: space-between;
+                        padding: $size-2 $size-3;
+                        background: #FFFFFF;
+                        border-radius: $size-3;
+                        margin-bottom: $size-2;
+                        border: 1rpx solid $fitness-border;
 
-                        .action-name {
-                            font-size: 28rpx;
-                            font-weight: 600;
-                            color: #333333;
-                            margin-right: 16rpx;
+                        .action-left {
+                            display: flex;
+                            align-items: center;
+                            gap: $size-2;
+
+                            .action-name {
+                                font-size: $size-3;
+                                font-weight: 700;
+                                color: $color-input;
+                            }
+
+                            .action-difficulty {
+                                font-size: 20rpx;
+                                padding: 2rpx $size-2;
+                                border-radius: $size-1;
+                                color: #FFFFFF;
+                                font-weight: 500;
+                            }
                         }
 
-                        .action-difficulty {
-                            font-size: 22rpx;
-                            padding: 6rpx 16rpx;
-                            border-radius: 12rpx;
-                            color: #FFFFFF;
+                        .action-right {
+                            display: flex;
+                            align-items: center;
+                            gap: $size-2;
+
+                            .action-param {
+                                font-size: $size-3;
+                                color: $color-secondory;
+                            }
+
+                            .action-ops {
+                                display: flex;
+                                gap: $size-1;
+
+                                .op-icon {
+                                    width: 48rpx;
+                                    height: 48rpx;
+                                    border-radius: $size-2;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    background: $fitness-secondary;
+
+                                    .op-img {
+                                        width: 28rpx;
+                                        height: 28rpx;
+                                    }
+                                }
+                            }
                         }
                     }
 
-                    .action-params {
+                    .add-action {
                         display: flex;
-                        gap: 24rpx;
-                        margin-bottom: 8rpx;
-
-                        .param-item {
-                            font-size: 24rpx;
-                            color: #666666;
-                        }
-                    }
-
-                    .weight-display {
-                        .weight-label {
-                            font-size: 24rpx;
-                            color: #999999;
-                        }
-
-                        .weight-values {
-                            font-size: 24rpx;
-                            color: #34C759;
-                        }
-                    }
-                }
-
-                .action-operations {
-                    display: flex;
-                    gap: 12rpx;
-                    align-items: flex-start;
-
-                    .op-btn {
-                        width: 56rpx;
-                        height: 56rpx;
-                        border-radius: 28rpx;
-                        display: flex;
+                        align-items: center;
                         justify-content: center;
-                        align-items: center;
+                        gap: $size-1;
+                        padding: $size-2;
+                        border: 2rpx dashed rgba(160, 62, 64, 0.3);
+                        border-radius: $size-3;
 
-                        &.replace {
-                            background: #E3F2FD;
-                        }
-
-                        &.delete {
-                            background: #FFEBEE;
-                        }
-
-                        .op-icon {
-                            font-size: 26rpx;
+                        .add-text {
+                            font-size: $size-3;
+                            color: $color-primary;
+                            font-weight: 700;
                         }
                     }
-                }
-            }
-
-            .add-action-btn {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                padding: 24rpx;
-                background: #F5F5F5;
-                border-radius: 16rpx;
-                border: 2rpx dashed #CCCCCC;
-
-                .btn-icon {
-                    font-size: 32rpx;
-                    color: #667eea;
-                    margin-right: 8rpx;
-                }
-
-                .btn-text {
-                    font-size: 26rpx;
-                    color: #667eea;
                 }
             }
         }
@@ -531,32 +612,56 @@ const editPlan = () => {
     left: 0;
     right: 0;
     display: flex;
-    gap: 20rpx;
-    padding: 24rpx 40rpx;
-    padding-bottom: calc(24rpx + env(safe-area-inset-bottom));
+    gap: $size-3;
+    padding: $size-3 $size-5;
+    padding-bottom: calc(#{$size-3} + env(safe-area-inset-bottom));
     background: #FFFFFF;
-    border-top: 1rpx solid #E5E5E5;
+    border-top: 1rpx solid $fitness-border;
+    box-shadow: 0 -2rpx 10rpx rgba(0, 0, 0, 0.05);
 
     .btn {
         flex: 1;
-        height: 88rpx;
-        border-radius: 44rpx;
+        height: $size-12;
+        border-radius: $size-6;
         border: none;
-        font-size: 28rpx;
-        font-weight: 600;
+        font-size: $size-4;
+        font-weight: 700;
         display: flex;
         align-items: center;
         justify-content: center;
-
-        &.archive-btn {
-            background: #F5F5F5;
-            color: #666666;
-        }
+        font-family: Manrope;
 
         &.edit-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: $fitness-secondary;
+            color: $color-label;
+        }
+
+        &.start-btn {
+            background: $button-bg2;
             color: #FFFFFF;
         }
+    }
+}
+
+.rest-card {
+    background: $glass-bg1;
+    border-radius: $size-5;
+    padding: $size-10 $size-5;
+    text-align: center;
+    box-shadow: 0 4rpx 20rpx $border-shadow;
+
+    .rest-title {
+        display: block;
+        font-size: $size-5;
+        font-weight: 700;
+        color: $color-input;
+        margin-bottom: $size-2;
+    }
+
+    .rest-sub {
+        display: block;
+        font-size: $size-3;
+        color: $color-secondory;
     }
 }
 </style>

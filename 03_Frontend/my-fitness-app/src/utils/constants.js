@@ -33,9 +33,9 @@ export const SCHEME_TYPES = [
 ]
 
 export const SESSION_TYPE_MAP = {
-    'warmup': { label: '热身激活', color: '#FF9F00', icon: '🔥' },
-    'main': { label: '正式训练', color: '#007AFF', icon: '💪' },
-    'cooldown': { label: '拉伸放松', color: '#34C759', icon: '🧘' }
+    'WARMUP': { label: '热身激活', color: '#FF9F00', icon: '/static/warmup.png' },
+    'MAIN': { label: '正式训练', color: '#007AFF', icon: '/static/main.png' },
+    'COOLDOWN': { label: '拉伸放松', color: '#34C759', icon: '/static/cooldown.png' }
 }
 
 export const DIFFICULTY_MAP = {

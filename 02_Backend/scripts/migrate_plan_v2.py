@@ -44,24 +44,32 @@ def migrate_plan_v2():
             else:
                 print("   ⚠️  total_duration_minutes 字段不存在，跳过")
             
-            # 新增字段（分别执行每条语句）
-            conn.execute(text("""
-                ALTER TABLE training_plan 
-                ADD COLUMN plan_type ENUM('FAT_LOSS', 'MUSCLE_GAIN') NOT NULL DEFAULT 'FAT_LOSS' COMMENT '计划类型：减脂/增肌'
-            """))
-            print("   ✅ 新增 plan_type 字段")
-            
-            conn.execute(text("""
-                ALTER TABLE training_plan 
-                ADD COLUMN scheme_type ENUM('ONE_SPLIT', 'TWO_SPLIT', 'THREE_SPLIT', 'FOUR_SPLIT') NULL COMMENT '分化方案（仅增肌计划）'
-            """))
-            print("   ✅ 新增 scheme_type 字段")
-            
-            conn.execute(text("""
-                ALTER TABLE training_plan 
-                ADD COLUMN cycle_rule VARCHAR(64) NULL COMMENT '训练循环规则（如练 3 休 1）'
-            """))
-            print("   ✅ 新增 cycle_rule 字段")
+            if 'plan_type' not in columns:
+                conn.execute(text("""
+                    ALTER TABLE training_plan 
+                    ADD COLUMN plan_type ENUM('FAT_LOSS', 'MUSCLE_GAIN') NOT NULL DEFAULT 'FAT_LOSS' COMMENT '计划类型：减脂/增肌'
+                """))
+                print("   ✅ 新增 plan_type 字段")
+            else:
+                print("   ⚠️  plan_type 字段已存在，跳过")
+
+            if 'scheme_type' not in columns:
+                conn.execute(text("""
+                    ALTER TABLE training_plan 
+                    ADD COLUMN scheme_type ENUM('ONE_SPLIT', 'TWO_SPLIT', 'THREE_SPLIT', 'FOUR_SPLIT') NULL COMMENT '分化方案（仅增肌计划）'
+                """))
+                print("   ✅ 新增 scheme_type 字段")
+            else:
+                print("   ⚠️  scheme_type 字段已存在，跳过")
+
+            if 'cycle_rule' not in columns:
+                conn.execute(text("""
+                    ALTER TABLE training_plan 
+                    ADD COLUMN cycle_rule VARCHAR(64) NULL COMMENT '训练循环规则（如练 3 休 1）'
+                """))
+                print("   ✅ 新增 cycle_rule 字段")
+            else:
+                print("   ⚠️  cycle_rule 字段已存在，跳过")
             
             # 修改 fitness_goal 字段约束（如果已存在则跳过）
             try:
@@ -104,8 +112,31 @@ def migrate_plan_v2():
                 print("   ✅ 新增 duration_minutes 字段")
             else:
                 print("   ⚠️  duration_minutes 字段已存在，跳过")
+
+            if 'sequence_order' not in columns:
+                conn.execute(text("""
+                    ALTER TABLE session_action_item
+                    ADD COLUMN sequence_order INT NOT NULL DEFAULT 1 COMMENT '动作项在阶段内的执行顺序'
+                """))
+                print("   ✅ 新增 sequence_order 字段")
+            else:
+                print("   ⚠️  sequence_order 字段已存在，跳过")
             
-            # ========== 3. 创建 training_schedule 表 ==========
+            # ========== 3. 修改 plan_session 表 ==========
+            print("\n📋 修改 plan_session 表...")
+
+            columns = [col['name'] for col in inspector.get_columns('plan_session')]
+
+            if 'training_part' not in columns:
+                conn.execute(text("""
+                    ALTER TABLE plan_session
+                    ADD COLUMN training_part VARCHAR(32) NULL COMMENT '训练部位分组标识（如推/腿/拉，用于区分不同训练日）'
+                """))
+                print("   ✅ 新增 training_part 字段")
+            else:
+                print("   ⚠️  training_part 字段已存在，跳过")
+
+            # ========== 4. 创建 training_schedule 表 ==========
             print("\n📋 创建 training_schedule 表...")
             
             if 'training_schedule' not in inspector.get_table_names():
@@ -157,7 +188,19 @@ def migrate_plan_v2():
             print("\n   session_action_item 表字段:")
             for row in result:
                 print(f"      - {row[0]}: {row[1]} - {row[2]}")
-            
+
+            result = conn.execute(text("""
+                SELECT COLUMN_NAME, DATA_TYPE, COLUMN_COMMENT
+                FROM INFORMATION_SCHEMA.COLUMNS 
+                WHERE TABLE_SCHEMA = :schema 
+                AND TABLE_NAME = 'plan_session'
+                ORDER BY ORDINAL_POSITION
+            """), {"schema": settings.MYSQL_DB})
+
+            print("\n   plan_session 表字段:")
+            for row in result:
+                print(f"      - {row[0]}: {row[1]} - {row[2]}")
+
             if 'training_schedule' in inspector.get_table_names():
                 result = conn.execute(text("""
                     SELECT COLUMN_NAME, DATA_TYPE, COLUMN_COMMENT

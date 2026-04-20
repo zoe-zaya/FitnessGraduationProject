@@ -1,7 +1,7 @@
 <template>
     <view class="container">
         <view class="header">
-            <text class="header-title">生成训练计划</text>
+            <text class="header-title"> </text>
         </view>
 
         <view class="content">
@@ -23,7 +23,6 @@
             <view class="form-section">
                 <view class="step-content" v-show="currentStep === 1">
                     <view class="section-title">
-                        <text class="title-icon">🎯</text>
                         <text class="title-text">请选择您的健身目标</text>
                     </view>
 
@@ -33,12 +32,16 @@
                             :class="{ selected: selectedPlanType === 'FAT_LOSS' }"
                             @click="selectPlanType('FAT_LOSS')"
                         >
-                            <view class="card-icon">🔥</view>
+                            <view class="card-icon-wrap">
+                                <image src="@/static/fatLoss.png" class="card-icon-img" mode="aspectFit" />
+                            </view>
                             <view class="card-content">
                                 <text class="card-title">减脂计划</text>
                                 <text class="card-desc">有氧+力量组合，高效燃脂</text>
                             </view>
-                            <view class="card-check" v-if="selectedPlanType === 'FAT_LOSS'">✓</view>
+                            <view class="card-check" v-if="selectedPlanType === 'FAT_LOSS'">
+                                <image src="@/static/check.png" class="check-icon" mode="aspectFit" />
+                            </view>
                         </view>
 
                         <view
@@ -46,19 +49,23 @@
                             :class="{ selected: selectedPlanType === 'MUSCLE_GAIN' }"
                             @click="selectPlanType('MUSCLE_GAIN')"
                         >
-                            <view class="card-icon">💪</view>
+                            <view class="card-icon-wrap">
+                                <image src="@/static/muscle.png" class="card-icon-img" mode="aspectFit" />
+                            </view>
                             <view class="card-content">
                                 <text class="card-title">增肌计划</text>
                                 <text class="card-desc">力量训练为主，肌肉增长</text>
                             </view>
-                            <view class="card-check" v-if="selectedPlanType === 'MUSCLE_GAIN'">✓</view>
+                            <view class="card-check" v-if="selectedPlanType === 'MUSCLE_GAIN'">
+                                <image src="@/static/check.png" class="check-icon" mode="aspectFit" />
+                            </view>
                         </view>
                     </view>
                 </view>
 
                 <view class="step-content" v-show="currentStep === 2 && selectedPlanType === 'MUSCLE_GAIN'">
                     <view class="section-title">
-                        <text class="title-icon">📋</text>
+                        <uni-icons type="list" size="22" color="#a03e40"></uni-icons>
                         <text class="title-text">请选择分化方案</text>
                     </view>
 
@@ -72,7 +79,9 @@
                         >
                             <view class="scheme-header">
                                 <text class="scheme-name">{{ scheme.label }}</text>
-                                <view class="scheme-check" v-if="selectedSchemeType === scheme.value">✓</view>
+                                <view class="scheme-check" v-if="selectedSchemeType === scheme.value">
+                                    <image src="@/static/check.png" class="check-icon-sm" mode="aspectFit" />
+                                </view>
                             </view>
                             <text class="scheme-desc">{{ scheme.description }}</text>
                         </view>
@@ -81,33 +90,45 @@
 
                 <view class="step-content" v-show="currentStep === 2 && selectedPlanType === 'FAT_LOSS'">
                     <view class="section-title">
-                        <text class="title-icon">🏃</text>
+                        <uni-icons type="staff" size="22" color="#a03e40"></uni-icons>
                         <text class="title-text">减脂计划说明</text>
                     </view>
 
                     <view class="info-card">
                         <view class="info-row">
-                            <text class="info-icon">🔥</text>
+                            <uni-icons type="fire" size="20" color="#d8696a"></uni-icons>
                             <text class="info-text">热身激活 → 力量训练 → 有氧训练 → 拉伸放松</text>
                         </view>
                         <view class="info-row">
-                            <text class="info-icon">⏱️</text>
+                            <uni-icons type="clock" size="20" color="#d8696a"></uni-icons>
                             <text class="info-text">每次训练约 45-60 分钟</text>
                         </view>
                         <view class="info-row">
-                            <text class="info-icon">📅</text>
-                            <text class="info-text">练 3 休 1 循环</text>
+                            <uni-icons type="calendar" size="20" color="#d8696a"></uni-icons>
+                            <text class="info-text">连练3天休息1天循环</text>
                         </view>
                         <view class="info-row">
-                            <text class="info-icon">🏋️</text>
-                            <text class="info-text">4 个力量动作 + 30 分钟有氧</text>
+                            <uni-icons type="flag" size="20" color="#d8696a"></uni-icons>
+                            <text class="info-text">第1天：胸·肩·三头 + 30分钟有氧</text>
+                        </view>
+                        <view class="info-row">
+                            <uni-icons type="flag" size="20" color="#d8696a"></uni-icons>
+                            <text class="info-text">第2天：臀·腿 + 30分钟有氧</text>
+                        </view>
+                        <view class="info-row">
+                            <uni-icons type="flag" size="20" color="#d8696a"></uni-icons>
+                            <text class="info-text">第3天：背·二头 + 30分钟有氧</text>
+                        </view>
+                        <view class="info-row">
+                            <uni-icons type="flag" size="20" color="#d8696a"></uni-icons>
+                            <text class="info-text">每天4个力量动作 + 30分钟有氧</text>
                         </view>
                     </view>
                 </view>
 
                 <view class="step-content" v-show="currentStep === 3">
                     <view class="section-title">
-                        <text class="title-icon">🏢</text>
+                        <uni-icons type="home" size="22" color="#a03e40"></uni-icons>
                         <text class="title-text">请选择健身房</text>
                     </view>
 
@@ -123,7 +144,9 @@
                                 <text class="gym-name">{{ gym.location_tag }}</text>
                                 <text class="gym-equipment">器材数量: {{ gym.equipment_count || 0 }}</text>
                             </view>
-                            <view class="gym-check" v-if="selectedGymIndex === index">✓</view>
+                            <view class="gym-check" v-if="selectedGymIndex === index">
+                                <image src="@/static/check.png" class="check-icon" mode="aspectFit" />
+                            </view>
                         </view>
                     </view>
 
@@ -136,7 +159,7 @@
 
             <view class="action-section">
                 <button class="btn prev-btn" v-if="currentStep > 1" @click="prevStep">
-                    <text>上一步</text>
+                    上一步
                 </button>
                 <button
                     class="btn next-btn"
@@ -144,7 +167,7 @@
                     @click="nextStep"
                     :disabled="!canNext"
                 >
-                    <text>下一步</text>
+                    下一步
                 </button>
                 <button
                     class="btn generate-btn"
@@ -153,7 +176,7 @@
                     :loading="loading"
                     :disabled="!canGenerate || loading"
                 >
-                    <text>{{ loading ? '生成中...' : '生成计划' }}</text>
+                    {{ loading ? '生成中...' : '生成计划' }}
                 </button>
             </view>
         </view>
@@ -285,60 +308,64 @@ const generatePlan = async () => {
 </script>
 
 <style lang="scss" scoped>
+@import '@/uni.scss';
+
 .container {
     min-height: 100vh;
-    background: #F5F5F5;
+    background: $fitness-secondary;
+    font-family: Manrope;
 }
 
 .header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    padding: 40rpx 40rpx 60rpx;
+    background: $color-primary;
+    padding: $size-5 $size-5 $size-8;
 
     .header-title {
-        font-size: 40rpx;
-        font-weight: bold;
+        font-size: $size-5;
+        font-weight: 700;
         color: #FFFFFF;
+        line-height: 1.3;
     }
 }
 
 .content {
-    margin-top: -30rpx;
-    background: #FFFFFF;
-    border-radius: 32rpx 32rpx 0 0;
+    margin-top: -$size-3;
+    background: $fitness-primary;
+    border-radius: $size-4 $size-4 0 0;
     min-height: calc(100vh - 200rpx);
-    padding: 40rpx 40rpx 120rpx;
+    padding: $size-5 $size-5 140rpx;
 }
 
 .step-section {
-    margin-bottom: 50rpx;
+    margin-bottom: $size-7;
 }
 
 .step-indicator {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 20rpx;
+    margin-bottom: $size-3;
 
     .step-dot {
-        width: 48rpx;
-        height: 48rpx;
+        width: $size-6;
+        height: $size-6;
         border-radius: 50%;
-        background: #E0E0E0;
-        color: #999999;
-        font-size: 24rpx;
+        background: $fitness-border;
+        color: $color-secondory;
+        font-size: $size-3;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-weight: 600;
+        font-weight: 700;
         transition: all 0.3s;
 
         &.active {
-            background: #667eea;
+            background: $button-bg2;
             color: #FFFFFF;
         }
 
         &.completed {
-            background: #34C759;
+            background: $color-primary;
             color: #FFFFFF;
         }
     }
@@ -346,12 +373,12 @@ const generatePlan = async () => {
     .step-line {
         width: 100rpx;
         height: 4rpx;
-        background: #E0E0E0;
-        margin: 0 10rpx;
+        background: $fitness-border;
+        margin: 0 $size-2;
         transition: all 0.3s;
 
         &.active {
-            background: #667eea;
+            background: $button-bg2;
         }
     }
 }
@@ -359,17 +386,17 @@ const generatePlan = async () => {
 .step-labels {
     display: flex;
     justify-content: space-between;
-    padding: 0 30rpx;
+    padding: 0 $size-4;
 
     .step-label {
-        font-size: 24rpx;
-        color: #999999;
+        font-size: $size-3;
+        color: $color-secondory;
         flex: 1;
         text-align: center;
 
         &.active {
-            color: #667eea;
-            font-weight: 600;
+            color: $color-primary;
+            font-weight: 700;
         }
     }
 }
@@ -381,42 +408,50 @@ const generatePlan = async () => {
 .section-title {
     display: flex;
     align-items: center;
-    margin-bottom: 40rpx;
-
-    .title-icon {
-        font-size: 40rpx;
-        margin-right: 16rpx;
-    }
+    margin-bottom: $size-5;
 
     .title-text {
-        font-size: 32rpx;
-        font-weight: bold;
-        color: #333333;
+        font-size: $size-4;
+        font-weight: 700;
+        color: $color-input;
+        margin-left: $size-2;
     }
 }
 
 .plan-type-cards {
     display: flex;
     flex-direction: column;
-    gap: 24rpx;
+    gap: $size-3;
 
     .plan-type-card {
         display: flex;
         align-items: center;
-        padding: 32rpx;
-        background: #F8F8F8;
-        border-radius: 24rpx;
-        border: 4rpx solid transparent;
+        padding: $size-4;
+        background: $glass-bg1;
+        border-radius: $size-4;
+        border: 2px solid rgba(160, 62, 64, 0.1);
+        box-shadow: 0 2rpx 10rpx $border-shadow;
         transition: all 0.3s;
 
         &.selected {
-            background: #F0EEFF;
-            border-color: #667eea;
+            background: $color-primary-light;
+            border-color: $color-primary;
         }
 
-        .card-icon {
-            font-size: 56rpx;
-            margin-right: 24rpx;
+        .card-icon-wrap {
+            width: $size-10;
+            height: $size-10;
+            border-radius: $size-4;
+            background: rgba(216, 105, 106, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: $size-3;
+
+            .card-icon-img {
+                width: 48rpx;
+                height: 48rpx;
+            }
         }
 
         .card-content {
@@ -424,30 +459,32 @@ const generatePlan = async () => {
 
             .card-title {
                 display: block;
-                font-size: 32rpx;
-                font-weight: bold;
-                color: #333333;
-                margin-bottom: 8rpx;
+                font-size: $size-4;
+                font-weight: 700;
+                color: $color-input;
+                margin-bottom: $size-1;
             }
 
             .card-desc {
                 display: block;
-                font-size: 26rpx;
-                color: #666666;
+                font-size: $size-3;
+                color: $color-secondory;
             }
         }
 
         .card-check {
-            width: 48rpx;
-            height: 48rpx;
+            width: $size-6;
+            height: $size-6;
             border-radius: 50%;
-            background: #667eea;
-            color: #FFFFFF;
-            font-size: 28rpx;
+            background: $button-bg2;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
+
+            .check-icon {
+                width: 28rpx;
+                height: 28rpx;
+            }
         }
     }
 }
@@ -455,74 +492,75 @@ const generatePlan = async () => {
 .scheme-cards {
     display: flex;
     flex-direction: column;
-    gap: 20rpx;
+    gap: $size-3;
 
     .scheme-card {
-        padding: 28rpx 32rpx;
-        background: #F8F8F8;
-        border-radius: 20rpx;
-        border: 4rpx solid transparent;
+        padding: $size-4;
+        background: $glass-bg1;
+        border-radius: $size-4;
+        border: 2px solid rgba(160, 62, 64, 0.1);
+        box-shadow: 0 2rpx 10rpx $border-shadow;
         transition: all 0.3s;
 
         &.selected {
-            background: #F0EEFF;
-            border-color: #667eea;
+            background: $color-primary-light;
+            border-color: $color-primary;
         }
 
         .scheme-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 12rpx;
+            margin-bottom: $size-2;
 
             .scheme-name {
-                font-size: 30rpx;
-                font-weight: bold;
-                color: #333333;
+                font-size: $size-4;
+                font-weight: 700;
+                color: $color-input;
             }
 
             .scheme-check {
-                width: 40rpx;
-                height: 40rpx;
+                width: $size-5;
+                height: $size-5;
                 border-radius: 50%;
-                background: #667eea;
-                color: #FFFFFF;
-                font-size: 24rpx;
+                background: $button-bg2;
                 display: flex;
                 align-items: center;
                 justify-content: center;
+
+                .check-icon-sm {
+                    width: 24rpx;
+                    height: 24rpx;
+                }
             }
         }
 
         .scheme-desc {
-            font-size: 26rpx;
-            color: #666666;
+            font-size: $size-3;
+            color: $color-secondory;
         }
     }
 }
 
 .info-card {
-    background: #F8F8F8;
-    border-radius: 24rpx;
-    padding: 32rpx;
+    background: $glass-bg1;
+    border-radius: $size-4;
+    padding: $size-4;
+    box-shadow: 0 2rpx 10rpx $border-shadow;
 
     .info-row {
         display: flex;
         align-items: center;
-        margin-bottom: 20rpx;
+        margin-bottom: $size-3;
 
         &:last-child {
             margin-bottom: 0;
         }
 
-        .info-icon {
-            font-size: 32rpx;
-            margin-right: 16rpx;
-        }
-
         .info-text {
-            font-size: 28rpx;
-            color: #333333;
+            font-size: $size-3;
+            color: $color-label;
+            margin-left: $size-2;
         }
     }
 }
@@ -530,68 +568,71 @@ const generatePlan = async () => {
 .gym-list {
     display: flex;
     flex-direction: column;
-    gap: 20rpx;
+    gap: $size-3;
 
     .gym-card {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 28rpx 32rpx;
-        background: #F8F8F8;
-        border-radius: 20rpx;
-        border: 4rpx solid transparent;
+        padding: $size-4;
+        background: $glass-bg1;
+        border-radius: $size-4;
+        border: 2px solid rgba(160, 62, 64, 0.1);
+        box-shadow: 0 2rpx 10rpx $border-shadow;
         transition: all 0.3s;
 
         &.selected {
-            background: #F0EEFF;
-            border-color: #667eea;
+            background: $color-primary-light;
+            border-color: $color-primary;
         }
 
         .gym-info {
             .gym-name {
                 display: block;
-                font-size: 30rpx;
-                font-weight: bold;
-                color: #333333;
-                margin-bottom: 8rpx;
+                font-size: $size-4;
+                font-weight: 700;
+                color: $color-input;
+                margin-bottom: $size-1;
             }
 
             .gym-equipment {
-                font-size: 26rpx;
-                color: #666666;
+                font-size: $size-3;
+                color: $color-secondory;
             }
         }
 
         .gym-check {
-            width: 48rpx;
-            height: 48rpx;
+            width: $size-6;
+            height: $size-6;
             border-radius: 50%;
-            background: #667eea;
-            color: #FFFFFF;
-            font-size: 28rpx;
+            background: $button-bg2;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
+
+            .check-icon {
+                width: 28rpx;
+                height: 28rpx;
+            }
         }
     }
 }
 
 .empty-gym {
     text-align: center;
-    padding: 60rpx 0;
+    padding: $size-8 0;
 
     .empty-text {
         display: block;
-        font-size: 30rpx;
-        color: #666666;
-        margin-bottom: 16rpx;
+        font-size: $size-4;
+        color: $color-label;
+        margin-bottom: $size-2;
     }
 
     .empty-tip {
         display: block;
-        font-size: 26rpx;
-        color: #999999;
+        font-size: $size-3;
+        color: $color-secondory;
     }
 }
 
@@ -601,32 +642,33 @@ const generatePlan = async () => {
     left: 0;
     right: 0;
     display: flex;
-    gap: 20rpx;
-    padding: 24rpx 40rpx;
-    padding-bottom: calc(24rpx + env(safe-area-inset-bottom));
-    background: #FFFFFF;
-    border-top: 1rpx solid #E5E5E5;
+    gap: $size-3;
+    padding: $size-3 $size-5;
+    padding-bottom: calc(#{$size-3} + env(safe-area-inset-bottom));
+    background: $fitness-primary;
+    border-top: 1px solid $fitness-border;
 
     .btn {
         flex: 1;
-        height: 96rpx;
-        border-radius: 48rpx;
+        height: $size-12;
+        border-radius: $size-6;
         border: none;
-        font-size: 30rpx;
-        font-weight: 600;
+        font-size: $size-4;
+        font-weight: 700;
         display: flex;
         align-items: center;
         justify-content: center;
+        font-family: Manrope;
 
         &.prev-btn {
-            background: #F5F5F5;
-            color: #666666;
+            background: $fitness-secondary;
+            color: $color-label;
         }
 
         &.next-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: $button-bg2;
             color: #FFFFFF;
-            opacity: 0.5;
+            opacity: 0.6;
 
             &:not([disabled]) {
                 opacity: 1;
@@ -634,11 +676,11 @@ const generatePlan = async () => {
         }
 
         &.generate-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: $button-bg2;
             color: #FFFFFF;
 
             &[disabled] {
-                opacity: 0.5;
+                opacity: 0.6;
             }
         }
     }

@@ -1,108 +1,109 @@
 <template>
     <view class="container">
-        <view class="header">
-            <text class="title">我的训练计划</text>
-            <view class="generate-btn" @click="navigateToGenerate">
-                <text class="btn-icon">+</text>
-                <text class="btn-text">生成计划</text>
-            </view>
+        <view class="loading-wrapper" v-if="loading">
+            <view class="loading-spinner"></view>
+            <text class="loading-text">加载中...</text>
         </view>
 
-        <view class="tab-bar">
-            <view
-                class="tab-item"
-                :class="{ active: currentTab === 'ACTIVE' }"
-                @click="switchTab('ACTIVE')"
-            >
-                <text class="tab-text">进行中</text>
-            </view>
-            <view
-                class="tab-item"
-                :class="{ active: currentTab === 'ARCHIVED' }"
-                @click="switchTab('ARCHIVED')"
-            >
-                <text class="tab-text">已归档</text>
-            </view>
-        </view>
-
-        <view class="plan-list" v-if="filteredPlanList.length > 0">
-            <view
-                class="plan-card"
-                v-for="(plan, index) in filteredPlanList"
-                :key="plan.plan_id"
-                @click="viewPlanDetail(plan)"
-            >
-                <view class="plan-header">
-                    <view class="plan-title-row">
-                        <text class="plan-name">{{ plan.plan_name }}</text>
-                        <view class="plan-type-badge" :class="plan.plan_type.toLowerCase()">
-                            {{ plan.plan_type === 'FAT_LOSS' ? '减脂' : '增肌' }}
+        <template v-else>
+            <view class="plan-list" v-if="planList.length > 0">
+                <view
+                    class="plan-card"
+                    v-for="plan in planList"
+                    :key="plan.plan_id"
+                    @click="viewPlanDetail(plan)"
+                >
+                    <view class="plan-header">
+                        <view class="plan-title-row">
+                            <text class="plan-name">{{ plan.plan_name }}</text>
+                            <view class="plan-type-badge" :class="plan.plan_type.toLowerCase()">
+                                {{ getPlanTypeLabel(plan.plan_type) }}
+                            </view>
+                        </view>
+                        <view class="plan-status" :class="plan.status.toLowerCase()">
+                            {{ getStatusLabel(plan.status) }}
                         </view>
                     </view>
-                    <view class="plan-status" :class="plan.status.toLowerCase()">
-                        {{ plan.status === 'ACTIVE' ? '进行中' : '已归档' }}
-                    </view>
-                </view>
 
-                <view class="plan-meta">
-                    <view class="meta-item" v-if="plan.scheme_type">
-                        <text class="meta-icon">📋</text>
-                        <text class="meta-text">{{ getSchemeName(plan.scheme_type) }}</text>
+                    <view class="plan-info-tags">
+                        <view class="info-tag" v-if="plan.scheme_type">
+                            <uni-icons type="bars" size="14" color="#d8696a"></uni-icons>
+                            <text class="tag-text" :class="getDifficultyClass(plan.scheme_type)">{{ getDifficultyLabel(plan.scheme_type) }}</text>
+                        </view>
+                        <view class="info-tag" v-else>
+                            <uni-icons type="fire" size="14" color="#d8696a"></uni-icons>
+                            <text class="tag-text">有氧+力量</text>
+                        </view>
+                        <view class="info-tag" v-if="plan.cycle_rule">
+                            <uni-icons type="reload" size="14" color="#8E8E93"></uni-icons>
+                            <text class="tag-text">{{ plan.cycle_rule }}</text>
+                        </view>
+                        <view class="info-tag">
+                            <uni-icons type="home" size="14" color="#8E8E93"></uni-icons>
+                            <text class="tag-text">{{ plan.inventory_name }}</text>
+                        </view>
                     </view>
-                    <view class="meta-item">
-                        <text class="meta-icon">📅</text>
-                        <text class="meta-text">{{ plan.cycle_rule }}</text>
-                    </view>
-                    <view class="meta-item">
-                        <text class="meta-icon">🏢</text>
-                        <text class="meta-text">{{ plan.inventory_name }}</text>
-                    </view>
-                </view>
 
-                <view class="plan-footer">
-                    <text class="create-time">创建于 {{ formatDate(plan.create_time) }}</text>
-                    <view class="action-buttons">
-                        <view class="action-btn schedule" @click.stop="viewSchedule(plan)">
-                            <text class="btn-icon">📅</text>
-                        </view>
-                        <view class="action-btn edit" @click.stop="editPlan(plan)">
-                            <text class="btn-icon">✏️</text>
-                        </view>
-                        <view class="action-btn delete" @click.stop="confirmDelete(plan)">
-                            <text class="btn-icon">🗑️</text>
+                    <view class="plan-footer">
+                        <text class="create-time">创建于 {{ formatDate(plan.create_time) }}</text>
+                        <view class="action-buttons">
+                            <view class="action-btn edit" @click.stop="editPlan(plan)">
+                                <image src="@/static/edit.png" class="action-icon" mode="aspectFit" />
+                            </view>
+                            <view class="action-btn delete" @click.stop="confirmDelete(plan)">
+                                <image src="@/static/delete.png" class="action-icon" mode="aspectFit" />
+                            </view>
                         </view>
                     </view>
                 </view>
             </view>
+
+            <view class="empty-state" v-else>
+                <image src="/static/empty-data.png" class="empty-image" mode="aspectFit" />
+                <text class="empty-text">暂无训练计划</text>
+                <text class="empty-subtext">点击右下角按钮生成您的第一个训练计划</text>
+            </view>
+        </template>
+
+        <view class="fab-btn" @click="navigateToGenerate">
+            <image src="/static/add.png" class="fab-icon" mode="aspectFit" />
         </view>
 
-        <view class="empty-state" v-else>
-            <image src="/static/empty-plan.png" class="empty-image" mode="aspectFit" />
-            <text class="empty-text">暂无{{ currentTab === 'ACTIVE' ? '进行中' : '已归档' }}的训练计划</text>
-            <text class="empty-subtext" v-if="currentTab === 'ACTIVE'">点击下方按钮生成您的第一个训练计划</text>
-            <button class="generate-plan-btn" @click="navigateToGenerate" v-if="currentTab === 'ACTIVE'">
-                生成训练计划
-            </button>
-        </view>
+        <CustomModal
+            :show="deleteModalShow"
+            title="删除计划"
+            :content="deleteModalContent"
+            confirmText="删除"
+            cancelText="取消"
+            confirmColor="#db0f00"
+            @confirm="handleDeleteConfirm"
+            @cancel="handleDeleteCancel"
+        />
     </view>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import request from '@/utils/request'
 import { API_V2, SCHEME_TYPES } from '@/utils/constants'
+import CustomModal from '@/components/CustomModal.vue'
 
 const planList = ref([])
-const currentTab = ref('ACTIVE')
 const loading = ref(false)
+const deleteModalShow = ref(false)
+const deleteModalContent = ref('')
+const pendingDeletePlanId = ref('')
+
+const DIFFICULTY_MAP = {
+    'ONE_SPLIT': { label: '初级', class: 'difficulty-beginner' },
+    'TWO_SPLIT': { label: '中级', class: 'difficulty-intermediate' },
+    'THREE_SPLIT': { label: '中高级', class: 'difficulty-advanced' },
+    'FOUR_SPLIT': { label: '高级', class: 'difficulty-expert' }
+}
 
 onShow(async () => {
     await loadPlanList()
-})
-
-const filteredPlanList = computed(() => {
-    return planList.value.filter(plan => plan.status === currentTab.value)
 })
 
 const loadPlanList = async () => {
@@ -118,13 +119,30 @@ const loadPlanList = async () => {
     }
 }
 
-const switchTab = (tab) => {
-    currentTab.value = tab
+const getPlanTypeLabel = (planType) => {
+    return planType === 'FAT_LOSS' ? '减脂' : '增肌'
 }
 
-const getSchemeName = (schemeType) => {
+const getStatusLabel = (status) => {
+    const map = {
+        'ACTIVE': '进行中',
+        'active': '进行中',
+        'ARCHIVED': '已归档',
+        'archived': '已归档'
+    }
+    return map[status] || status
+}
+
+const getDifficultyLabel = (schemeType) => {
+    const diff = DIFFICULTY_MAP[schemeType]
+    if (diff) return diff.label
     const scheme = SCHEME_TYPES.find(s => s.value === schemeType)
     return scheme ? scheme.label.split('（')[0] : schemeType
+}
+
+const getDifficultyClass = (schemeType) => {
+    const diff = DIFFICULTY_MAP[schemeType]
+    return diff ? diff.class : ''
 }
 
 const formatDate = (dateStr) => {
@@ -141,24 +159,27 @@ const viewPlanDetail = (plan) => {
     uni.navigateTo({ url: `/pages/plan/plan-detail?plan_id=${plan.plan_id}` })
 }
 
-const viewSchedule = (plan) => {
-    uni.navigateTo({ url: `/pages/plan/weekly-schedule?plan_id=${plan.plan_id}` })
-}
-
 const editPlan = (plan) => {
     uni.navigateTo({ url: `/pages/plan/plan-edit?plan_id=${plan.plan_id}` })
 }
 
 const confirmDelete = (plan) => {
-    uni.showModal({
-        title: '提示',
-        content: `确定要删除"${plan.plan_name}"吗？删除后无法恢复。`,
-        success: async (res) => {
-            if (res.confirm) {
-                await deletePlan(plan.plan_id)
-            }
-        }
-    })
+    pendingDeletePlanId.value = plan.plan_id
+    deleteModalContent.value = `确定要删除"${plan.plan_name}"吗？删除后无法恢复。`
+    deleteModalShow.value = true
+}
+
+const handleDeleteConfirm = async () => {
+    deleteModalShow.value = false
+    if (pendingDeletePlanId.value) {
+        await deletePlan(pendingDeletePlanId.value)
+        pendingDeletePlanId.value = ''
+    }
+}
+
+const handleDeleteCancel = () => {
+    deleteModalShow.value = false
+    pendingDeletePlanId.value = ''
 }
 
 const deletePlan = async (planId) => {
@@ -174,153 +195,164 @@ const deletePlan = async (planId) => {
 </script>
 
 <style lang="scss" scoped>
+@import '@/uni.scss';
+
 .container {
     min-height: 100vh;
-    background: #F5F5F5;
-    padding: 0 0 40rpx;
+    background-color: $fitness-secondary;
+    padding: 0 0 $size-5;
+    font-family: Manrope;
 }
 
-.header {
+.loading-wrapper {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
     align-items: center;
-    padding: 30rpx 40rpx;
-    background: #FFFFFF;
-    border-bottom: 1rpx solid #E5E5E5;
+    justify-content: center;
+    padding: 200rpx 0;
 
-    .title {
-        font-size: 36rpx;
-        font-weight: bold;
-        color: #333333;
+    .loading-spinner {
+        width: $size-8;
+        height: $size-8;
+        border: 6rpx solid $fitness-border;
+        border-top-color: $color-primary;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
     }
 
-    .generate-btn {
-        display: flex;
-        align-items: center;
-        padding: 12rpx 24rpx;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-radius: 32rpx;
-
-        .btn-icon {
-            font-size: 32rpx;
-            color: #FFFFFF;
-            margin-right: 8rpx;
-        }
-
-        .btn-text {
-            font-size: 26rpx;
-            color: #FFFFFF;
-        }
+    .loading-text {
+        margin-top: $size-3;
+        font-size: $size-3;
+        color: $color-secondory;
+        font-weight: 525;
     }
 }
 
-.tab-bar {
-    display: flex;
-    background: #FFFFFF;
-    padding: 0 40rpx;
-
-    .tab-item {
-        flex: 1;
-        padding: 24rpx 0;
-        text-align: center;
-        border-bottom: 4rpx solid transparent;
-        transition: all 0.3s;
-
-        &.active {
-            border-bottom-color: #667eea;
-
-            .tab-text {
-                color: #667eea;
-                font-weight: 600;
-            }
-        }
-
-        .tab-text {
-            font-size: 28rpx;
-            color: #666666;
-        }
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
     }
 }
 
 .plan-list {
-    padding: 30rpx 40rpx;
+    padding: $size-3 $size-5;
 
     .plan-card {
-        background: #FFFFFF;
-        border-radius: 24rpx;
-        padding: 32rpx;
-        margin-bottom: 24rpx;
-        box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.08);
+        background: $glass-bg1;
+        border-radius: $size-4;
+        padding: $size-4;
+        margin-bottom: $size-3;
+        box-shadow: 0 2rpx 10rpx $border-shadow;
+        border: 2rpx solid $fitness-border;
+        transition: all 0.2s ease;
+
+        &:active {
+            transform: scale(0.98);
+            box-shadow: 0 1rpx 6rpx rgba(0, 0, 0, 0.08);
+        }
 
         .plan-header {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 24rpx;
+            align-items: center;
+            margin-bottom: $size-3;
 
             .plan-title-row {
                 display: flex;
                 align-items: center;
                 flex: 1;
+                margin-right: $size-2;
 
                 .plan-name {
-                    font-size: 32rpx;
-                    font-weight: bold;
-                    color: #333333;
-                    margin-right: 16rpx;
+                    font-size: $size-4;
+                    font-weight: 700;
+                    color: $color-input;
+                    margin-right: $size-2;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    max-width: 360rpx;
+                    line-height: 1.2;
                 }
 
                 .plan-type-badge {
-                    font-size: 22rpx;
-                    padding: 6rpx 16rpx;
-                    border-radius: 12rpx;
-                    color: #FFFFFF;
+                    font-size: $size-3;
+                    padding: $size-1 $size-2;
+                    border-radius: $size-2;
+                    color: $fitness-primary;
+                    font-weight: 700;
+                    flex-shrink: 0;
 
                     &.fat_loss {
-                        background: linear-gradient(135deg, #FF6B6B, #FF8E53);
+                        background: rgba(160, 62, 64, 0.12);
+                        color: $color-primary;
                     }
 
                     &.muscle_gain {
-                        background: linear-gradient(135deg, #667eea, #764ba2);
+                        background: $color-primary-light;
+                        color: $color-primary;
                     }
                 }
             }
 
             .plan-status {
-                font-size: 24rpx;
-                padding: 8rpx 20rpx;
-                border-radius: 20rpx;
+                font-size: $size-3;
+                padding: $size-1 $size-3;
+                border-radius: $size-3;
+                font-weight: 700;
+                flex-shrink: 0;
 
                 &.active {
-                    background: #E8F5E9;
-                    color: #34C759;
+                    background: $uni-success-bg;
+                    color: $uni-success;
                 }
 
                 &.archived {
-                    background: #F5F5F5;
-                    color: #999999;
+                    background: $fitness-secondary;
+                    color: $color-secondory;
                 }
             }
         }
 
-        .plan-meta {
+        .plan-info-tags {
             display: flex;
             flex-wrap: wrap;
-            gap: 20rpx;
-            margin-bottom: 24rpx;
+            gap: $size-2;
+            margin-bottom: $size-3;
+            padding: $size-3;
+            background: $fitness-secondary;
+            border-radius: $size-4;
 
-            .meta-item {
+            .info-tag {
                 display: flex;
                 align-items: center;
+                gap: $size-1;
+                padding: $size-1 $size-2;
+                background: $fitness-primary;
+                border-radius: $size-2;
+                border: 1rpx solid $fitness-border;
 
-                .meta-icon {
-                    font-size: 28rpx;
-                    margin-right: 8rpx;
-                }
+                .tag-text {
+                    font-size: $size-3;
+                    color: $color-input;
+                    font-weight: 700;
+                    line-height: 1.4;
 
-                .meta-text {
-                    font-size: 26rpx;
-                    color: #666666;
+                    &.difficulty-beginner {
+                        color: $uni-success;
+                    }
+
+                    &.difficulty-intermediate {
+                        color: $uni-warning;
+                    }
+
+                    &.difficulty-advanced {
+                        color: $color-primary;
+                    }
+
+                    &.difficulty-expert {
+                        color: $uni-error;
+                    }
                 }
             }
         }
@@ -329,40 +361,48 @@ const deletePlan = async (planId) => {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-top: 24rpx;
-            border-top: 1rpx solid #F5F5F5;
+            padding-top: $size-3;
+            border-top: 1rpx solid $fitness-border;
 
             .create-time {
-                font-size: 24rpx;
-                color: #999999;
+                font-size: $size-3;
+                color: $color-secondory;
+                font-weight: 525;
             }
 
             .action-buttons {
                 display: flex;
-                gap: 16rpx;
+                gap: $size-3;
 
                 .action-btn {
-                    width: 60rpx;
-                    height: 60rpx;
-                    border-radius: 30rpx;
+                    width: $size-7;
+                    height: $size-7;
+                    border-radius: 50%;
                     display: flex;
                     justify-content: center;
                     align-items: center;
+                    transition: all 0.15s ease;
 
-                    &.schedule {
-                        background: #E3F2FD;
+                    &:active {
+                        transform: scale(0.9);
                     }
 
                     &.edit {
-                        background: #FFF3E0;
+                        background: $uni-warning-bg;
+
+                        .action-icon {
+                            width: 36rpx;
+                            height: 36rpx;
+                        }
                     }
 
                     &.delete {
-                        background: #FFEBEE;
-                    }
+                        background: $uni-error-bg;
 
-                    .btn-icon {
-                        font-size: 28rpx;
+                        .action-icon {
+                            width: 36rpx;
+                            height: 36rpx;
+                        }
                     }
                 }
             }
@@ -375,36 +415,53 @@ const deletePlan = async (planId) => {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 100rpx 40rpx;
+    padding: 160rpx $size-5 100rpx;
 
     .empty-image {
         width: 300rpx;
         height: 300rpx;
-        margin-bottom: 40rpx;
+        margin-bottom: $size-5;
     }
 
     .empty-text {
-        font-size: 32rpx;
-        color: #333333;
-        font-weight: 600;
-        margin-bottom: 16rpx;
+        font-size: $size-4;
+        color: $color-input;
+        font-weight: 700;
+        margin-bottom: $size-2;
+        line-height: 1.3;
     }
 
     .empty-subtext {
-        font-size: 28rpx;
-        color: #666666;
-        margin-bottom: 40rpx;
+        font-size: $size-3;
+        color: $color-secondory;
+        font-weight: 525;
+        line-height: 1.4;
+    }
+}
+
+.fab-btn {
+    position: fixed;
+    right: $size-5;
+    bottom: 120rpx;
+    width: $size-12;
+    height: $size-12;
+    border-radius: 50%;
+    background: $button-bg2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 8rpx 24rpx rgba(216, 105, 106, 0.4);
+    z-index: 200;
+    transition: all 0.2s ease;
+
+    &:active {
+        transform: scale(0.9);
+        box-shadow: 0 4rpx 12rpx rgba(216, 105, 106, 0.3);
     }
 
-    .generate-plan-btn {
-        width: 300rpx;
-        height: 88rpx;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: #FFFFFF;
-        font-size: 30rpx;
-        font-weight: 600;
-        border-radius: 44rpx;
-        border: none;
+    .fab-icon {
+        width: $size-6;
+        height: $size-6;
     }
 }
 </style>

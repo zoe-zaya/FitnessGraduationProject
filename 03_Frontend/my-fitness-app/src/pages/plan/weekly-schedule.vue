@@ -35,7 +35,8 @@
 
                         <view class="session-info" v-if="item.session_type">
                             <text class="session-type">{{ getSessionLabel(item.session_type) }}</text>
-                            <text class="session-target" v-if="item.target_muscles">{{ item.target_muscles.join(', ') }}</text>
+                            <text class="session-part" v-if="item.training_part">{{ getPartLabel(item.training_part) }}</text>
+                            <text class="session-target" v-if="item.target_muscles">{{ item.target_muscles.join('、') }}</text>
                         </view>
 
                         <view class="rest-info" v-else-if="item.status === 'REST'">
@@ -46,7 +47,7 @@
                     <view class="schedule-actions">
                         <view
                             class="action-btn postpone"
-                            v-if="item.status === 'PLANNED' && item.can_postpone"
+                            v-if="(item.status === 'PLANNED' || item.status === 'POSTPONED') && item.can_postpone"
                             @click="showPostponeOptions(item)"
                         >
                             <text class="btn-icon">⏰</text>
@@ -148,9 +149,24 @@ const getSessionLabel = (sessionType) => {
     return SESSION_TYPE_MAP[sessionType]?.label || sessionType
 }
 
+const PART_LABEL_MAP = {
+    '推': '推日 · 胸肩三头',
+    '腿': '腿日 · 臀腿',
+    '拉': '拉日 · 背二头'
+}
+
+const getPartLabel = (part) => PART_LABEL_MAP[part] || part
+
 const showPostponeOptions = (item) => {
+    const maxDays = 3 - (item.postpone_count || 0)
+    const options = []
+    for (let i = 1; i <= maxDays; i++) {
+        options.push(`延后${i}天`)
+    }
+    if (options.length === 0) return
+
     uni.showActionSheet({
-        itemList: ['延后1天', '延后2天', '延后3天'],
+        itemList: options,
         success: async (res) => {
             const days = res.tapIndex + 1
             await postponeSchedule(item, days)
@@ -346,6 +362,14 @@ const onRestSkip = () => {
                 display: block;
                 font-size: 28rpx;
                 color: #333333;
+                font-weight: 600;
+                margin-bottom: 4rpx;
+            }
+
+            .session-part {
+                display: block;
+                font-size: 24rpx;
+                color: #667eea;
                 font-weight: 600;
                 margin-bottom: 4rpx;
             }

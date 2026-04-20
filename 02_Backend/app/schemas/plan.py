@@ -107,6 +107,7 @@ class SessionActionItemResponse(BaseModel):
     action_category: str
     difficulty_level: str
     target_muscles: Optional[List[str]] = None
+    sequence_order: int = 1
     sets: Optional[int] = None
     reps_per_set: Optional[int] = None
     rest_seconds_default: int = 60  # ✅ V2.1 默认 60 秒
@@ -129,6 +130,7 @@ class PlanSessionResponse(BaseModel):
     sequence_order: int
     estimated_duration_minutes: int
     target_muscles: Optional[List[str]] = None
+    training_part: Optional[str] = None
     description: Optional[str] = None
     action_items: List[SessionActionItemResponse] = []
     
@@ -143,6 +145,8 @@ class TrainingScheduleResponse(BaseModel):
     plan_id: str
     scheduled_date: date
     session_type: Optional[str] = None
+    training_part: Optional[str] = None
+    target_muscles: Optional[List[str]] = None
     status: str
     postpone_count: int = 0
     can_postpone: bool = True

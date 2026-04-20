@@ -84,6 +84,7 @@ class PlanGeneratorV2:
     # ==================== 减脂计划配置 ====================
     FAT_LOSS_CONFIG = {
         "cycle_rule": "练 3 休 1",
+        "training_parts": ["推", "腿", "拉"],
         "warmup_actions": 3,
         "strength_actions": 4,
         "cardio_duration_minutes": 30,
@@ -154,20 +155,17 @@ class PlanGeneratorV2:
             status="active"
         )
         
-        # ========== 步骤 4: 生成训练日程（7 天） ==========
-        schedules = self._generate_weekly_schedule(plan, plan_type, scheme_type)
-        plan.schedules = schedules
-        
-        # ========== 步骤 5: 根据日程生成各次训练的计划 ==========
-        # 注意：V2.1 版中，每次训练生成独立的 PlanSession
-        # 这里简化处理，生成一个包含三阶段的计划模板
-        
+        # ========== 步骤 4: 根据日程生成各次训练的计划 ==========
         if plan_type == PlanTypeEnum.FAT_LOSS:
             sessions = self._generate_fat_loss_plan()
         else:
             sessions = self._generate_muscle_gain_plan(scheme_type, training_part)
-        
+
         plan.sessions = sessions
+
+        # ========== 步骤 5: 生成训练日程（7 天）并关联 session ==========
+        schedules = self._generate_weekly_schedule(plan, plan_type, scheme_type)
+        plan.schedules = schedules
         
         # ========== 步骤 6: 保存计划 ==========
         self.db.add(plan)
@@ -242,19 +240,34 @@ class PlanGeneratorV2:
         """生成 7 天训练日程"""
         schedules = []
         today = datetime.now().date()
-        
+
         if plan_type == PlanTypeEnum.FAT_LOSS:
-            # 减脂：练 3 休 1
+            training_parts = self.FAT_LOSS_CONFIG["training_parts"]
+            main_sessions = {
+                s.training_part: s
+                for s in plan.sessions
+                if s.session_type == SessionTypeEnum.MAIN
+            }
+
             for i in range(7):
                 schedule_date = today + timedelta(days=i)
-                is_rest_day = (i % 4) == 3  # 第 4 天休息
-                
+                is_rest_day = (i % 4) == 3
+
+                session_id = None
+                if not is_rest_day:
+                    part_index = i % 4
+                    if part_index < len(training_parts):
+                        part = training_parts[part_index]
+                        main_session = main_sessions.get(part)
+                        if main_session:
+                            session_id = main_session.session_id
+
                 schedule = TrainingSchedule(
                     schedule_id=str(uuid.uuid4()),
                     plan_id=plan.plan_id,
                     scheduled_date=schedule_date,
                     status=ScheduleStatusEnum.REST if is_rest_day else ScheduleStatusEnum.PLANNED,
-                    session_id=None if is_rest_day else None  # 后续关联具体阶段
+                    session_id=session_id
                 )
                 schedules.append(schedule)
         
@@ -300,98 +313,116 @@ class PlanGeneratorV2:
         return schedules
     
     def _generate_fat_loss_plan(self) -> List[PlanSession]:
-        """生成减脂计划（热身 + 无氧 + 有氧 + 拉伸）"""
+        """生成减脂计划（3天不同肌群：推日/腿日/拉日，每天含热身+力量+有氧+拉伸）"""
         sessions = []
         config = self.FAT_LOSS_CONFIG
-        
-        # ========== 阶段 1: 热身激活 ==========
-        warmup_actions = self._filter_actions_by_category_and_muscles(
-            category="WARMUP",
-            target_muscles=["全身肌群", "心肺功能"],
-            count=config["warmup_actions"]
-        )
-        
-        warmup_items = [
-            self._create_action_item(action, "WARMUP")
-            for action in warmup_actions
-        ]
-        
-        warmup_session = PlanSession(
-            session_id=str(uuid.uuid4()),
-            session_type=SessionTypeEnum.WARMUP,
-            sequence_order=1,
-            estimated_duration_minutes=sum(item.total_duration_seconds for item in warmup_items) // 60,
-            target_muscles=json.dumps(["全身肌群", "心肺功能"], ensure_ascii=False),
-            description="全身激活热身",
-            action_items=warmup_items
-        )
-        sessions.append(warmup_session)
-        
-        # ========== 阶段 2: 正式训练（无氧 + 有氧） ==========
-        # 无氧部分：4 个力量动作
-        strength_actions = self._filter_actions_by_category_and_muscles(
-            category="MAIN_STRENGTH",
-            target_muscles=["全身肌群"],
-            count=config["strength_actions"]
-        )
-        
-        strength_items = [
-            self._create_action_item(
-                action,
-                "MAIN_STRENGTH",
-                sets=config["sets"],
-                reps=config["reps"],
-                rest_seconds=config["rest_seconds"]
+
+        training_parts = config["training_parts"]
+
+        part_muscles_map = {
+            "推": self.TRAINING_PART_MUSCLES["推"],
+            "腿": self.TRAINING_PART_MUSCLES["腿部"],
+            "拉": self.TRAINING_PART_MUSCLES["拉"],
+        }
+
+        part_desc_map = {
+            "推": "胸肩三头",
+            "腿": "臀腿",
+            "拉": "背二头",
+        }
+
+        for part in training_parts:
+            target_muscles = part_muscles_map[part]
+            part_desc = part_desc_map[part]
+
+            warmup_actions = self._filter_actions_by_category_and_muscles(
+                category="WARMUP",
+                target_muscles=target_muscles,
+                count=config["warmup_actions"]
             )
-            for action in strength_actions
-        ]
-        
-        # 有氧部分：30 分钟跑步机爬坡（或其他有氧）
-        cardio_action = self._get_cardio_action()
-        cardio_item = self._create_action_item(
-            cardio_action,
-            "MAIN_CARDIO",
-            duration_minutes=config["cardio_duration_minutes"]
-        )
-        
-        main_items = strength_items + [cardio_item]
-        
-        main_session = PlanSession(
-            session_id=str(uuid.uuid4()),
-            session_type=SessionTypeEnum.MAIN,
-            sequence_order=2,
-            estimated_duration_minutes=sum(item.total_duration_seconds for item in main_items) // 60,
-            target_muscles=json.dumps(["全身肌群"], ensure_ascii=False),
-            description="无氧 + 有氧减脂训练",
-            action_items=main_items
-        )
-        sessions.append(main_session)
-        
-        # ========== 阶段 3: 拉伸放松 ==========
-        cooldown_actions = self._filter_actions_by_category_and_muscles(
-            category="COOLDOWN",
-            target_muscles=["全身肌群"],
-            count=config["cooldown_actions"]
-        )
-        
-        cooldown_items = [
-            self._create_action_item(action, "COOLDOWN")
-            for action in cooldown_actions
-        ]
-        
-        cooldown_session = PlanSession(
-            session_id=str(uuid.uuid4()),
-            session_type=SessionTypeEnum.COOLDOWN,
-            sequence_order=3,
-            estimated_duration_minutes=sum(item.total_duration_seconds for item in cooldown_items) // 60,
-            target_muscles=json.dumps(["全身肌群"], ensure_ascii=False),
-            description="全身拉伸放松",
-            action_items=cooldown_items
-        )
-        sessions.append(cooldown_session)
-        
+
+            warmup_items = [
+                self._create_action_item(action, "WARMUP", sequence_order=i + 1)
+                for i, action in enumerate(warmup_actions)
+            ]
+
+            warmup_session = PlanSession(
+                session_id=str(uuid.uuid4()),
+                session_type=SessionTypeEnum.WARMUP,
+                sequence_order=1,
+                estimated_duration_minutes=sum(item.total_duration_seconds for item in warmup_items) // 60,
+                target_muscles=json.dumps(target_muscles, ensure_ascii=False),
+                training_part=part,
+                description=f"{part_desc}热身激活",
+                action_items=warmup_items
+            )
+            sessions.append(warmup_session)
+
+            strength_actions = self._filter_actions_by_category_and_muscles(
+                category="MAIN_STRENGTH",
+                target_muscles=target_muscles,
+                count=config["strength_actions"]
+            )
+
+            strength_items = [
+                self._create_action_item(
+                    action,
+                    "MAIN_STRENGTH",
+                    sets=config["sets"],
+                    reps=config["reps"],
+                    rest_seconds=config["rest_seconds"],
+                    sequence_order=i + 1
+                )
+                for i, action in enumerate(strength_actions)
+            ]
+
+            cardio_action = self._get_cardio_action()
+            cardio_item = self._create_action_item(
+                cardio_action,
+                "MAIN_CARDIO",
+                duration_minutes=config["cardio_duration_minutes"],
+                sequence_order=len(strength_items) + 1
+            )
+
+            main_items = strength_items + [cardio_item]
+
+            main_session = PlanSession(
+                session_id=str(uuid.uuid4()),
+                session_type=SessionTypeEnum.MAIN,
+                sequence_order=2,
+                estimated_duration_minutes=sum(item.total_duration_seconds for item in main_items) // 60,
+                target_muscles=json.dumps(target_muscles, ensure_ascii=False),
+                training_part=part,
+                description=f"{part_desc}力量+有氧训练",
+                action_items=main_items
+            )
+            sessions.append(main_session)
+
+            cooldown_actions = self._filter_actions_by_category_and_muscles(
+                category="COOLDOWN",
+                target_muscles=target_muscles,
+                count=config["cooldown_actions"]
+            )
+
+            cooldown_items = [
+                self._create_action_item(action, "COOLDOWN", sequence_order=i + 1)
+                for i, action in enumerate(cooldown_actions)
+            ]
+
+            cooldown_session = PlanSession(
+                session_id=str(uuid.uuid4()),
+                session_type=SessionTypeEnum.COOLDOWN,
+                sequence_order=3,
+                estimated_duration_minutes=sum(item.total_duration_seconds for item in cooldown_items) // 60,
+                target_muscles=json.dumps(target_muscles, ensure_ascii=False),
+                training_part=part,
+                description=f"{part_desc}拉伸放松",
+                action_items=cooldown_items
+            )
+            sessions.append(cooldown_session)
+
         return sessions
-    
+
     def _generate_muscle_gain_plan(
         self,
         scheme_type: SchemeTypeEnum,
@@ -423,10 +454,10 @@ class PlanGeneratorV2:
         )
         
         warmup_items = [
-            self._create_action_item(action, "WARMUP")
-            for action in warmup_actions
+            self._create_action_item(action, "WARMUP", sequence_order=i + 1)
+            for i, action in enumerate(warmup_actions)
         ]
-        
+
         warmup_session = PlanSession(
             session_id=str(uuid.uuid4()),
             session_type=SessionTypeEnum.WARMUP,
@@ -437,25 +468,25 @@ class PlanGeneratorV2:
             action_items=warmup_items
         )
         sessions.append(warmup_session)
-        
-        # ========== 阶段 2: 正式训练（力量） ==========
+
         strength_actions = self._filter_actions_by_category_and_muscles(
             category="MAIN_STRENGTH",
             target_muscles=target_muscles,
             count=config["actions_per_session"]
         )
-        
+
         strength_items = [
             self._create_action_item(
                 action,
                 "MAIN_STRENGTH",
                 sets=config["sets"],
                 reps=config["reps"],
-                rest_seconds=config["rest_seconds"]
+                rest_seconds=config["rest_seconds"],
+                sequence_order=i + 1
             )
-            for action in strength_actions
+            for i, action in enumerate(strength_actions)
         ]
-        
+
         main_session = PlanSession(
             session_id=str(uuid.uuid4()),
             session_type=SessionTypeEnum.MAIN,
@@ -475,8 +506,8 @@ class PlanGeneratorV2:
         )
         
         cooldown_items = [
-            self._create_action_item(action, "COOLDOWN")
-            for action in cooldown_actions
+            self._create_action_item(action, "COOLDOWN", sequence_order=i + 1)
+            for i, action in enumerate(cooldown_actions)
         ]
         
         cooldown_session = PlanSession(
@@ -522,15 +553,18 @@ class PlanGeneratorV2:
         """检查动作肌群与目标肌群是否匹配"""
         if not action_muscles or not target_muscles:
             return True
-        
+
+        if "全身肌群" in target_muscles:
+            return True
+
         for muscle in target_muscles:
             for action_muscle in action_muscles:
                 if muscle in action_muscle or action_muscle in muscle:
                     return True
-        
+
         if "全身肌群" in action_muscles or "心肺功能" in action_muscles:
             return True
-        
+
         return False
     
     def _get_cardio_action(self) -> TrainingAction:
@@ -563,7 +597,8 @@ class PlanGeneratorV2:
         reps: Optional[int] = None,
         rest_seconds: Optional[int] = None,
         duration_seconds: Optional[int] = None,
-        duration_minutes: Optional[int] = None
+        duration_minutes: Optional[int] = None,
+        sequence_order: int = 1
     ) -> SessionActionItem:
         """创建动作项"""
         # 计算总时长
@@ -577,9 +612,10 @@ class PlanGeneratorV2:
         return SessionActionItem(
             item_id=str(uuid.uuid4()),
             action_id=action.action_id,
+            sequence_order=sequence_order,
             sets=sets,
             reps_per_set=reps,
-            rest_seconds_default=rest_seconds or 60,  # ✅ V2.1 默认 60 秒
+            rest_seconds_default=rest_seconds or 60,
             duration_seconds=duration_seconds,
             duration_minutes=duration_minutes,
             lateral_coeff=1,

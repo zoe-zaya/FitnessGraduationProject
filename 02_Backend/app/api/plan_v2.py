@@ -188,6 +188,8 @@ async def get_weekly_schedule(
     response_list = []
     for schedule in schedules:
         session_type = None
+        training_part = None
+        target_muscles = None
         if schedule.session_id:
             from app.models.plan import PlanSession
             session = db.query(PlanSession).filter(
@@ -195,12 +197,21 @@ async def get_weekly_schedule(
             ).first()
             if session:
                 session_type = session.session_type.value if session.session_type else None
-        
+                training_part = session.training_part
+                if session.target_muscles:
+                    import json as _json
+                    try:
+                        target_muscles = _json.loads(session.target_muscles)
+                    except:
+                        target_muscles = None
+
         response_list.append(TrainingScheduleResponse(
             schedule_id=schedule.schedule_id,
             plan_id=schedule.plan_id,
             scheduled_date=schedule.scheduled_date,
             session_type=session_type,
+            training_part=training_part,
+            target_muscles=target_muscles,
             status=schedule.status.value if schedule.status else "PLANNED",
             postpone_count=schedule.postpone_count,
             can_postpone=schedule.can_postpone(1)
@@ -394,6 +405,7 @@ async def add_action_item(
         action_category=action.action_category.value if action.action_category else "unknown",
         difficulty_level=action.difficulty_level.value if action.difficulty_level else "unknown",
         target_muscles=action.get_target_muscles_list(),
+        sequence_order=new_item.sequence_order,
         sets=new_item.sets,
         reps_per_set=new_item.reps_per_set,
         rest_seconds_default=new_item.rest_seconds_default,
@@ -457,6 +469,7 @@ async def update_action_item(
         action_category=action.action_category.value if action and action.action_category else "unknown",
         difficulty_level=action.difficulty_level.value if action and action.difficulty_level else "unknown",
         target_muscles=action.get_target_muscles_list() if action else [],
+        sequence_order=item.sequence_order,
         sets=item.sets,
         reps_per_set=item.reps_per_set,
         rest_seconds_default=item.rest_seconds_default,
@@ -559,6 +572,7 @@ async def replace_action_item(
         action_category=new_action.action_category.value if new_action.action_category else "unknown",
         difficulty_level=new_action.difficulty_level.value if new_action.difficulty_level else "unknown",
         target_muscles=new_action.get_target_muscles_list(),
+        sequence_order=item.sequence_order,
         sets=item.sets,
         reps_per_set=item.reps_per_set,
         rest_seconds_default=item.rest_seconds_default,
@@ -581,7 +595,14 @@ async def postpone_schedule(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """延后训练（支持 1-3 天）"""
+    """
+    延后训练（支持 1-3 天）
+    
+    逻辑：将指定训练日延后 N 天，原日期变为休息日，
+    该训练日之后的所有日程整体后移 N 天。
+    """
+    import uuid
+    
     schedule = db.query(TrainingSchedule).join(TrainingPlan).filter(
         TrainingSchedule.schedule_id == schedule_id,
         TrainingSchedule.plan_id == plan_id,
@@ -600,15 +621,37 @@ async def postpone_schedule(
             detail="休息日不可延后"
         )
     
-    success = schedule.postpone(request.days)
-    
-    if not success:
+    if not schedule.can_postpone(request.days):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="已达到最大延后次数限制（最多 3 天）"
         )
     
+    postpone_date = schedule.scheduled_date
+    days = request.days
+    
+    later_schedules = db.query(TrainingSchedule).filter(
+        TrainingSchedule.plan_id == plan_id,
+        TrainingSchedule.scheduled_date > postpone_date
+    ).order_by(TrainingSchedule.scheduled_date).all()
+    
+    for s in later_schedules:
+        s.scheduled_date = s.scheduled_date + timedelta(days=days)
+    
+    schedule.scheduled_date = postpone_date + timedelta(days=days)
+    schedule.postpone_count += days
+    schedule.status = ScheduleStatusEnum.POSTPONED
+    
+    rest_schedule = TrainingSchedule(
+        schedule_id=str(uuid.uuid4()),
+        plan_id=plan_id,
+        scheduled_date=postpone_date,
+        status=ScheduleStatusEnum.REST
+    )
+    db.add(rest_schedule)
+    
     db.commit()
+    db.refresh(schedule)
     
     remaining_days = 3 - schedule.postpone_count
     
@@ -631,7 +674,11 @@ def _build_plan_response(plan: TrainingPlan, db: Session) -> TrainingPlanRespons
     
     # 构建阶段响应
     sessions_response = []
-    for session in sorted(plan.sessions, key=lambda s: s.sequence_order):
+    fat_loss_part_order = {"推": 0, "腿": 1, "拉": 2}
+    for session in sorted(plan.sessions, key=lambda s: (
+        fat_loss_part_order.get(s.training_part, 99) if s.training_part else 0,
+        s.sequence_order
+    )):
         action_items_response = []
         for item in session.action_items:
             action = db.query(TrainingAction).filter(
@@ -645,6 +692,7 @@ def _build_plan_response(plan: TrainingPlan, db: Session) -> TrainingPlanRespons
                 action_category=action.action_category.value if action and action.action_category else "unknown",
                 difficulty_level=action.difficulty_level.value if action and action.difficulty_level else "unknown",
                 target_muscles=action.get_target_muscles_list() if action else [],
+                sequence_order=item.sequence_order,
                 sets=item.sets,
                 reps_per_set=item.reps_per_set,
                 rest_seconds_default=item.rest_seconds_default,
@@ -663,22 +711,23 @@ def _build_plan_response(plan: TrainingPlan, db: Session) -> TrainingPlanRespons
             sequence_order=session.sequence_order,
             estimated_duration_minutes=session.estimated_duration_minutes,
             target_muscles=json.loads(session.target_muscles) if session.target_muscles else [],
+            training_part=session.training_part,
             description=session.description,
             action_items=action_items_response
         ))
     
     # 构建 7 天日程响应
     today = datetime.now().date()
-    end_date = today + timedelta(days=7)
     schedules = db.query(TrainingSchedule).filter(
         TrainingSchedule.plan_id == plan.plan_id,
-        TrainingSchedule.scheduled_date >= today,
-        TrainingSchedule.scheduled_date <= end_date
+        TrainingSchedule.scheduled_date >= today
     ).order_by(TrainingSchedule.scheduled_date).all()
     
     weekly_schedule = []
     for schedule in schedules:
         session_type = None
+        training_part = None
+        target_muscles = None
         if schedule.session_id:
             from app.models.plan import PlanSession
             session = db.query(PlanSession).filter(
@@ -686,12 +735,21 @@ def _build_plan_response(plan: TrainingPlan, db: Session) -> TrainingPlanRespons
             ).first()
             if session:
                 session_type = session.session_type.value if session.session_type else None
-        
+                training_part = session.training_part
+                if session.target_muscles:
+                    import json as _json
+                    try:
+                        target_muscles = _json.loads(session.target_muscles)
+                    except:
+                        target_muscles = None
+
         weekly_schedule.append(TrainingScheduleResponse(
             schedule_id=schedule.schedule_id,
             plan_id=schedule.plan_id,
             scheduled_date=schedule.scheduled_date,
             session_type=session_type,
+            training_part=training_part,
+            target_muscles=target_muscles,
             status=schedule.status.value if schedule.status else "PLANNED",
             postpone_count=schedule.postpone_count,
             can_postpone=schedule.can_postpone(1)

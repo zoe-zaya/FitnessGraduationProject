@@ -101,11 +101,12 @@ class PlanSession(Base):
     estimated_duration_minutes = Column(Integer, default=0, comment="该阶段预估总时长（分钟）")
     description = Column(Text, nullable=True, comment="阶段说明")
     target_muscles = Column(String(512), nullable=True, comment="该阶段目标肌群列表（JSON 格式）")
-    
+    training_part = Column(String(32), nullable=True, comment="训练部位分组标识（如推/腿/拉，用于区分不同训练日）")
+
     # === 业务关系 ===
     plan = relationship("TrainingPlan", back_populates="sessions")
-    action_items = relationship("SessionActionItem", back_populates="session", cascade="all, delete-orphan", lazy="select")
-    
+    action_items = relationship("SessionActionItem", back_populates="session", cascade="all, delete-orphan", lazy="select", order_by="SessionActionItem.sequence_order")
+
     __table_args__ = (
         CheckConstraint('sequence_order IN (1,2,3)', name='chk_sequence_order'),
     )
@@ -125,6 +126,7 @@ class SessionActionItem(Base):
     item_id = Column(String(64), primary_key=True, index=True, comment="动作项唯一标识符")
     session_id = Column(String(64), ForeignKey("plan_session.session_id"), nullable=False, index=True, comment="关联阶段 ID")
     action_id = Column(String(64), ForeignKey("training_action.action_id"), nullable=False, index=True, comment="引用的训练动作 ID")
+    sequence_order = Column(Integer, nullable=False, default=1, comment="动作项在阶段内的执行顺序")
     
     # === 力量训练参数 ===
     sets = Column(Integer, nullable=True, comment="组数，范围 1-6 组")
@@ -179,15 +181,4 @@ class TrainingSchedule(Base):
         """检查是否可以延后"""
         if self.postpone_count + days > 3:
             return False
-        return True
-    
-    def postpone(self, days: int) -> bool:
-        """延后训练"""
-        if not self.can_postpone(days):
-            return False
-        
-        from datetime import timedelta
-        self.scheduled_date = self.scheduled_date + timedelta(days=days)
-        self.postpone_count += days
-        self.status = ScheduleStatusEnum.POSTPONED
         return True
