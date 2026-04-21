@@ -20,7 +20,8 @@ from app.schemas.action import (
     ActionDetailResponse,
     ActionQueryRequest,
     ActionInfoResponse,
-    ActionLibraryResponse
+    ActionLibraryResponse,
+    ReplaceRecommendResponse
 )
 from app.core.security import get_current_user
 from app.services.recommendation import ActionRecommender
@@ -438,6 +439,224 @@ async def get_action_library(
         actions=response_list,
         category_stats=category_stats
     )
+
+
+@router.get("/replace-recommend/{action_id}", response_model=List[ReplaceRecommendResponse], summary="推荐可替换动作")
+async def replace_recommend_actions(
+    action_id: str,
+    plan_id: str = Query(..., description="当前训练计划 ID"),
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    根据原动作的目标肌群和用户健身房器材推荐可替换动作
+    
+    推荐逻辑：
+    1. 查询原动作的目标肌群和动作类别
+    2. 获取用户健身房的所有器材
+    3. 查询同类别的所有动作，排除原动作自身
+    4. 筛选器材在用户健身房中的动作
+    5. 按肌群相似度排序返回
+    """
+    from app.models.plan import TrainingPlan
+    from app.models.equipment import EquipmentInventory, inventory_equipment_rel
+
+    original_action = db.query(TrainingAction).filter(
+        TrainingAction.action_id == action_id
+    ).first()
+
+    if not original_action:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="原动作不存在"
+        )
+
+    plan = db.query(TrainingPlan).filter(
+        TrainingPlan.plan_id == plan_id,
+        TrainingPlan.user_id == current_user.user_id
+    ).first()
+
+    if not plan:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="训练计划不存在或无权访问"
+        )
+
+    inventory_equipments = db.query(inventory_equipment_rel.c.equipment_id).filter(
+        inventory_equipment_rel.c.inventory_id == plan.inventory_id
+    ).all()
+    user_equipment_ids = {eq[0] for eq in inventory_equipments}
+
+    original_muscles = set(original_action.get_target_muscles_list())
+
+    candidate_actions = db.query(TrainingAction).filter(
+        TrainingAction.action_category == original_action.action_category,
+        TrainingAction.action_id != action_id
+    ).all()
+
+    scored_actions = []
+    for action in candidate_actions:
+        if action.equipment_id and action.equipment_id != "none":
+            if action.equipment_id not in user_equipment_ids:
+                continue
+
+        action_muscles = set(action.get_target_muscles_list())
+        if original_muscles:
+            intersection = original_muscles & action_muscles
+            similarity = len(intersection) / len(original_muscles)
+        else:
+            similarity = 0.0
+
+        scored_actions.append((action, similarity))
+
+    scored_actions.sort(key=lambda x: x[1], reverse=True)
+
+    response_list = []
+    for action, similarity in scored_actions:
+        equipment_name = None
+        if action.equipment_id and action.equipment_id != "none":
+            equipment = db.query(GymEquipment).filter(
+                GymEquipment.equipment_id == action.equipment_id
+            ).first()
+            if equipment:
+                equipment_name = equipment.name
+
+        response_list.append(ReplaceRecommendResponse(
+            action_id=action.action_id,
+            name=action.name,
+            action_category=action.action_category.value if action.action_category else "unknown",
+            difficulty_level=action.difficulty_level.value if action.difficulty_level else "unknown",
+            target_muscles=action.get_target_muscles_list(),
+            equipment_id=action.equipment_id,
+            equipment_name=equipment_name,
+            video_demo_url=action.video_demo_url,
+            image_url=getattr(action, 'image_url', None),
+            safety_tips=action.safety_tips,
+            estimated_seconds=action.estimated_seconds or 0,
+            muscle_similarity=round(similarity, 2)
+        ))
+
+    return response_list
+
+
+@router.get("/add-recommend/{session_id}", response_model=List[ReplaceRecommendResponse], summary="推荐可添加动作")
+async def add_recommend_actions(
+    session_id: str,
+    plan_id: str = Query(..., description="当前训练计划 ID"),
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    根据阶段的目标肌群、动作类别和用户健身房器材推荐可添加的动作
+
+    推荐逻辑：
+    1. 查询阶段的目标肌群和阶段类型
+    2. 根据阶段类型映射动作类别
+    3. 获取用户健身房的所有器材
+    4. 查询符合类别的动作，筛选器材在用户健身房中的动作
+    5. 排除该阶段已添加的动作
+    6. 按肌群相似度排序返回
+    """
+    from app.models.plan import TrainingPlan, PlanSession, SessionActionItem
+    from app.models.equipment import EquipmentInventory, inventory_equipment_rel
+
+    session = db.query(PlanSession).filter(
+        PlanSession.session_id == session_id
+    ).first()
+
+    if not session:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="阶段不存在"
+        )
+
+    plan = db.query(TrainingPlan).filter(
+        TrainingPlan.plan_id == plan_id,
+        TrainingPlan.user_id == current_user.user_id
+    ).first()
+
+    if not plan:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="训练计划不存在或无权访问"
+        )
+
+    inventory_equipments = db.query(inventory_equipment_rel.c.equipment_id).filter(
+        inventory_equipment_rel.c.inventory_id == plan.inventory_id
+    ).all()
+    user_equipment_ids = {eq[0] for eq in inventory_equipments}
+
+    existing_action_ids = {
+        item[0] for item in db.query(SessionActionItem.action_id).filter(
+            SessionActionItem.session_id == session_id
+        ).all()
+    }
+
+    category_map = {
+        "WARMUP": ["warmup"],
+        "MAIN": ["main_strength", "main_cardio"],
+        "COOLDOWN": ["cooldown"]
+    }
+    target_categories = category_map.get(session.session_type, [])
+
+    candidate_actions = db.query(TrainingAction).filter(
+        TrainingAction.action_category.in_(target_categories)
+    ).all()
+
+    session_muscles = set()
+    if session.target_muscles:
+        import json
+        try:
+            session_muscles = set(json.loads(session.target_muscles))
+        except (json.JSONDecodeError, TypeError):
+            session_muscles = set()
+
+    scored_actions = []
+    for action in candidate_actions:
+        if action.action_id in existing_action_ids:
+            continue
+
+        if action.equipment_id and action.equipment_id != "none":
+            if action.equipment_id not in user_equipment_ids:
+                continue
+
+        action_muscles = set(action.get_target_muscles_list())
+        if session_muscles:
+            intersection = session_muscles & action_muscles
+            similarity = len(intersection) / len(session_muscles)
+        else:
+            similarity = 0.0
+
+        scored_actions.append((action, similarity))
+
+    scored_actions.sort(key=lambda x: x[1], reverse=True)
+
+    response_list = []
+    for action, similarity in scored_actions:
+        equipment_name = None
+        if action.equipment_id and action.equipment_id != "none":
+            equipment = db.query(GymEquipment).filter(
+                GymEquipment.equipment_id == action.equipment_id
+            ).first()
+            if equipment:
+                equipment_name = equipment.name
+
+        response_list.append(ReplaceRecommendResponse(
+            action_id=action.action_id,
+            name=action.name,
+            action_category=action.action_category.value if action.action_category else "unknown",
+            difficulty_level=action.difficulty_level.value if action.difficulty_level else "unknown",
+            target_muscles=action.get_target_muscles_list(),
+            equipment_id=action.equipment_id,
+            equipment_name=equipment_name,
+            video_demo_url=action.video_demo_url,
+            image_url=getattr(action, 'image_url', None),
+            safety_tips=action.safety_tips,
+            estimated_seconds=action.estimated_seconds or 0,
+            muscle_similarity=round(similarity, 2)
+        ))
+
+    return response_list
 
 
 @router.get("/muscles", response_model=List[str], summary="获取所有目标肌群列表")

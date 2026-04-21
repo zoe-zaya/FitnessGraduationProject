@@ -76,7 +76,8 @@ export const API_V2 = {
     PLAN_DELETE_ACTION: '/api/plan/v2/deleteAction',
     PLAN_REPLACE_ACTION: '/api/plan/v2/replaceAction',
     SCHEDULE_LIST: '/api/plan/v2/schedule',
-    SCHEDULE_POSTPONE: '/api/plan/v2/postponeSchedule'
+    SCHEDULE_POSTPONE: '/api/plan/v2/postponeSchedule',
+    SCHEDULE_COMPLETE: '/api/plan/v2/completeSchedule'
 }
 
 export const API = {
@@ -110,6 +111,8 @@ export const API = {
     ACTION_LIBRARY: '/api/action/library',
     ACTION_MUSCLES: '/api/action/muscles',
     ACTION_QUERY: '/api/action/query',
+    ACTION_REPLACE_RECOMMEND: '/api/action/replace-recommend',
+    ACTION_ADD_RECOMMEND: '/api/action/add-recommend',
 
     PLAN_GENERATE: '/api/plan/generate',
     PLAN_LIST: '/api/plan/',

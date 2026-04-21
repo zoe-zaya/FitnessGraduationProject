@@ -300,8 +300,7 @@ class PlanGenerator:
             training_part=training_part,  # ✅ 新增：存储训练部位
             create_time=datetime.now(),
             valid_days=30,
-            total_duration_minutes=0,
-            status="active"
+            total_duration_minutes=0
         )
     
     def _get_main_category(self, fitness_goal: str) -> str:

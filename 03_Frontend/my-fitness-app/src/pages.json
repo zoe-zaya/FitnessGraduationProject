@@ -197,20 +197,6 @@
       }
     },
     {
-      "path": "pages/plan/select-action",
-      "style": {
-        "navigationBarTitleText": "选择动作",
-        "navigationStyle": "default"
-      }
-    },
-    {
-      "path": "pages/plan/weekly-schedule",
-      "style": {
-        "navigationBarTitleText": "7天训练日程",
-        "navigationStyle": "default"
-      }
-    },
-    {
       "path": "pages/plan/training-execution",
       "style": {
         "navigationBarTitleText": "训练执行",

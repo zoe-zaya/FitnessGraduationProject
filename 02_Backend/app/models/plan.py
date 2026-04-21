@@ -62,7 +62,6 @@ class TrainingPlan(Base):
     cycle_rule = Column(String(64), nullable=True, comment="训练循环规则（如练 3 休 1）")
     
     # === 保留属性 ===
-    status = Column(String(32), default="active", comment="计划状态：active/expired/archived")
     plan_name = Column(String(128), nullable=True, comment="计划名称")
     fitness_goal = Column(Enum(PlanTypeEnum), nullable=True, comment="健身目标")
     training_part = Column(String(32), nullable=True, comment="训练部位")
@@ -171,6 +170,7 @@ class TrainingSchedule(Base):
     session_id = Column(String(64), nullable=True, comment="当次训练对应的阶段 ID")
     status = Column(Enum(ScheduleStatusEnum), default=ScheduleStatusEnum.PLANNED, comment="状态")
     postpone_count = Column(Integer, default=0, comment="延后次数，限制最大延后 3 天")
+    actual_duration_seconds = Column(Integer, nullable=True, comment="实际训练时长（秒）")
     create_time = Column(DateTime, default=datetime.now, comment="创建时间")
     update_time = Column(DateTime, default=datetime.now, onupdate=datetime.now, comment="更新时间")
     

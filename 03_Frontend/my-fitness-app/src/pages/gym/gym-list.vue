@@ -8,21 +8,21 @@
         :key="gym.inventory_id"
         @click="navigateToEquipmentList(gym.inventory_id)"
       >
-        <view class="gym-info">
+        <view class="gym-header">
           <text class="gym-name">{{ gym.location_tag }}</text>
-            <text class="gym-desc">{{ gym.description ? (gym.description.length > 20 ? gym.description.substring(0, 20) + '...' : gym.description) : '暂无描述' }}</text>
-          <text class="gym-meta">
-            {{ gym.equipment_count }} 个器材 · {{ formatDate(gym.create_time) }}
-          </text>
-        </view>
-        <view class="gym-actions">
-          <view class="action-btn edit" @click.stop="openEditDialog(gym)">
-            <img src="/static/edit.png" class="action-icon" mode="aspectFit" />
-          </view>
-          <view class="action-btn delete" @click.stop="confirmDelete(gym)">
-            <img src="/static/delete.png" class="action-icon" mode="aspectFit" />
+          <view class="gym-actions">
+            <view class="action-btn edit" @click.stop="openEditDialog(gym)">
+              <img src="/static/edit.png" class="action-icon" mode="aspectFit" />
+            </view>
+            <view class="action-btn delete" @click.stop="confirmDelete(gym)">
+              <img src="/static/delete.png" class="action-icon" mode="aspectFit" />
+            </view>
           </view>
         </view>
+        <text class="gym-desc">{{ gym.description ? (gym.description.length > 20 ? gym.description.substring(0, 20) + '...' : gym.description) : '暂无描述' }}</text>
+        <text class="gym-meta">
+          {{ gym.equipment_count }} 个器材 · {{ formatDate(gym.create_time) }}
+        </text>
       </view>
     </view>
     
@@ -124,10 +124,9 @@
     />
     
     <!-- 右下角悬浮添加按钮 -->
-    <img src="/static/add.png" 
-      class="fab-button" 
-      mode="aspectFit" 
-      @click="showAddDialog = true">
+    <view class="fab-btn" @click="showAddDialog = true">
+      <image src="/static/add.png" class="fab-icon" mode="aspectFit" />
+    </view>
   </view>
 </template>
 
@@ -446,66 +445,86 @@ const deleteGym = async (inventoryId) => {
 }
 
 .gym-list {
-  padding: $size-5;
+  padding: $size-3 $size-5;
 
   .gym-card {
     background: rgba(252, 249, 248, 0.7);
     border: 1rpx solid rgba(160, 62, 64, 0.1);
-    border-radius: 32rpx;
-    padding: 40rpx 32rpx;
+    border-radius: 24rpx;
+    padding: $size-4 $size-4 $size-4 $size-5;
     margin-bottom: $size-3;
     display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.12);
+    flex-direction: column;
+    box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.08);
     position: relative;
   }
 
-  .gym-card .gym-info {
-    flex: 1;
-    margin-right: 120rpx;
-  }
-
-  .gym-card .gym-info .gym-name {
-    display: block;
-    font-size: 24px;
-    font-weight: 700;
-    color: rgb(160, 62, 64);
-    margin-bottom: 10rpx;
-  }
-
-  .gym-card .gym-info .gym-desc {
-    display: block;
-    font-size: $size-3;
-    color: #8E8E93;
-    margin-bottom: 15rpx;
-  }
-
-  .gym-card .gym-info .gym-meta {
-    display: block;
-    font-size: $size-2;
-    color: #8E8E93;
-  }
-
-  .gym-card .gym-actions {
-    position: absolute;
-    right: 20rpx;
+  .gym-card .gym-header {
     display: flex;
-    gap: 20rpx;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12rpx;
   }
 
-  .gym-card .gym-actions .action-btn {
-    width: 60rpx;
-    height: 60rpx;
-    border-radius: 30rpx;
+  .gym-card .gym-header .gym-name {
+    font-size: 32rpx;
+    font-weight: 800;
+    color: #d66d5d;
+    line-height: 21px;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .gym-card .gym-header .gym-actions {
+    display: flex;
+    gap: 8rpx;
+    flex-shrink: 0;
+    margin-left: 16rpx;
+  }
+
+  .gym-card .gym-header .gym-actions .action-btn {
+    width: 64rpx;
+    height: 64rpx;
+    border-radius: 14rpx;
     display: flex;
     justify-content: center;
     align-items: center;
+    background: rgba(160, 62, 64, 0.06);
+
+    &:active {
+      background: rgba(160, 62, 64, 0.15);
+    }
+
+    &.edit {
+      border-radius: 100rpx;
+      background-color: #f2f2f7;
+    }
+
+    &.delete {
+      border-radius: 50px;
+      background-color: #f2f2f7;
+    }
   }
 
-  .gym-card .gym-actions .action-btn .action-icon {
-    width: $size-5;
-    height: $size-5;
+  .gym-card .gym-header .gym-actions .action-btn .action-icon {
+    width: 32rpx;
+    height: 32rpx;
+  }
+
+  .gym-card .gym-desc {
+    display: block;
+    font-size: 26rpx;
+    color: #8E8E93;
+    //margin-bottom: 8rpx;
+    line-height: 1.4;
+  }
+
+  .gym-card .gym-meta {
+    display: block;
+    font-size: 22rpx;
+    color: #AEAEB2;
   }
 }
 
@@ -540,23 +559,29 @@ const deleteGym = async (inventoryId) => {
   }
 }
 
-.fab-button {
+.fab-btn {
   position: fixed;
-  right: 30rpx;
-  bottom: 100rpx;
-  width: 100rpx;
-  height: 100rpx;
+  right: $size-5;
+  bottom: 120rpx;
+  width: $size-12;
+  height: $size-12;
   border-radius: 50%;
+  background: $button-bg2;
   display: flex;
   justify-content: center;
   align-items: center;
-  box-shadow: 0 4rpx 12rpx rgba(7, 4, 4, 0.2);
-  z-index: 998;
-  margin-bottom: 20rpx;
+  box-shadow: 0 8rpx 24rpx rgba(216, 105, 106, 0.4);
+  z-index: 200;
+  transition: all 0.2s ease;
 
   &:active {
-    transform: scale(0.95);
-    opacity: 0.9;
+    transform: scale(0.9);
+    box-shadow: 0 4rpx 12rpx rgba(216, 105, 106, 0.3);
+  }
+
+  .fab-icon {
+    width: $size-6;
+    height: $size-6;
   }
 }
 

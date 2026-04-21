@@ -120,6 +120,28 @@ class ActionInfoResponse(BaseModel):
         from_attributes = True
 
 
+class ReplaceRecommendResponse(BaseModel):
+    """
+    替换动作推荐响应模型
+    基于原动作的目标肌群和用户健身房器材推荐可替换动作
+    """
+    action_id: str
+    name: str
+    action_category: str
+    difficulty_level: str
+    target_muscles: Optional[List[str]] = None
+    equipment_id: Optional[str] = None
+    equipment_name: Optional[str] = None
+    video_demo_url: Optional[str] = None
+    image_url: Optional[str] = None
+    safety_tips: Optional[str] = None
+    estimated_seconds: int
+    muscle_similarity: float = 0.0
+
+    class Config:
+        from_attributes = True
+
+
 class ActionLibraryResponse(BaseModel):
     """
     动作库响应模型

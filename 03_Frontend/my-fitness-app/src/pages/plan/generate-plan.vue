@@ -297,7 +297,7 @@ const generatePlan = async () => {
     } catch (error) {
         console.error('生成失败:', error)
         uni.showToast({
-            title: error.detail || error.message || '生成失败',
+            title: error.message || '生成失败',
             icon: 'none',
             duration: 3000
         })

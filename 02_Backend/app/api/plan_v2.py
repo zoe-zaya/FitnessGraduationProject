@@ -26,8 +26,10 @@ from app.schemas.plan import (
     ActionItemUpdateRequest,
     ActionItemReplaceRequest,
     SchedulePostponeRequest,
+    ScheduleCompleteRequest,
     DeleteResponse,
-    PostponeResponse
+    PostponeResponse,
+    ScheduleCompleteResponse
 )
 from app.core.security import get_current_user
 from app.services.plan_generator_v2 import PlanGeneratorV2
@@ -130,8 +132,7 @@ async def get_user_plans(
             plan_type=plan.plan_type.value if plan.plan_type else "FAT_LOSS",
             scheme_type=plan.scheme_type.value if plan.scheme_type else None,
             cycle_rule=plan.cycle_rule,
-            create_time=plan.create_time,
-            status=plan.status
+            create_time=plan.create_time
         ))
     
     return response_list
@@ -214,7 +215,8 @@ async def get_weekly_schedule(
             target_muscles=target_muscles,
             status=schedule.status.value if schedule.status else "PLANNED",
             postpone_count=schedule.postpone_count,
-            can_postpone=schedule.can_postpone(1)
+            can_postpone=schedule.can_postpone(1),
+            actual_duration_seconds=schedule.actual_duration_seconds
         ))
     
     return response_list
@@ -243,8 +245,6 @@ async def update_plan(
     
     if request.plan_name is not None:
         plan.plan_name = request.plan_name
-    if request.status is not None:
-        plan.status = request.status
     
     db.commit()
     db.refresh(plan)
@@ -518,8 +518,19 @@ async def replace_action_item(
     db: Session = Depends(get_db)
 ):
     """替换训练动作"""
-    from app.models.plan import SessionActionItem, PlanSession
+    from app.models.plan import SessionActionItem, PlanSession, TrainingPlan
     from app.models.equipment import inventory_equipment_rel
+
+    plan = db.query(TrainingPlan).filter(
+        TrainingPlan.plan_id == plan_id,
+        TrainingPlan.user_id == current_user.user_id
+    ).first()
+
+    if not plan:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="训练计划不存在或无权访问"
+        )
 
     item = db.query(SessionActionItem).join(PlanSession).filter(
         SessionActionItem.item_id == item_id,
@@ -662,6 +673,56 @@ async def postpone_schedule(
     )
 
 
+@router.post("/completeSchedule/{plan_id}/{schedule_id}", response_model=ScheduleCompleteResponse, summary="完成训练")
+async def complete_schedule(
+    plan_id: str,
+    schedule_id: str,
+    request: ScheduleCompleteRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    完成训练日程
+    
+    将指定日程标记为已完成，并记录实际训练时长。
+    同一日程不可重复完成。
+    """
+    schedule = db.query(TrainingSchedule).join(TrainingPlan).filter(
+        TrainingSchedule.schedule_id == schedule_id,
+        TrainingSchedule.plan_id == plan_id,
+        TrainingPlan.user_id == current_user.user_id
+    ).first()
+    
+    if not schedule:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="训练日程不存在或无权访问"
+        )
+    
+    if schedule.status == ScheduleStatusEnum.REST:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="休息日不可完成"
+        )
+    
+    if schedule.status == ScheduleStatusEnum.COMPLETED:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="该训练日程已完成，不可重复完成"
+        )
+    
+    schedule.status = ScheduleStatusEnum.COMPLETED
+    schedule.actual_duration_seconds = request.actual_duration_seconds
+    
+    db.commit()
+    db.refresh(schedule)
+    
+    return ScheduleCompleteResponse(
+        message="训练已完成",
+        actual_duration_seconds=schedule.actual_duration_seconds
+    )
+
+
 # ==================== 辅助函数 ====================
 
 def _build_plan_response(plan: TrainingPlan, db: Session) -> TrainingPlanResponse:
@@ -752,7 +813,8 @@ def _build_plan_response(plan: TrainingPlan, db: Session) -> TrainingPlanRespons
             target_muscles=target_muscles,
             status=schedule.status.value if schedule.status else "PLANNED",
             postpone_count=schedule.postpone_count,
-            can_postpone=schedule.can_postpone(1)
+            can_postpone=schedule.can_postpone(1),
+            actual_duration_seconds=schedule.actual_duration_seconds
         ))
     
     return TrainingPlanResponse(
@@ -765,7 +827,6 @@ def _build_plan_response(plan: TrainingPlan, db: Session) -> TrainingPlanRespons
         plan_type=plan.plan_type.value if plan.plan_type else "FAT_LOSS",
         scheme_type=plan.scheme_type.value if plan.scheme_type else None,
         cycle_rule=plan.cycle_rule,
-        status=plan.status,
         fitness_goal=plan.fitness_goal.value if plan.fitness_goal else None,
         training_part=plan.training_part,
         sessions=sessions_response,

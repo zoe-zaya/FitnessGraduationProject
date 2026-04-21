@@ -13,46 +13,28 @@
                     :key="plan.plan_id"
                     @click="viewPlanDetail(plan)"
                 >
-                    <view class="plan-header">
-                        <view class="plan-title-row">
+                    <view class="plan-left">
+                        <view class="plan-name-row">
                             <text class="plan-name">{{ plan.plan_name }}</text>
-                            <view class="plan-type-badge" :class="plan.plan_type.toLowerCase()">
-                                {{ getPlanTypeLabel(plan.plan_type) }}
-                            </view>
                         </view>
-                        <view class="plan-status" :class="plan.status.toLowerCase()">
-                            {{ getStatusLabel(plan.status) }}
+                        <view class="plan-meta">
+                            <view class="meta-item">
+                                <text class="meta-label">目标</text>
+                                <text class="meta-value" :class="plan.plan_type.toLowerCase()">{{ getPlanTypeLabel(plan.plan_type) }}</text>
+                            </view>
+                            <view class="meta-divider"></view>
+                            <view class="meta-item">
+                                <text class="meta-label">健身房</text>
+                                <text class="meta-value">{{ plan.inventory_name }}</text>
+                            </view>
                         </view>
                     </view>
-
-                    <view class="plan-info-tags">
-                        <view class="info-tag" v-if="plan.scheme_type">
-                            <uni-icons type="bars" size="14" color="#d8696a"></uni-icons>
-                            <text class="tag-text" :class="getDifficultyClass(plan.scheme_type)">{{ getDifficultyLabel(plan.scheme_type) }}</text>
+                    <view class="plan-right">
+                        <view class="action-btn edit" @click.stop="openRenameDialog(plan)">
+                            <image src="@/static/edit.png" class="action-icon" mode="aspectFit" />
                         </view>
-                        <view class="info-tag" v-else>
-                            <uni-icons type="fire" size="14" color="#d8696a"></uni-icons>
-                            <text class="tag-text">有氧+力量</text>
-                        </view>
-                        <view class="info-tag" v-if="plan.cycle_rule">
-                            <uni-icons type="reload" size="14" color="#8E8E93"></uni-icons>
-                            <text class="tag-text">{{ plan.cycle_rule }}</text>
-                        </view>
-                        <view class="info-tag">
-                            <uni-icons type="home" size="14" color="#8E8E93"></uni-icons>
-                            <text class="tag-text">{{ plan.inventory_name }}</text>
-                        </view>
-                    </view>
-
-                    <view class="plan-footer">
-                        <text class="create-time">创建于 {{ formatDate(plan.create_time) }}</text>
-                        <view class="action-buttons">
-                            <view class="action-btn edit" @click.stop="editPlan(plan)">
-                                <image src="@/static/edit.png" class="action-icon" mode="aspectFit" />
-                            </view>
-                            <view class="action-btn delete" @click.stop="confirmDelete(plan)">
-                                <image src="@/static/delete.png" class="action-icon" mode="aspectFit" />
-                            </view>
+                        <view class="action-btn delete" @click.stop="confirmDelete(plan)">
+                            <image src="@/static/delete.png" class="action-icon" mode="aspectFit" />
                         </view>
                     </view>
                 </view>
@@ -79,6 +61,25 @@
             @confirm="handleDeleteConfirm"
             @cancel="handleDeleteCancel"
         />
+
+        <view class="dialog-mask" v-if="renameDialogShow" @click="closeRenameDialog">
+            <view class="dialog-content" @click.stop>
+                <text class="dialog-title">修改计划名称</text>
+                <view class="form-item">
+                    <text class="form-label">计划名称</text>
+                    <textarea
+                        v-model="renameForm.plan_name"
+                        placeholder="请输入新的计划名称"
+                        class="form-input"
+                        maxlength="20"
+                    />
+                </view>
+                <view class="dialog-buttons">
+                    <button class="btn-cancel" @click="closeRenameDialog">取消</button>
+                    <button class="btn-confirm" @click="handleRename" :loading="renameLoading">确认</button>
+                </view>
+            </view>
+        </view>
     </view>
 </template>
 
@@ -86,7 +87,7 @@
 import { ref } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import request from '@/utils/request'
-import { API_V2, SCHEME_TYPES } from '@/utils/constants'
+import { API_V2 } from '@/utils/constants'
 import CustomModal from '@/components/CustomModal.vue'
 
 const planList = ref([])
@@ -94,13 +95,12 @@ const loading = ref(false)
 const deleteModalShow = ref(false)
 const deleteModalContent = ref('')
 const pendingDeletePlanId = ref('')
-
-const DIFFICULTY_MAP = {
-    'ONE_SPLIT': { label: '初级', class: 'difficulty-beginner' },
-    'TWO_SPLIT': { label: '中级', class: 'difficulty-intermediate' },
-    'THREE_SPLIT': { label: '中高级', class: 'difficulty-advanced' },
-    'FOUR_SPLIT': { label: '高级', class: 'difficulty-expert' }
-}
+const renameDialogShow = ref(false)
+const renameLoading = ref(false)
+const renameForm = ref({
+    plan_id: '',
+    plan_name: ''
+})
 
 onShow(async () => {
     await loadPlanList()
@@ -123,34 +123,6 @@ const getPlanTypeLabel = (planType) => {
     return planType === 'FAT_LOSS' ? '减脂' : '增肌'
 }
 
-const getStatusLabel = (status) => {
-    const map = {
-        'ACTIVE': '进行中',
-        'active': '进行中',
-        'ARCHIVED': '已归档',
-        'archived': '已归档'
-    }
-    return map[status] || status
-}
-
-const getDifficultyLabel = (schemeType) => {
-    const diff = DIFFICULTY_MAP[schemeType]
-    if (diff) return diff.label
-    const scheme = SCHEME_TYPES.find(s => s.value === schemeType)
-    return scheme ? scheme.label.split('（')[0] : schemeType
-}
-
-const getDifficultyClass = (schemeType) => {
-    const diff = DIFFICULTY_MAP[schemeType]
-    return diff ? diff.class : ''
-}
-
-const formatDate = (dateStr) => {
-    if (!dateStr) return ''
-    const date = new Date(dateStr)
-    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
-}
-
 const navigateToGenerate = () => {
     uni.navigateTo({ url: '/pages/plan/generate-plan' })
 }
@@ -159,8 +131,41 @@ const viewPlanDetail = (plan) => {
     uni.navigateTo({ url: `/pages/plan/plan-detail?plan_id=${plan.plan_id}` })
 }
 
-const editPlan = (plan) => {
-    uni.navigateTo({ url: `/pages/plan/plan-edit?plan_id=${plan.plan_id}` })
+const openRenameDialog = (plan) => {
+    renameForm.value = {
+        plan_id: plan.plan_id,
+        plan_name: plan.plan_name
+    }
+    renameDialogShow.value = true
+}
+
+const closeRenameDialog = () => {
+    renameDialogShow.value = false
+    renameForm.value = {
+        plan_id: '',
+        plan_name: ''
+    }
+}
+
+const handleRename = async () => {
+    if (!renameForm.value.plan_name || renameForm.value.plan_name.trim().length === 0) {
+        uni.showToast({ title: '请输入计划名称', icon: 'none' })
+        return
+    }
+    renameLoading.value = true
+    try {
+        await request.put(`${API_V2.PLAN_UPDATE}/${renameForm.value.plan_id}`, {
+            plan_name: renameForm.value.plan_name.trim()
+        })
+        uni.showToast({ title: '修改成功', icon: 'success' })
+        closeRenameDialog()
+        await loadPlanList()
+    } catch (error) {
+        console.error('修改名称失败:', error)
+        uni.showToast({ title: '修改失败', icon: 'none' })
+    } finally {
+        renameLoading.value = false
+    }
 }
 
 const confirmDelete = (plan) => {
@@ -199,7 +204,7 @@ const deletePlan = async (planId) => {
 
 .container {
     min-height: 100vh;
-    background-color: $fitness-secondary;
+    background-color: #ffffff;
     padding: 0 0 $size-5;
     font-family: Manrope;
 }
@@ -240,10 +245,12 @@ const deletePlan = async (planId) => {
     .plan-card {
         background: $glass-bg1;
         border-radius: $size-4;
-        padding: $size-4;
+        padding: $size-4 $size-4 $size-4 $size-5;
         margin-bottom: $size-3;
         box-shadow: 0 2rpx 10rpx $border-shadow;
         border: 2rpx solid $fitness-border;
+        display: flex;
+        align-items: center;
         transition: all 0.2s ease;
 
         &:active {
@@ -251,158 +258,98 @@ const deletePlan = async (planId) => {
             box-shadow: 0 1rpx 6rpx rgba(0, 0, 0, 0.08);
         }
 
-        .plan-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: $size-3;
+        .plan-left {
+            flex: 1;
+            min-width: 0;
+            margin-right: $size-3;
 
-            .plan-title-row {
-                display: flex;
-                align-items: center;
-                flex: 1;
-                margin-right: $size-2;
+            .plan-name-row {
+                margin-bottom: $size-2;
 
                 .plan-name {
                     font-size: $size-4;
                     font-weight: 700;
-                    color: $color-input;
-                    margin-right: $size-2;
+                    color: $uni-primary;
                     overflow: hidden;
                     text-overflow: ellipsis;
                     white-space: nowrap;
-                    max-width: 360rpx;
-                    line-height: 1.2;
-                }
-
-                .plan-type-badge {
-                    font-size: $size-3;
-                    padding: $size-1 $size-2;
-                    border-radius: $size-2;
-                    color: $fitness-primary;
-                    font-weight: 700;
-                    flex-shrink: 0;
-
-                    &.fat_loss {
-                        background: rgba(160, 62, 64, 0.12);
-                        color: $color-primary;
-                    }
-
-                    &.muscle_gain {
-                        background: $color-primary-light;
-                        color: $color-primary;
-                    }
+                    line-height: 1.3;
                 }
             }
 
-            .plan-status {
-                font-size: $size-3;
-                padding: $size-1 $size-3;
-                border-radius: $size-3;
-                font-weight: 700;
-                flex-shrink: 0;
-
-                &.active {
-                    background: $uni-success-bg;
-                    color: $uni-success;
-                }
-
-                &.archived {
-                    background: $fitness-secondary;
-                    color: $color-secondory;
-                }
-            }
-        }
-
-        .plan-info-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: $size-2;
-            margin-bottom: $size-3;
-            padding: $size-3;
-            background: $fitness-secondary;
-            border-radius: $size-4;
-
-            .info-tag {
+            .plan-meta {
                 display: flex;
                 align-items: center;
-                gap: $size-1;
-                padding: $size-1 $size-2;
-                background: $fitness-primary;
-                border-radius: $size-2;
-                border: 1rpx solid $fitness-border;
 
-                .tag-text {
-                    font-size: $size-3;
-                    color: $color-input;
-                    font-weight: 700;
-                    line-height: 1.4;
+                .meta-item {
+                    display: flex;
+                    align-items: center;
+                    gap: 6rpx;
 
-                    &.difficulty-beginner {
-                        color: $uni-success;
+                    .meta-label {
+                        font-size: 22rpx;
+                        color: $color-secondory;
+                        font-weight: 525;
                     }
 
-                    &.difficulty-intermediate {
-                        color: $uni-warning;
-                    }
+                    .meta-value {
+                        font-size: 22rpx;
+                        color: $color-input;
+                        font-weight: 700;
 
-                    &.difficulty-advanced {
-                        color: $color-primary;
-                    }
+                        &.fat_loss {
+                            color: $color-input;
+                        }
 
-                    &.difficulty-expert {
-                        color: $uni-error;
+                        &.muscle_gain {
+                            color: $color-input;
+                        }
                     }
+                }
+
+                .meta-divider {
+                    width: 2rpx;
+                    height: 20rpx;
+                    background: $fitness-border;
+                    margin: 0 $size-2;
                 }
             }
         }
 
-        .plan-footer {
+        .plan-right {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            padding-top: $size-3;
-            border-top: 1rpx solid $fitness-border;
+            gap: $size-2;
+            flex-shrink: 0;
 
-            .create-time {
-                font-size: $size-3;
-                color: $color-secondory;
-                font-weight: 525;
-            }
-
-            .action-buttons {
+            .action-btn {
+                width: 64rpx;
+                height: 64rpx;
+                border-radius: 50%;
                 display: flex;
-                gap: $size-3;
+                justify-content: center;
+                align-items: center;
+                transition: all 0.15s ease;
 
-                .action-btn {
-                    width: $size-7;
-                    height: $size-7;
-                    border-radius: 50%;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    transition: all 0.15s ease;
+                &:active {
+                    transform: scale(0.85);
+                }
 
-                    &:active {
-                        transform: scale(0.9);
+                &.edit {
+                    background: $fitness-secondary;
+
+                    .action-icon {
+                        width: 32rpx;
+                        height: 32rpx;
                     }
+                }
 
-                    &.edit {
-                        background: $uni-warning-bg;
+                &.delete {
+                    background: $fitness-secondary;
 
-                        .action-icon {
-                            width: 36rpx;
-                            height: 36rpx;
-                        }
-                    }
-
-                    &.delete {
-                        background: $uni-error-bg;
-
-                        .action-icon {
-                            width: 36rpx;
-                            height: 36rpx;
-                        }
+                    .action-icon {
+                        width: 32rpx;
+                        height: 32rpx;
                     }
                 }
             }
@@ -462,6 +409,96 @@ const deletePlan = async (planId) => {
     .fab-icon {
         width: $size-6;
         height: $size-6;
+    }
+}
+
+.dialog-mask {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: end;
+    z-index: 999;
+
+    .dialog-content {
+        background: $fitness-primary;
+        border-radius: $size-4 $size-4 0 0;
+        padding: $size-5;
+        width: stretch;
+        box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.15);
+
+        .dialog-title {
+            display: block;
+            font-size: $size-5;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: $size-4;
+            color: $color-input;
+        }
+
+        .form-item {
+            margin-bottom: $size-4;
+
+            .form-label {
+                font-weight: 700;
+                font-size: 24rpx;
+                display: block;
+                margin-left: $size-1;
+                color: $color-secondory;
+                margin-bottom: $size-2;
+            }
+
+            .form-input {
+                width: 100%;
+                background: $fitness-secondary;
+                border: 2rpx solid $fitness-border;
+                border-radius: $size-4;
+                padding: 20rpx 30rpx;
+                font-size: $size-4;
+                font-family: Manrope;
+                color: $color-input;
+                box-sizing: border-box;
+                height: 96rpx;
+            }
+        }
+
+        .dialog-buttons {
+            display: flex;
+            gap: $size-3;
+            margin-top: $size-5;
+
+            .btn-cancel, .btn-confirm {
+                flex: 1;
+                height: 96rpx;
+                border-radius: $size-4;
+                font-size: $size-5;
+                font-weight: 700;
+                display: flex;
+                align-content: center;
+                align-items: center;
+                justify-content: center;
+                border: none;
+            }
+
+            .btn-cancel {
+                background: transparent;
+                color: $color-primary;
+                border: 2rpx solid $color-primary;
+            }
+
+            .btn-cancel:after {
+                border: none;
+            }
+
+            .btn-confirm {
+                background: $button-bg2;
+                color: $fitness-primary;
+            }
+        }
     }
 }
 </style>

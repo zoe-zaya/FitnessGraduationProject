@@ -416,7 +416,6 @@ def _build_plan_response(plan: TrainingPlan, db: Session) -> TrainingPlanRespons
         total_duration_minutes=plan.total_duration_minutes,
         fitness_goal=plan.fitness_goal,
         training_part=plan.training_part,
-        status=plan.status,
         sessions=sessions_response,
         is_expired=_is_plan_expired(plan)
     )

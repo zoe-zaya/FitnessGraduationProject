@@ -91,10 +91,14 @@ class SchedulePostponeRequest(BaseModel):
     days: int = Field(..., ge=1, le=3, description="延后天数（1-3 天）")
 
 
+class ScheduleCompleteRequest(BaseModel):
+    """完成训练日程请求模型"""
+    actual_duration_seconds: int = Field(..., ge=0, description="实际训练时长（秒）")
+
+
 class PlanUpdateRequest(BaseModel):
     """更新训练计划基本信息请求模型"""
     plan_name: Optional[str] = Field(None, max_length=128, description="计划名称")
-    status: Optional[str] = Field(None, description="计划状态")
 
 
 # ==================== 响应模型 ====================
@@ -150,6 +154,7 @@ class TrainingScheduleResponse(BaseModel):
     status: str
     postpone_count: int = 0
     can_postpone: bool = True
+    actual_duration_seconds: Optional[int] = None
     
     class Config:
         from_attributes = True
@@ -167,7 +172,6 @@ class TrainingPlanResponse(BaseModel):
     plan_type: str  # ✅ V2.1 新增
     scheme_type: Optional[str] = None  # ✅ V2.1 新增
     cycle_rule: Optional[str] = None  # ✅ V2.1 新增
-    status: str = "active"
     fitness_goal: Optional[str] = None
     training_part: Optional[str] = None
     sessions: List[PlanSessionResponse] = []
@@ -187,7 +191,6 @@ class PlanListResponse(BaseModel):
     scheme_type: Optional[str] = None
     cycle_rule: Optional[str] = None
     create_time: datetime
-    status: str
     
     class Config:
         from_attributes = True
@@ -204,3 +207,9 @@ class PostponeResponse(BaseModel):
     message: str
     new_scheduled_date: date
     remaining_postpone_days: int
+
+
+class ScheduleCompleteResponse(BaseModel):
+    """完成训练响应模型"""
+    message: str
+    actual_duration_seconds: int

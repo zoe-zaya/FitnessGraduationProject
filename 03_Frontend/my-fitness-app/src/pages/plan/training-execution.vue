@@ -2,8 +2,6 @@
     <view class="container">
         <view class="header">
             <view class="header-top">
-                <text class="back-btn" @click="goBack">←</text>
-                <text class="header-title">训练执行</text>
                 <text class="header-time">{{ formatElapsedTime(elapsedSeconds) }}</text>
             </view>
             <view class="session-tabs">
@@ -14,7 +12,7 @@
                     :key="session.session_id"
                     @click="switchSession(index)"
                 >
-                    <text class="tab-icon">{{ SESSION_TYPE_MAP[session.session_type]?.icon }}</text>
+                    <image class="tab-icon" :src="SESSION_TYPE_MAP[session.session_type]?.icon" mode="aspectFit"></image>
                     <text class="tab-label">{{ SESSION_TYPE_MAP[session.session_type]?.label }}</text>
                 </view>
             </view>
@@ -104,18 +102,19 @@
         </view>
 
         <view class="bottom-bar">
-            <button class="btn prev-btn" v-if="hasPrevSession" @click="prevSession">
-                <text>上一阶段</text>
-            </button>
-            <button class="btn action-btn" @click="toggleTraining">
-                <text>{{ isTraining ? '暂停' : isStarted ? '继续' : '开始训练' }}</text>
-            </button>
-            <button class="btn next-btn" v-if="hasNextSession" @click="nextSession">
-                <text>下一阶段</text>
-            </button>
-            <button class="btn finish-btn" v-if="allSessionsCompleted" @click="finishTraining">
-                <text>完成训练</text>
-            </button>
+            <template v-if="!isStarted">
+                <button class="btn action-btn" @click="startTraining">
+                    <text>开始训练</text>
+                </button>
+            </template>
+            <template v-else>
+                <button class="btn action-btn" @click="togglePauseResume">
+                    <text>{{ isTraining ? '暂停' : '继续' }}</text>
+                </button>
+                <button class="btn finish-btn" @click="finishTraining">
+                    <text>结束训练</text>
+                </button>
+            </template>
         </view>
 
         <RestCountdown
@@ -135,9 +134,19 @@ import request from '@/utils/request'
 import { API_V2, SESSION_TYPE_MAP, DIFFICULTY_MAP, DEFAULT_REST_SECONDS } from '@/utils/constants'
 import RestCountdown from '@/components/RestCountdown.vue'
 
+const PART_LABEL_MAP = {
+    '推': '推日',
+    '腿': '腿日',
+    '拉': '拉日'
+}
+
+const SESSION_ORDER = ['WARMUP', 'MAIN', 'COOLDOWN']
+
 const planId = ref('')
 const scheduleId = ref('')
 const sessionId = ref('')
+const trainingPart = ref('')
+const allSessions = ref([])
 const sessions = ref([])
 const activeSessionIndex = ref(0)
 const currentActionIndex = ref(0)
@@ -156,6 +165,12 @@ onLoad((options) => {
     planId.value = options.plan_id || ''
     scheduleId.value = options.schedule_id || ''
     sessionId.value = options.session_id || ''
+    trainingPart.value = options.training_part ? decodeURIComponent(options.training_part) : ''
+
+    if (trainingPart.value) {
+        const label = PART_LABEL_MAP[trainingPart.value] || trainingPart.value
+        uni.setNavigationBarTitle({ title: `${label}训练` })
+    }
 })
 
 onMounted(async () => {
@@ -170,31 +185,15 @@ const currentSession = computed(() => {
     return sessions.value[activeSessionIndex.value]
 })
 
-const hasPrevSession = computed(() => {
-    return activeSessionIndex.value > 0
-})
-
-const hasNextSession = computed(() => {
-    return activeSessionIndex.value < sessions.value.length - 1
-})
-
-const allSessionsCompleted = computed(() => {
-    if (sessions.value.length === 0) return false
-    for (const session of sessions.value) {
-        if (session.action_items.length === 0) continue
-        for (const item of session.action_items) {
-            if (!completedActions.value.has(item.item_id)) {
-                return false
-            }
-        }
-    }
-    return true
-})
-
 const loadPlanDetail = async () => {
     try {
         const res = await request.get(`${API_V2.PLAN_DETAIL}/${planId.value}`)
-        sessions.value = res.sessions || []
+        allSessions.value = res.sessions || []
+
+        sessions.value = trainingPart.value
+            ? allSessions.value.filter(s => s.training_part === trainingPart.value)
+                .sort((a, b) => SESSION_ORDER.indexOf(a.session_type) - SESSION_ORDER.indexOf(b.session_type))
+            : allSessions.value
 
         if (sessionId.value) {
             const index = sessions.value.findIndex(s => s.session_id === sessionId.value)
@@ -221,18 +220,6 @@ const switchSession = (index) => {
     activeSessionIndex.value = index
     currentActionIndex.value = 0
     currentSetIndex.value = 0
-}
-
-const prevSession = () => {
-    if (hasPrevSession.value) {
-        switchSession(activeSessionIndex.value - 1)
-    }
-}
-
-const nextSession = () => {
-    if (hasNextSession.value) {
-        switchSession(activeSessionIndex.value + 1)
-    }
 }
 
 const selectAction = (index) => {
@@ -290,12 +277,22 @@ const updateWeightRecords = async (item) => {
     }
 }
 
-const toggleTraining = () => {
-    if (!isStarted.value) {
-        startTimer()
-        isStarted.value = true
-        isTraining.value = true
-    } else if (isTraining.value) {
+const startTraining = () => {
+    uni.showModal({
+        title: '确认开始训练',
+        content: '确定要开始本次训练吗？同一训练计划每天只能训练一次。',
+        success: (res) => {
+            if (res.confirm) {
+                startTimer()
+                isStarted.value = true
+                isTraining.value = true
+            }
+        }
+    })
+}
+
+const togglePauseResume = () => {
+    if (isTraining.value) {
         pauseTimer()
         isTraining.value = false
     } else {
@@ -346,16 +343,19 @@ const onRestSkip = () => {
     showRestModal.value = false
 }
 
-const finishTraining = async () => {
-    stopTimer()
+const finishTraining = () => {
+    pauseTimer()
 
     uni.showModal({
-        title: '确认完成',
-        content: '确定要结束本次训练吗？',
+        title: '确认结束训练',
+        content: '确定要结束本次训练吗？结束后将保存训练记录。',
         success: async (res) => {
             if (res.confirm) {
+                stopTimer()
                 try {
-                    await request.post(`${API_V2.SCHEDULE_POSTPONE}/${planId.value}/${scheduleId.value}`, { completed: true })
+                    await request.post(`${API_V2.SCHEDULE_COMPLETE}/${planId.value}/${scheduleId.value}`, {
+                        actual_duration_seconds: elapsedSeconds.value
+                    })
                     uni.showToast({ title: '训练已完成', icon: 'success' })
                     setTimeout(() => {
                         uni.navigateBack()
@@ -363,7 +363,12 @@ const finishTraining = async () => {
                 } catch (error) {
                     console.error('完成训练失败:', error)
                     uni.showToast({ title: '操作失败', icon: 'none' })
+                    resumeTimer()
+                    isTraining.value = true
                 }
+            } else {
+                resumeTimer()
+                isTraining.value = true
             }
         }
     })
@@ -390,69 +395,62 @@ const goBack = () => {
 <style lang="scss" scoped>
 .container {
     min-height: 100vh;
-    background: #F5F5F5;
+    background: $fitness-secondary;
     padding-bottom: 200rpx;
+    font-family: Manrope;
 }
 
 .header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    padding: 40rpx 40rpx 30rpx;
+    background: linear-gradient(135deg, #a03e40 0%, #c05557 100%);
+    padding: $size-5 $size-5 $size-4;
 
     .header-top {
         display: flex;
         align-items: center;
-        justify-content: space-between;
-        margin-bottom: 30rpx;
-
-        .back-btn {
-            font-size: 40rpx;
-            color: #FFFFFF;
-            padding: 10rpx;
-        }
-
-        .header-title {
-            font-size: 36rpx;
-            font-weight: bold;
-            color: #FFFFFF;
-        }
+        justify-content: center;
+        margin-bottom: $size-4;
 
         .header-time {
-            font-size: 32rpx;
+            font-size: $size-6;
             color: #FFFFFF;
-            font-family: 'DIN Alternate', -apple-system;
+            font-weight: 700;
+            font-family: Manrope;
         }
     }
 
     .session-tabs {
         display: flex;
-        gap: 16rpx;
+        gap: $size-2;
 
         .session-tab {
             flex: 1;
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
             align-items: center;
-            padding: 16rpx;
+            justify-content: center;
+            padding: $size-2;
             background: rgba(255, 255, 255, 0.2);
-            border-radius: 16rpx;
+            border-radius: $size-2;
             transition: all 0.3s;
 
             &.active {
-                background: rgba(255, 255, 255, 0.95);
+                background: rgba(255, 255, 255, 0.7);
+                flex-direction: row;
 
                 .tab-icon, .tab-label {
-                    color: #667eea;
+                    color: $color-primary;
                 }
             }
 
             .tab-icon {
-                font-size: 32rpx;
-                margin-bottom: 4rpx;
-                color: rgba(255, 255, 255, 0.9);
+                width: $size-5;
+                height: $size-5;
+                margin-bottom: $size-1;
             }
 
             .tab-label {
-                font-size: 22rpx;
+                font-size: $size-3;
+                font-weight: 700;
                 color: rgba(255, 255, 255, 0.9);
             }
         }
@@ -460,25 +458,25 @@ const goBack = () => {
 }
 
 .content {
-    padding: 30rpx 40rpx;
+    padding: $size-4 $size-5;
 }
 
 .current-session {
     .session-header {
-        margin-bottom: 30rpx;
+        margin-bottom: $size-4;
 
         .session-name {
             display: block;
-            font-size: 32rpx;
-            font-weight: bold;
-            color: #333333;
-            margin-bottom: 8rpx;
+            font-size: $size-4;
+            font-weight: 700;
+            color: $color-input;
+            margin-bottom: $size-1;
         }
 
         .session-info {
             display: block;
-            font-size: 26rpx;
-            color: #666666;
+            font-size: $size-3;
+            color: $color-secondory;
         }
     }
 }
@@ -486,17 +484,18 @@ const goBack = () => {
 .action-list {
     display: flex;
     flex-direction: column;
-    gap: 24rpx;
+    gap: $size-3;
 
     .action-card {
-        background: #FFFFFF;
-        border-radius: 24rpx;
-        padding: 28rpx;
-        box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.08);
+        background: $glass-bg1;
+        border-radius: $size-4;
+        padding: $size-4;
+        box-shadow: 0 2rpx 10rpx $border-shadow;
+        border: 2rpx solid $fitness-border;
         transition: all 0.3s;
 
         &.active {
-            border: 2rpx solid #667eea;
+            border: 2rpx solid $color-primary;
         }
 
         &.completed {
@@ -508,24 +507,24 @@ const goBack = () => {
         }
 
         .action-main {
-            margin-bottom: 20rpx;
+            margin-bottom: $size-3;
 
             .action-info {
                 display: flex;
                 align-items: center;
-                margin-bottom: 16rpx;
+                margin-bottom: $size-2;
 
                 .action-name {
-                    font-size: 30rpx;
-                    font-weight: bold;
-                    color: #333333;
-                    margin-right: 16rpx;
+                    font-size: $size-4;
+                    font-weight: 700;
+                    color: $color-input;
+                    margin-right: $size-2;
                 }
 
                 .action-difficulty {
-                    font-size: 20rpx;
-                    padding: 4rpx 12rpx;
-                    border-radius: 8rpx;
+                    font-size: $size-3;
+                    padding: $size-1 $size-2;
+                    border-radius: $size-1;
                     color: #FFFFFF;
                 }
             }
@@ -533,55 +532,55 @@ const goBack = () => {
             .action-params {
                 display: flex;
                 align-items: center;
-                gap: 12rpx;
+                gap: $size-2;
 
                 .param-item {
                     display: flex;
                     align-items: baseline;
 
                     .param-value {
-                        font-size: 32rpx;
-                        font-weight: bold;
-                        color: #333333;
+                        font-size: $size-4;
+                        font-weight: 700;
+                        color: $color-input;
                     }
 
                     .param-label {
-                        font-size: 22rpx;
-                        color: #666666;
-                        margin-left: 4rpx;
+                        font-size: $size-3;
+                        color: $color-label;
+                        margin-left: $size-1;
                     }
                 }
 
                 .param-divider {
-                    font-size: 24rpx;
-                    color: #999999;
+                    font-size: $size-3;
+                    color: $color-secondory;
                 }
             }
         }
 
         .action-progress {
             display: flex;
-            gap: 12rpx;
+            gap: $size-2;
             flex-wrap: wrap;
 
             .set-indicator {
-                width: 64rpx;
-                height: 64rpx;
+                width: $size-8;
+                height: $size-8;
                 border-radius: 50%;
-                background: #F5F5F5;
+                background: $fitness-secondary;
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 transition: all 0.3s;
 
                 .set-num {
-                    font-size: 26rpx;
-                    font-weight: bold;
-                    color: #666666;
+                    font-size: $size-3;
+                    font-weight: 700;
+                    color: $color-label;
                 }
 
                 &.current {
-                    background: #667eea;
+                    background: $button-bg2;
 
                     .set-num {
                         color: #FFFFFF;
@@ -589,7 +588,7 @@ const goBack = () => {
                 }
 
                 &.completed {
-                    background: #34C759;
+                    background: $uni-success;
 
                     .set-num {
                         color: #FFFFFF;
@@ -599,28 +598,32 @@ const goBack = () => {
         }
 
         .weight-section {
-            margin-top: 20rpx;
-            padding-top: 20rpx;
-            border-top: 1rpx solid #F0F0F0;
+            margin-top: $size-3;
+            padding-top: $size-3;
+            border-top: 2rpx solid $fitness-border;
 
             .weight-label {
                 display: block;
-                font-size: 24rpx;
-                color: #666666;
-                margin-bottom: 12rpx;
+                font-size: $size-3;
+                font-weight: 700;
+                color: $color-label;
+                margin-bottom: $size-2;
             }
 
             .weight-inputs {
                 display: flex;
-                gap: 12rpx;
+                gap: $size-2;
 
                 .weight-input {
                     flex: 1;
-                    height: 72rpx;
-                    background: #F5F5F5;
-                    border-radius: 12rpx;
-                    padding: 0 16rpx;
-                    font-size: 26rpx;
+                    height: $size-9;
+                    background: $fitness-primary;
+                    border-radius: $size-2;
+                    border: 2rpx solid rgba(160, 62, 64, 0.1);
+                    padding: 0 $size-2;
+                    font-size: $size-3;
+                    font-family: Manrope;
+                    color: $color-input;
                     text-align: center;
                 }
             }
@@ -630,11 +633,11 @@ const goBack = () => {
 
 .empty-actions {
     text-align: center;
-    padding: 60rpx 0;
+    padding: $size-8 0;
 
     .empty-text {
-        font-size: 28rpx;
-        color: #999999;
+        font-size: $size-4;
+        color: $color-secondory;
     }
 }
 
@@ -644,35 +647,32 @@ const goBack = () => {
     left: 0;
     right: 0;
     display: flex;
-    gap: 16rpx;
-    padding: 24rpx 40rpx;
-    padding-bottom: calc(24rpx + env(safe-area-inset-bottom));
-    background: #FFFFFF;
-    border-top: 1rpx solid #E5E5E5;
+    gap: $size-2;
+    padding: $size-3 $size-5;
+    padding-bottom: calc(#{$size-3} + env(safe-area-inset-bottom));
+    background: $fitness-primary;
+    border-top: 2rpx solid $fitness-border;
+    box-shadow: 0 -2rpx 10rpx $border-shadow;
 
     .btn {
         flex: 1;
-        height: 88rpx;
-        border-radius: 44rpx;
+        height: $size-12;
+        border-radius: $size-6;
         border: none;
-        font-size: 28rpx;
-        font-weight: 600;
+        font-size: $size-4;
+        font-weight: 700;
+        font-family: Manrope;
         display: flex;
         align-items: center;
         justify-content: center;
 
-        &.prev-btn, &.next-btn {
-            background: #F5F5F5;
-            color: #666666;
-        }
-
         &.action-btn {
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: $button-bg2;
             color: #FFFFFF;
         }
 
         &.finish-btn {
-            background: #34C759;
+            background: $uni-success;
             color: #FFFFFF;
         }
     }

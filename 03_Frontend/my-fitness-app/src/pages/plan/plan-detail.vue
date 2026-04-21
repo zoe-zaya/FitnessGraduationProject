@@ -37,7 +37,7 @@
                     </view>
                     <view class="postpone-btn" v-if="canPostpone" @click="showPostponeOptions">
                         <uni-icons type="redo" size="16" color="#a03e40"></uni-icons>
-                        <text class="postpone-text">延后</text>
+                        <text class="postpone-text">延后训练</text>
                     </view>
                 </view>
 
@@ -83,9 +83,12 @@
             </view>
         </view>
 
-        <view class="bottom-bar">
-            <button class="btn edit-btn" @click="editPlan">编辑计划</button>
-            <button class="btn start-btn" @click="startExecution">开始训练</button>
+        <view class="bottom-bar" v-if="showEditBtn || showStartBtn || isCurrentDayCompleted">
+            <button class="btn edit-btn" @click="editPlan" v-if="showEditBtn">编辑计划</button>
+            <button class="btn start-btn" @click="startExecution" v-if="showStartBtn">开始训练</button>
+            <view class="completed-tip" v-if="isCurrentDayCompleted">
+                <text class="completed-text">今日已完成训练</text>
+            </view>
         </view>
     </view>
 </template>
@@ -102,7 +105,6 @@ const planInfo = ref({
     plan_type: '',
     scheme_type: '',
     cycle_rule: '',
-    status: '',
     sessions: [],
     weekly_schedule: []
 })
@@ -182,6 +184,31 @@ const todayMusclesDesc = computed(() => {
     return PART_MUSCLES_DESC[part] || currentSchedule.value?.target_muscles?.join(' · ') || ''
 })
 
+const isSelectedDayToday = computed(() => {
+    const idx = selectedDayIndex.value
+    if (idx < 0) return false
+    const days = weekDays.value
+    return days[idx]?.isToday || false
+})
+
+const isCurrentDayRest = computed(() => {
+    return currentSchedule.value?.status === 'REST'
+})
+
+const showEditBtn = computed(() => {
+    return !isCurrentDayRest.value
+})
+
+const showStartBtn = computed(() => {
+    if (!isSelectedDayToday.value || isCurrentDayRest.value) return false
+    if (currentSchedule.value?.status === 'COMPLETED') return false
+    return true
+})
+
+const isCurrentDayCompleted = computed(() => {
+    return currentSchedule.value?.status === 'COMPLETED'
+})
+
 const selectDay = (index) => {
     selectedDayIndex.value = index
 }
@@ -217,17 +244,18 @@ const getDifficultyColor = (level) => {
 
 const startExecution = () => {
     const part = todayTrainingPart.value
+    const scheduleId = currentSchedule.value?.schedule_id || ''
     const sessions = planInfo.value.sessions || []
     const mainSession = sessions.find(s => s.session_type === 'MAIN' && s.training_part === part)
     if (mainSession && mainSession.session_id) {
         uni.navigateTo({
-            url: `/pages/plan/training-execution?plan_id=${planId.value}&session_id=${mainSession.session_id}`
+            url: `/pages/plan/training-execution?plan_id=${planId.value}&session_id=${mainSession.session_id}&schedule_id=${scheduleId}&training_part=${encodeURIComponent(part || '')}`
         })
     } else {
         const fallback = sessions.find(s => s.session_type === 'MAIN')
         if (fallback && fallback.session_id) {
             uni.navigateTo({
-                url: `/pages/plan/training-execution?plan_id=${planId.value}&session_id=${fallback.session_id}`
+                url: `/pages/plan/training-execution?plan_id=${planId.value}&session_id=${fallback.session_id}&schedule_id=${scheduleId}&training_part=${encodeURIComponent(part || '')}`
             })
         }
     }
@@ -237,17 +265,7 @@ const viewActionDetail = (action) => {
     uni.navigateTo({ url: `/pages/action/action-detail?action_id=${action.action_id}` })
 }
 
-const replaceAction = (action, session) => {
-    uni.navigateTo({
-        url: `/pages/plan/select-action?session_id=${session.session_id}&plan_id=${planId.value}&session_type=${session.session_type}&action_id=${action.item_id}&mode=replace`
-    })
-}
 
-const addActionToSession = (session) => {
-    uni.navigateTo({
-        url: `/pages/plan/select-action?session_id=${session.session_id}&plan_id=${planId.value}&session_type=${session.session_type}&mode=add`
-    })
-}
 
 const confirmDeleteAction = (action) => {
     uni.showModal({
@@ -273,7 +291,8 @@ const deleteActionItem = async (itemId) => {
 }
 
 const editPlan = () => {
-    uni.navigateTo({ url: `/pages/plan/plan-edit?plan_id=${planId.value}` })
+    const part = todayTrainingPart.value || ''
+    uni.navigateTo({ url: `/pages/plan/plan-edit?plan_id=${planId.value}&training_part=${encodeURIComponent(part)}` })
 }
 
 const canPostpone = computed(() => {
@@ -319,7 +338,8 @@ const postponeSchedule = async (scheduleId, days) => {
 
 .container {
     min-height: 100vh;
-    background: $fitness-secondary;
+    //background: $fitness-secondary;
+    background: #FFFFFF;
     padding-bottom: 140rpx;
     font-family: Manrope;
 }
@@ -640,11 +660,33 @@ const postponeSchedule = async (scheduleId, days) => {
             background: $button-bg2;
             color: #FFFFFF;
         }
+
+        &.completed-tip {
+            background: $fitness-secondary;
+            color: $color-secondory;
+        }
+    }
+
+    .completed-tip {
+        flex: 1;
+        height: $size-12;
+        border-radius: $size-6;
+        background: $fitness-secondary;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        .completed-text {
+            font-size: $size-4;
+            font-weight: 700;
+            color: $color-secondory;
+            font-family: Manrope;
+        }
     }
 }
 
 .rest-card {
-    background: $glass-bg1;
+    background: rgba(252, 249, 248, 0.8);
     border-radius: $size-5;
     padding: $size-10 $size-5;
     text-align: center;

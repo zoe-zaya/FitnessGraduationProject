@@ -151,8 +151,7 @@ class PlanGeneratorV2:
             scheme_type=scheme_type,
             cycle_rule=cycle_rule,
             fitness_goal=plan_type,
-            training_part=training_part,
-            status="active"
+            training_part=training_part
         )
         
         # ========== 步骤 4: 根据日程生成各次训练的计划 ==========
